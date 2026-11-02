@@ -29,8 +29,8 @@ export class FramePlayer {
   }
 
   async load(url, still, name) {
-    const tok = ++this.token;
-    this.stop(); this.frames = []; this.name = name || 'frame';
+    this.stop(); const tok = ++this.token;
+    this.frames = []; this.name = name || 'frame';
     this.still.src = still || ''; this.still.hidden = false; this.canvas.hidden = true;
     this.strip.replaceChildren(); this.counter.textContent = '拆帧中…';
     try {
@@ -88,7 +88,7 @@ export class FramePlayer {
     cancelAnimationFrame(this.raf); this.last = performance.now(); this.raf = requestAnimationFrame(this.tick);
   }
   pause() { this.playing = false; this.playBtn.textContent = '▶'; this.playBtn.setAttribute('aria-label', '播放'); cancelAnimationFrame(this.raf); }
-  stop() { cancelAnimationFrame(this.raf); }
+  stop() { this.token++; cancelAnimationFrame(this.raf); }    // 也作废正在下载 / 拆帧的那次 load：弹窗关了就别再开始播
   toggle() { if (this.playing) this.pause(); else this.play(); }
   step(d) { this.pause(); this.show(this.i + d); }
   cycleSpeed() {
