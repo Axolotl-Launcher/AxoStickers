@@ -17,13 +17,21 @@ function normalize(s, special) {
 }
 
 export function loadGallery() {
-  G.ready ||= fetch('out/stickers.json').then((r) => r.json()).then((d) => {
+  G.ready ||= fetch('out/stickers.json').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }).then((d) => {
     G.items = [...d.stickers.map((s) => normalize(s, false)), ...d.specials.map((s) => normalize(s, true))];
     for (const it of G.items) G.byKey.set(it.key, it);
     return G;
-  });
+  }).catch((e) => { G.ready = null; throw e; });    // 失败了不缓存，下次还能重试
   return G.ready;
 }
+
+// 加载失败的提示单独放一块，不覆盖原来的空状态
+export function loadFailed(box, what) {
+  loadOk(box); box.hidden = true;
+  box.before(el('div', { class: 'empty load-error' }, el('b', { text: `${what}没加载出来` }), '网络抖了一下，过会儿再试。', el('br'), el('br'),
+    el('button', { class: 'btn primary', type: 'button', text: '重试', onclick: () => location.reload() })));
+}
+export function loadOk(box) { box.parentElement.querySelector('.load-error')?.remove(); }
 
 function card(it) {
   const img = el('img', {
@@ -52,7 +60,8 @@ function apply() {
 }
 
 export async function initGallery() {
-  await loadGallery();
+  try { await loadGallery(); } catch (e) { loadFailed($('#g-empty'), '图鉴'); throw e; }
+  loadOk($('#g-empty'));
   const grid = $('#grid');
   grid.append(...G.items.map((it) => (it.card = card(it))));
 

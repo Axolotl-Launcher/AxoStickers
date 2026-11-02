@@ -1,10 +1,12 @@
 // 工坊作品：workshop/index.json 里的投稿（GitHub Actions 用真引擎出的图），按最新 / 最多赞排。
 import { $, el, encodePath, animated, unobserve } from './util.js';
+import { loadFailed, loadOk } from './gallery.js';
 
 export const WS = { entries: [], ready: null, sort: 'new' };
 
 export function loadWorkshop() {
-  WS.ready ||= fetch('workshop/index.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : { entries: [] })).catch(() => ({ entries: [] }))
+  WS.ready ||= fetch('workshop/index.json', { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .catch((e) => { WS.ready = null; throw e; })    // 失败了不缓存，下次还能重试
     .then((d) => {
       WS.entries = (d.entries || []).map((e) => ({
         ...e, key: String(e.issue), gifUrl: encodePath(e.gif), still: `thumbs/w${e.issue}.webp`, coverUrl: encodePath(e.cover),
@@ -35,7 +37,8 @@ function render() {
 }
 
 export async function initWorkshop() {
-  await loadWorkshop();
+  try { await loadWorkshop(); } catch (e) { loadFailed($('#ws-empty'), '工坊作品'); throw e; }
+  loadOk($('#ws-empty'));
   const chips = $('#ws-sort');
   chips.addEventListener('click', (ev) => {
     const b = ev.target.closest('.chip'); if (!b) return;

@@ -26,6 +26,7 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: read
+      pages: read       # configure-pages 要读 Pages 设置
     steps:
       - uses: actions/checkout@v7
         with:

@@ -1,4 +1,5 @@
 # 工坊的点赞 = 投稿 issue 上的 👍。每 6 小时数一次写进 workshop/index.json，访客不用每人都去调 GitHub API。
+# 顺便兜底：要是之前哪次出图后没能触发部署，main 比网站新，这里补一次。
 name: 工坊 · 数点赞
 
 on:
@@ -32,8 +33,15 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python workshop/tools/workshop.py likes --push
       - name: 更新网站
-        if: steps.likes.outputs.changed != '0'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: gh workflow run pages.yml --ref main
+          CHANGED: ${{ steps.likes.outputs.changed }}
+        run: |
+          head=$(gh api "repos/$GH_REPO/commits/main" --jq .sha)
+          live=$(gh run list --workflow pages.yml --branch main --status success --limit 1 --json headSha --jq '.[0].headSha // ""')
+          if [ "$CHANGED" != 0 ] || [ "$head" != "$live" ]; then
+            for i in 1 2 3 4; do gh workflow run pages.yml --ref main && exit 0; sleep $((i * 10)); done
+            exit 1
+          fi
+          echo "网站已经是最新的（$head）"

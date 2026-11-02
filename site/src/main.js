@@ -22,8 +22,9 @@ for (let i = 0; i < 14; i++) {
 
 let view = null;
 const ready = { gallery: null, workshop: null };
-const gallery = () => (ready.gallery ||= initGallery().then(() => initHero(G.items, () => view === 'gallery').catch(console.error)));
-const workshop = () => (ready.workshop ||= initWorkshop());
+const retryable = (key, init) => (ready[key] ||= init().catch((e) => { ready[key] = null; console.error(e); }));
+const gallery = () => retryable('gallery', () => initGallery().then(() => { initHero(G.items, () => view === 'gallery').catch(console.error); }));
+const workshop = () => retryable('workshop', initWorkshop);
 
 function show(v) {
   if (v !== view) {

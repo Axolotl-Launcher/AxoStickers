@@ -43,6 +43,11 @@ def extract(body):
     if not isinstance(r, dict): raise ValueError('配方应该是一个 JSON 对象')
     return r
 
+def consented(body):
+    """「### 授权」那一段里的复选框勾上了没有（表单里是必填，但 API 建的 / 改过正文的 issue 绕得过去）。"""
+    m = re.search(r'###\s*授权\s*\n(.*?)(?=\n###\s|\Z)', body or '', re.S)
+    return bool(m and re.search(r'^\s*[-*]\s*\[[xX]\]', m.group(1), re.M))
+
 def show(v):
     """把用户输入放进行内代码再回显：不会被当成 @提及 或 markdown。"""
     return '`' + re.sub(r'\s+', ' ', str(v)[:40]).replace('`', "'") + '`'
@@ -147,22 +152,35 @@ def git(*args, check=True):
 
 BOT = ('-c', 'user.name=github-actions[bot]', '-c', 'user.email=41898282+github-actions[bot]@users.noreply.github.com')
 
+class Abort(Exception):
+    """change() 在最新的 index 上发现这次改动不该做了：status 写进 $GITHUB_OUTPUT，errs 回复给 issue。"""
+    def __init__(self, status, errs=()):
+        super().__init__(status); self.status, self.errs = status, list(errs)
+
+def fetch_main():
+    for k in range(5):                              # GitHub 偶尔抖一下，有限次退避重试
+        if git('fetch', '-q', 'origin', 'main', check=False).returncode == 0: return
+        time.sleep(2 ** k * 3)
+    raise SystemExit('git fetch failed 5 times')
+
 def apply(change, paths, message, push):
     """改 index.json（和几个文件）。push=True 时在最新的 main 上重放这次改动再推送：
-    几张投稿同时在跑也不会互相覆盖（不用 concurrency 组，那个会把排队的直接丢掉）。"""
+    几张投稿同时在跑也不会互相覆盖（不用 concurrency 组，那个会把排队的直接丢掉）。
+    change(idx) 每次都在最新的 index 上跑，可以抛 Abort 放弃。"""
     if not push:
         idx = load_index(); change(idx); save_index(idx); return True
     keep = {p: open(os.path.join(ROOT, p), 'rb').read() for p in paths if os.path.exists(os.path.join(ROOT, p))}
     for attempt in range(6):
-        git('fetch', '-q', 'origin', 'main')
+        fetch_main()
         git('checkout', '-q', '-f', '-B', 'workshop-bot', 'origin/main')
+        idx = load_index(); change(idx)
         for p in paths:
             full = os.path.join(ROOT, p)
             if p in keep:
                 os.makedirs(os.path.dirname(full), exist_ok=True)
                 with open(full, 'wb') as f: f.write(keep[p])
             elif os.path.exists(full): os.remove(full)
-        idx = load_index(); change(idx); save_index(idx)
+        save_index(idx)
         git('add', '-A', '--', 'workshop')
         if git('diff', '--cached', '--quiet', check=False).returncode == 0:
             print('nothing to commit'); return False
@@ -171,26 +189,53 @@ def apply(change, paths, message, push):
         print('push rejected, retrying'); time.sleep(3 + attempt * 4)
     raise SystemExit('push failed 6 times')
 
+def limits(idx, rec, author, num):
+    """查重 + 每人每天的配额，按给定的 index 算（发布前查一次，重放到最新 index 上时再查一次）。"""
+    errs, others = [], [e for e in idx['entries'] if e['issue'] != num]
+    same = next((e for e in others if e['recipe'] == rec), None)
+    if same: errs.append(f"工坊里已经有一模一样的了：#{same['issue']}（@{same['author']}）。换个表情或者特效再来")
+    now = datetime.now(timezone.utc)
+    recent = [e for e in others if e['author'] == author and now - datetime.fromisoformat(e['date']) < timedelta(days=1)]
+    if len(recent) >= PER_DAY: errs.append(f'24 小时内每人最多发 {PER_DAY} 张，明天再来')
+    return errs
+
+def still_current(num, body):
+    """出图要十几秒：提交前再看一眼 issue，被改过正文（新的那次运行会处理）、关了或被撤下就不发了。"""
+    token, repo = os.environ.get('GITHUB_TOKEN'), os.environ.get('GITHUB_REPOSITORY')
+    if not token or not repo: return
+    try: cur = api(f'issues/{num}', token, repo)
+    except Exception as e: print('issue check skipped:', e); return   # 查不到就按事件里的来，别让抖动卡住发布
+    if any(l.get('name') == 'rejected' for l in cur.get('labels', [])): raise Abort('stale')
+    if cur.get('state') != 'open' or (cur.get('body') or '') != body: raise Abort('stale')
+
+MARK = '<!-- workshop:published -->'
+
+def published_comment(e, repo):
+    return (f'出图了 ✅\n\n![{e["text"]}](https://github.com/{repo}/blob/main/{e["gif"]}?raw=true)\n\n'
+            f'- 配方：{describe(e["recipe"])}\n- 网站上几分钟后就能看到：{SITE}#/workshop\n'
+            f'- 觉得好笑就给这个 issue 点个 👍，工坊的「最多赞」按它排（每 6 小时数一次）\n\n'
+            f'机器人顺手把 issue 关了，点赞不受影响。\n{MARK}\n')
+
+def invalid_comment(errs):
+    return ('没能出图 ❌\n\n' + '\n'.join(f'- {e}' for e in errs) +
+            '\n\n改一下正文里的配方（或者回网站重新点「发布到工坊」把新配方贴过来），保存后机器人会再试一次。\n')
+
 # ---------------- commands ----------------
 def cmd_publish(push):
-    ev = event(); issue = ev['issue']
+    ev = event(); issue = ev['issue']; body = issue.get('body') or ''
     num = int(issue['number']); author = str(issue['user']['login']); repo = os.environ.get('GITHUB_REPOSITORY', 'Axolotl-Launcher/AxoStickers')
     idx = load_index()
-    if any(e['issue'] == num for e in idx['entries']):
-        print('already published'); return outputs(status='skip', number=num)
+    done = next((e for e in idx['entries'] if e['issue'] == num), None)
+    if done:                                       # 已经发过：交给工作流补回复 / 关 issue / 部署（都是幂等的）
+        print('already published'); write_comment(published_comment(done, repo)); return outputs(status='skip', number=num)
     try:
-        rec, errs = validate(extract(issue.get('body') or ''))
+        rec, errs = validate(extract(body))
     except ValueError as e:
         rec, errs = None, [str(e)]
-    if not errs:
-        same = next((e for e in idx['entries'] if e['recipe'] == rec), None)
-        if same: errs.append(f"工坊里已经有一模一样的了：#{same['issue']}（@{same['author']}）。换个表情或者特效再来")
-        now = datetime.now(timezone.utc)
-        recent = [e for e in idx['entries'] if e['author'] == author and now - datetime.fromisoformat(e['date']) < timedelta(days=1)]
-        if len(recent) >= PER_DAY: errs.append(f'24 小时内每人最多发 {PER_DAY} 张，明天再来')
+    if not consented(body): errs.append('没勾选「授权」：要同意按 GPL-3.0-only 发布才能进工坊')
+    if not errs: errs = limits(idx, rec, author, num)
     if errs:
-        write_comment('没能出图 ❌\n\n' + '\n'.join(f'- {e}' for e in errs) +
-                      '\n\n改一下正文里的配方（或者回网站重新点「发布到工坊」把新配方贴过来），保存后机器人会再试一次。\n')
+        write_comment(invalid_comment(errs))
         return outputs(status='invalid', number=num)
     gif, cover = f'workshop/gifs/{num}.gif', f'workshop/covers/{num}.png'
     t0 = time.time()
@@ -199,12 +244,17 @@ def cmd_publish(push):
     entry = dict(issue=num, text=rec['text'], recipe=rec, author=author,
                  date=datetime.now(timezone.utc).replace(microsecond=0).isoformat(), likes=0, gif=gif, cover=cover)
     def add(idx):
+        errs = limits(idx, rec, author, num)         # 别的投稿可能刚抢先落库
+        if errs: raise Abort('invalid', errs)
+        still_current(num, body)
         idx['entries'] = [e for e in idx['entries'] if e['issue'] != num] + [entry]
-    apply(add, [gif, cover], f'工坊：#{num}「{rec["text"]}」by @{author}', push)
-    write_comment(f'出图了 ✅\n\n![{rec["text"]}](https://github.com/{repo}/blob/main/{gif}?raw=true)\n\n'
-                  f'- 配方：{describe(rec)}\n- 网站上几分钟后就能看到：{SITE}#/workshop\n'
-                  f'- 觉得好笑就给这个 issue 点个 👍，工坊的「最多赞」按它排（每 6 小时数一次）\n\n'
-                  '机器人顺手把 issue 关了，点赞不受影响。\n')
+    try:
+        apply(add, [gif, cover], f'工坊：#{num}「{rec["text"]}」by @{author}', push)
+    except Abort as a:
+        print('aborted:', a.status)
+        if a.errs: write_comment(invalid_comment(a.errs))
+        return outputs(status=a.status, number=num)
+    write_comment(published_comment(entry, repo))
     outputs(status='published', number=num)
 
 def cmd_reject(push):
