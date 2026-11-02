@@ -2,7 +2,9 @@
 // 内置的动作 / 特效 / 文字动画在 src/components/**.axo.js，和用户写的、从文件载入的、组件库里的走同一条路：
 // 源码 -> compile() -> Registry。辅助函数（addrot、bump、icon、put…）直接在作用域里，this 是这一层的上下文（见 scene.js）。
 import * as API from './api.js';
-import { instrument, __loop, GUARD } from './loopguard.js';
+import { instrument, bounded } from './loopguard.js';
+
+const RealFunction = Function;                                  // 沙盒启动后全局的 Function 会被换成插保险的版本（lockEval）；编译自己已经插过了，用原版，行号也准
 
 export const TYPES = {
   motion: '动作', fx: '特效', textanim: '文字动画', prop: '道具', wear: '帽子', face: '表情', skin: '皮肤', scene: '场景',
@@ -32,16 +34,15 @@ export function compile(src, origin = 'component', { guard = false } = {}) {
   let code = src, fn;
   if (guard) { try { code = instrument(src); } catch (e) { throw new ComponentError(e.message, e.line); } }
   try {
-    fn = new Function(...names, 'component', '__loop', `"use strict";\n${code}\n//# sourceURL=axo-component-${origin.replace(/[^\w.-]/g, '_')}.js`);
+    fn = new RealFunction(...names, 'component', `"use strict";\n${code}\n//# sourceURL=axo-component-${origin.replace(/[^\w.-]/g, '_')}.js`);
   } catch (e) {
     throw new ComponentError(`语法错误：${e.message}`, lineOf(e));
   }
   try {
-    GUARD.until = performance.now() + 1000;
-    fn(...names.map((k) => API[k]), component, __loop);
+    bounded(1000, () => fn(...names.map((k) => API[k]), component));
   } catch (e) {
     throw new ComponentError(e instanceof ComponentError ? e.message : `运行出错：${e.message}`, e.line || lineOf(e));
-  } finally { GUARD.until = Infinity; }
+  }
   if (!found.length) throw new ComponentError('这段代码里没有调用 component({...})');
   return found;
 }

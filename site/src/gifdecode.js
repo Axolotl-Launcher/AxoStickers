@@ -40,12 +40,16 @@ function deinterlace(px, w, h) {
 }
 
 // 返回 { width, height, frames: [{ data: Uint8ClampedArray(RGBA 整帧), delay: ms }] }
-export function decodeGif(buf) {
+// maxBytes：解出来的帧（每帧一整张 RGBA）总共最多占多少内存，超了就只留前面的帧（truncated = true）
+export function decodeGif(buf, { maxBytes = 96 << 20 } = {}) {
   const b = new Uint8Array(buf);
   if (String.fromCharCode(...b.subarray(0, 3)) !== 'GIF') throw new Error('不是 GIF');
   let p = 6;
   const u16 = () => { const v = b[p] | (b[p + 1] << 8); p += 2; return v; };
   const width = u16(), height = u16(), packed = b[p++]; p += 2;
+  if (!width || !height || width > 2048 || height > 2048) throw new Error('GIF 尺寸不对');
+  const maxFrames = Math.max(1, Math.floor(maxBytes / (width * height * 4)));
+  let truncated = false;
   const table = (n) => { const t = b.subarray(p, p + 3 * n); p += 3 * n; return t; };
   const gct = packed & 0x80 ? table(1 << ((packed & 7) + 1)) : null;
   const canvas = new Uint8ClampedArray(width * height * 4);
@@ -94,8 +98,9 @@ export function decodeGif(buf) {
       }
     }
     frames.push({ data: canvas.slice(), delay: gce.delay || 100 });
+    if (frames.length >= maxFrames) { truncated = true; break; }
     prev = { disposal: gce.disposal, x, y, w, h, saved };
     gce = { disposal: 0, delay: 0, transparent: -1 };
   }
-  return { width, height, frames };
+  return { width, height, frames, truncated };
 }

@@ -49,6 +49,11 @@ export function makeCanvas(w, h) {
   if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(Math.max(1, w), Math.max(1, h));
   const c = document.createElement('canvas'); c.width = Math.max(1, w); c.height = Math.max(1, h); return c;
 }
+// 画布 -> 图片字节（OffscreenCanvas 用 convertToBlob，普通 canvas 用 toBlob）
+export async function canvasBytes(c, type = 'image/png') {
+  const blob = c.convertToBlob ? await c.convertToBlob({ type }) : await new Promise((r) => c.toBlob(r, type));
+  return new Uint8Array(await blob.arrayBuffer());
+}
 
 // ---------------- matrices (rig.py) ----------------
 export function rotEuler(rx = 0, ry = 0, rz = 0) {        // 度数，先 X 再 Y 再 Z

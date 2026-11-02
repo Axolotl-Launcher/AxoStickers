@@ -14,12 +14,17 @@ export class Runner {
   start() {
     this.frame?.remove();
     this.ready = false;
+    // 旧沙盒没回完的请求（导出、缩略图…）不会再有回音了：直接算失败，别让调用的地方一直等；排队的消息也作废（ready 后会重发工程）
+    for (const p of this.pending.values()) p.reject(new Error('预览重开了，再试一次'));
+    this.pending.clear(); this.queue = [];
     const f = this.frame = document.createElement('iframe');
     if (this.sandboxed) f.setAttribute('sandbox', 'allow-scripts');     // 不给 allow-same-origin：碰不到本站的存储和页面
     f.src = 'sandbox.html';
     f.title = '预览';
     f.className = 'stage-iframe';
     f.setAttribute('allow', '');
+    let loads = 0;                                                       // 组件代码让预览框跳走了（本站 CSP 的 frame-src 会拦住别的网站）：重开
+    f.addEventListener('load', () => { if (++loads > 1 && this.frame === f) { this.emit('fatal', { message: '组件想让预览跳到别的网页，已经拦下并重开' }); this.start(); } });
     this.mount.append(f);
     clearTimeout(this.bootTimer);
     this.bootTimer = setTimeout(() => { if (!this.ready) this.emit('boot-failed', {}); }, 12000);

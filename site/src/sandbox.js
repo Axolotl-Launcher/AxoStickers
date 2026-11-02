@@ -2,10 +2,21 @@
 import './gen/fonts.css';
 import { W, Scene, builtinRegistry, renderer, loadFont, exportGif, renderFrames } from './engine/index.js';
 import { compile, sourceFor } from './engine/components.js';
-import { makeCanvas } from './engine/core.js';
+import { makeCanvas, canvasBytes } from './engine/core.js';
 import { zipStore } from './engine/zip.js';
 import { BUILTIN_MODEL } from './engine/core.js';
 import { loadModel } from './engine/model.js';
+import { lockEval } from './engine/loopguard.js';
+
+// 只在不透明来源里干活（<iframe sandbox="allow-scripts">）：别的网站要是不加 sandbox 直接嵌这个页面，
+// 组件代码就会以本站的身份运行，能读本站的存储。本机开发 / CI 出图（localhost、127.0.0.1）例外，但只认同源发来的消息。
+const OPAQUE = self.origin === 'null';
+const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+if (!OPAQUE && !LOCAL) {
+  document.body.textContent = '这个页面只能在创意工坊编辑器的沙盒里打开。';
+  throw new Error('sandbox.html must run in an opaque-origin sandboxed iframe');
+}
+lockEval();                                                  // eval / Function 造出来的代码也要插循环保险
 
 const reg = builtinRegistry();
 const builtins = new Map(reg.items);                         // 改过的内置组件可以恢复原样
@@ -88,9 +99,30 @@ function loadUser(items) {                                   // 用户 / 文件 
   return errors;
 }
 
+// 组件有两个来源：「我的组件」（components 消息）和工程自带的（project 消息）。
+// 某个来源不再带某段代码了，就把它注册的组件撤掉（顶掉的内置组件恢复原样），免得新工程用到上一个工程的旧代码。
+const owned = { mine: new Set(), project: new Set() };
+function dropOrigin(origin) {
+  let n = 0;
+  for (const [key, e] of [...reg.items]) {
+    if (e.origin !== origin) continue;
+    reg.remove(e.def.type, e.def.id); n++;
+    const b = builtins.get(key); if (b) reg.put(b.def, b.source, b.origin);
+  }
+  userSources.delete(origin);
+  return n;
+}
+function syncUser(kind, items) {
+  const errors = loadUser(items), now = new Set(items.map((i) => i.origin)), other = owned[kind === 'mine' ? 'project' : 'mine'];
+  let dropped = 0;
+  for (const o of owned[kind]) if (!now.has(o) && !other.has(o)) dropped += dropOrigin(o);
+  owned[kind] = now;
+  return { errors, dropped };
+}
+
 const handlers = {
   async components({ items = [] }) {
-    const errors = loadUser(items);
+    const { errors } = syncUser('mine', items);
     post({ type: 'catalog', errors, catalog: catalog() });
     if (project) await build();
   },
@@ -104,8 +136,8 @@ const handlers = {
     post({ type: 'catalog', errors: [], catalog: catalog() }); if (project) await build(); },
   async project({ project: p }) {
     project = p;
-    const errors = loadUser(p.components || []);
-    if (errors.length) post({ type: 'catalog', errors, catalog: catalog() });
+    const { errors, dropped } = syncUser('project', p.components || []);
+    if (errors.length || dropped) post({ type: 'catalog', errors, catalog: catalog() });
     await build();
   },
   transport({ playing: pl, speed: sp, t, onion: on }) {
@@ -130,13 +162,13 @@ const handlers = {
         const files = [];
         for (let i = 0; i < frames.length; i++) {
           g.putImageData(new ImageData(frames[i], c.width, c.height), 0, 0);
-          files.push({ name: `frame_${String(i + 1).padStart(3, '0')}.png`, data: new Uint8Array(await (await c.convertToBlob({ type: 'image/png' })).arrayBuffer()) });
+          files.push({ name: `frame_${String(i + 1).padStart(3, '0')}.png`, data: await canvasBytes(c) });
         }
         bytes = zipStore(files); mime = 'application/zip';
       } else if (format === 'png') {
         const c = makeCanvas(size || s.P.size, size || s.P.size), b = makeCanvas(W, W);
-        s.frame(b.getContext('2d'), tHold); c.getContext('2d').drawImage(b, 0, 0, c.width, c.height);
-        bytes = new Uint8Array(await (await c.convertToBlob({ type: 'image/png' })).arrayBuffer()); mime = 'image/png';
+        s.frame(b.getContext('2d'), currentT(performance.now())); c.getContext('2d').drawImage(b, 0, 0, c.width, c.height);   // 正在播就存当下这一帧
+        bytes = await canvasBytes(c); mime = 'image/png';
       }
       post({ type: 'exported', req, mime, bytes: bytes.buffer }, [bytes.buffer]);
     } catch (e) {
@@ -186,8 +218,18 @@ const handlers = {
   ping({ n }) { post({ type: 'pong', n }); },
 };
 
+// 组件在定时器、await 之后抛的错（包括循环保险）不经过 scene.guard：也记成组件错误，出图时就不会悄悄发布
+const asyncFail = (err) => {
+  if (!scene) return;
+  scene.fail('async', '定时器或异步代码', err instanceof Error ? err : new Error(String(err)));
+  post({ type: 'errors', errors: errorsOf(scene) }); reported = scene.errors.size;
+};
+window.addEventListener('error', (e) => asyncFail(e.error || e.message));
+window.addEventListener('unhandledrejection', (e) => asyncFail(e.reason));
+
 window.addEventListener('message', async (e) => {
   if (e.source !== parent || !e.data || typeof e.data.type !== 'string' || !handlers[e.data.type]) return;
+  if (!OPAQUE && e.origin !== location.origin) return;                // 本机不加沙盒跑的时候只认同源
   try { await handlers[e.data.type](e.data); } catch (err) { post({ type: 'fatal', message: String(err && err.message || err) }); }
 });
 

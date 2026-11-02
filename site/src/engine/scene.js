@@ -4,7 +4,7 @@
 import { E, K, W, H, BOX, mod, rng, strHash, clamp, win, headWorld, itemXf, xfPoint, projectBox, hx, makeCanvas } from './core.js';
 import { layout, charSprite, star, sq, polygon, line } from './draw.js';
 import { resolveParams, lineOf } from './components.js';
-import { GUARD } from './loopguard.js';
+import { bounded } from './loopguard.js';
 import { Ax } from './ax.js';
 import { normalizeProject } from './project.js';
 
@@ -97,8 +97,7 @@ export class Scene {
   fail(type, id, e) { const k = `${type}:${id}`; if (!this.errors.has(k)) this.errors.set(k, { message: e.message || String(e), line: e.line ?? lineOf(e) }); }
   guard(ctx, fn) {
     if (ctx.broken) return undefined;
-    GUARD.until = performance.now() + 400;                 // 单次调用超过 0.4 秒就当死循环
-    try { return fn(); } catch (e) { ctx.broken = true; this.fail(ctx.def.type, ctx.def.id, e); return undefined; } finally { GUARD.until = Infinity; }
+    try { return bounded(400, fn); } catch (e) { ctx.broken = true; this.fail(ctx.def.type, ctx.def.id, e); return undefined; }   // 单次调用超过 0.4 秒就当死循环
   }
   call(ctx, name, ...args) { const f = ctx.def[name]; return f ? this.guard(ctx, () => f.apply(ctx, args)) : undefined; }
   weight(l, t) {                                          // 图层在这一时刻的权重：强度 × 时间段（两头 0.08 淡入淡出）
@@ -109,9 +108,14 @@ export class Scene {
 
   skinFn() {
     const s = this.P.skin, def = s && this.reg.get('skin', s.component);
+    if (s && !def) this.fail('skin', s.component, new Error('组件库里没有这个皮肤'));
     if (!def || !def.tint) return null;
     const ctx = Object.assign(Object.create(Object.assign(Object.create(this), def)), { def, layer: s, p: resolveParams(def, s.params) });
-    return (rgb, part) => { try { const c = def.tint.call(ctx, rgb, part); return Array.isArray(c) ? c : rgb; } catch (e) { this.fail('skin', def.id, e); return rgb; } };
+    let broken = false;
+    return (rgb, part) => {                                // 每个面的颜色都过一遍 tint：也要有期限，坏了一次就不再调
+      if (broken) return rgb;
+      try { const c = bounded(400, () => def.tint.call(ctx, rgb, part)); return Array.isArray(c) ? c : rgb; } catch (e) { broken = true; this.fail('skin', def.id, e); return rgb; }
+    };
   }
 
   // ---- loop helpers ----
@@ -160,7 +164,9 @@ export class Scene {
 
   faceDict(t) {
     const L = this.faceLayer;
-    let f = !L ? {} : L.face ? { ...L.face } : { ...(this.reg.get('face', L.component)?.face || E.faces[L.component] || {}) };
+    const known = L && !L.face && (this.reg.get('face', L.component)?.face || E.faces[L.component]);
+    if (L && !L.face && !known) this.fail('face', L.component, new Error('组件库里没有这个表情'));
+    let f = !L ? {} : L.face ? { ...L.face } : { ...(known || {}) };
     if ((!L || L.blink !== false) && (f.L || 'open') === 'open' && (f.R || 'open') === 'open') {
       if (this.ph(t, 1, 0.37) < 0.045) f.L = f.R = 'closed';
     }
@@ -177,17 +183,20 @@ export class Scene {
     else {
       a = blend(base, act.map(([m, k]) => { const x = cloneAx(base); this.call(m, 'move', x, t); return [x, k]; }));
     }
-    for (const s of this.scenes) if (s.def.move) this.call(s, 'move', a, t);
+    for (const s of this.scenes) if (s.def.move && this.weight(s.layer, t) > 0) this.call(s, 'move', a, t);
     this.dress(a, t, act.some(([m, k]) => m.def.holdsItself && k >= 0.5));
     return a;
   }
   dress(a, t, holdsItself) {
     if (!('_face' in a.pose)) { const f = this.faceDict(t); if (Object.keys(f).length) a.pose._face = f; }
-    for (const w of this.wears) if (this.reg.get('wear', w.component)) this.wear(a, w.component, { gear: true });
+    for (const w of this.wears) {                         // 找不到的道具 / 帽子记成错误（出图会因此失败），别悄悄少画一样
+      if (this.reg.get('wear', w.component)) this.wear(a, w.component, { gear: true });
+      else this.fail('wear', w.component, new Error('组件库里没有这个帽子'));
+    }
     if (!holdsItself) {
       for (const p of this.props) {
         const def = this.reg.get('prop', p.component);
-        if (!def) continue;
+        if (!def) { this.fail('prop', p.component, new Error('组件库里没有这个道具')); continue; }
         const q = p.params || {};
         const opt = { s: q.s ?? (def.sprite ? K.SPR_S : 0.9) };
         for (const k of ['x', 'y', 'z', 'rx', 'ry', 'rz']) if (q[k] !== undefined && q[k] !== '') opt[k] = Number(q[k]);
@@ -215,7 +224,7 @@ export class Scene {
   itemPt(idx = 0, p = [0, 0, 0]) { return this.proj(xfPoint(itemXf(this.A.pose, this.A.pose._items[idx]), p)); }
 
   hooks(ctx, name, t) {
-    for (const s of this.scenes) this.call(s, name, ctx, t);
+    for (const s of this.scenes) if (this.weight(s.layer, t) > 0) this.call(s, name, ctx, t);
     for (const m of this.motions) if (this.weight(m.layer, t) > 0) this.call(m, name, ctx, t);
   }
   drawFx(ctx, t, layer) {
@@ -270,8 +279,19 @@ export class Scene {
   // ---- 一帧：画到 ctx（W×H） ----
   frame(ctx, t) {
     this.wl = this.waterLevel;
-    const own = this.scenes.find((s) => s.def.render && !s.broken);
-    if (own) { ctx.save(); this.background(ctx); this.call(own, 'render', ctx, t); ctx.restore(); return; }
+    this.rippleOn = this.P.water.ripples; this.rippleDx = 0;   // 动作组件每帧可以改这两个（比如卡顿关掉涟漪），过了它的时间段要恢复
+    // 接管整帧的场景组件（水龙卷）：只在它的时间段里接管，两头淡入淡出
+    const own = this.scenes.find((s) => s.def.render && !s.broken && this.weight(s.layer, t) > 0.001);
+    const k = own ? Math.min(1, this.weight(own.layer, t)) : 0;
+    if (own && k >= 0.999) { ctx.save(); this.background(ctx); this.call(own, 'render', ctx, t); ctx.restore(); return; }
+    this.plainFrame(ctx, t);
+    if (own) {
+      const c = this.sceneCanvas ||= makeCanvas(W, H), g = c.getContext('2d');
+      g.save(); this.background(g); this.call(own, 'render', g, t); g.restore();
+      ctx.save(); ctx.globalAlpha = k; ctx.drawImage(c, 0, 0); ctx.restore();
+    }
+  }
+  plainFrame(ctx, t) {
     ctx.save();
     this.background(ctx);
     this.hooks(ctx, 'drawSky', t);

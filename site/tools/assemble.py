@@ -18,7 +18,9 @@ def thumb(src, name):
     dst = os.path.join(THUMBS, name + '.webp')
     if os.path.exists(dst) and os.path.getmtime(dst) >= os.path.getmtime(src): return 0
     im = Image.open(src); im.seek(0)                      # GIF 取第一帧（就是封面）
-    im = im.convert('RGB').resize((TS, TS), Image.LANCZOS)
+    im = im.convert('RGBA')
+    flat = Image.new('RGB', im.size, (255, 255, 255)); flat.paste(im, mask=im.getchannel('A'))   # 透明底的投稿：垫白底，别变成黑底
+    im = flat.resize((TS, TS), Image.LANCZOS)
     im.save(dst, 'WEBP', quality=82, method=6)
     return 1
 
@@ -26,7 +28,9 @@ def preview(src, name):
     """GIF -> 240px 无声循环 mp4（H.264，几十 KB）。"""
     dst = os.path.join(PREVIEWS, name + '.mp4')
     if os.path.exists(dst) and os.path.getmtime(dst) >= os.path.getmtime(src): return 0
-    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', src, '-vf', f'scale={TS}:{TS}:flags=lanczos,format=yuv420p',
+    # 先垫一层白底再转成不带透明的视频（透明底的投稿不然会变成黑底）；白底和 GIF 本身是同一路帧，时间对得上
+    vf = f'[0:v]scale={TS}:{TS}:flags=lanczos,format=rgba,split[a][b];[a]drawbox=c=white:t=fill[bg];[bg][b]overlay=format=auto,format=yuv420p'
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', src, '-filter_complex', vf,
                     '-c:v', 'libx264', '-preset', 'slow', '-crf', '26', '-movflags', '+faststart', '-an', dst], check=True)
     return 1
 

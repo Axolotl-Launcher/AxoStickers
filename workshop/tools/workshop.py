@@ -13,7 +13,7 @@ issue 正文是不可信输入：只当 JSON 解析（不 eval），结构、大
 publish 阶段不信 render 交回来的任何东西：工程从事件里重新读、重新校验，只拿那张 GIF，当图片解码、检查、重新编码。
 回复正文写到 $RUNNER_TEMP/workshop/comment.md，状态写到 $GITHUB_OUTPUT。
 """
-import os, sys, re, json, time, hashlib, subprocess, unicodedata, urllib.request
+import os, sys, re, json, math, time, hashlib, subprocess, unicodedata, urllib.request
 from datetime import datetime, timezone, timedelta
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -39,7 +39,8 @@ def parse(part, cap, what):
     if a < 0 or b <= a: raise ValueError(f'没找到{what} JSON（「### {what}」下面那一段）')
     raw = part[a:b + 1]
     if len(raw.encode('utf-8')) > cap: raise ValueError(f'{what}太大了（最多 {cap // 1000} KB）')
-    try: r = json.loads(raw)
+    def nonfinite(c): raise ValueError(f'{what}里不能有 {c}（不是标准 JSON）')
+    try: r = json.loads(raw, parse_constant=nonfinite)
     except json.JSONDecodeError as e: raise ValueError(f'{what}不是合法的 JSON：{e.msg}（第 {e.lineno} 行第 {e.colno} 列）')
     if not isinstance(r, dict): raise ValueError(f'{what}应该是一个 JSON 对象')
     return r
@@ -129,14 +130,15 @@ SIZE = 400                       # 工坊统一按 400px 出图
 def plain(v, depth=0):
     """参数这类值只能是 JSON 的基本类型、不深不大的数组和对象。"""
     if depth > 4: return False
-    if v is None or isinstance(v, (bool, int, float)): return True
+    if v is None or isinstance(v, (bool, int)): return True
+    if isinstance(v, float): return math.isfinite(v)               # 1e999 这种会变成 inf，写出去就不是合法 JSON 了
     if isinstance(v, str): return len(v) <= 400
     if isinstance(v, list): return len(v) <= 64 and all(plain(x, depth + 1) for x in v)
     if isinstance(v, dict): return len(v) <= 64 and all(isinstance(k, str) and len(k) <= 40 and plain(x, depth + 1) for k, x in v.items())
     return False
 
 def number(v, lo, hi):
-    return isinstance(v, (int, float)) and not isinstance(v, bool) and lo <= v <= hi
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) and lo <= v <= hi
 
 def validate_project(p):
     """返回 (规范化后的工程, [问题])。数值的细节交给网页引擎的 normalizeProject 去夹，这里管结构、大小和会显示出来的文字。"""
@@ -153,12 +155,12 @@ def validate_project(p):
         if not isinstance(v, dict) or len(v) > 16 or not plain(v): errs.append(f'{k} 应该是一个小的 JSON 对象'); v = {}
         out[k] = v
     skin = p.get('skin', {'component': 'lucy'})
-    if not isinstance(skin, dict) or not ID_RE.fullmatch(str(skin.get('component', ''))) or not plain(skin.get('params', {})):
+    if not isinstance(skin, dict) or not isinstance(skin.get('component'), str) or not ID_RE.fullmatch(skin['component']) or not plain(skin.get('params', {})):
         errs.append('皮肤 skin 的格式不对'); skin = {'component': 'lucy'}
     out['skin'] = {'component': skin['component'], 'params': skin.get('params') or {}}
     model = p.get('model', {}) if isinstance(p.get('model', {}), dict) else {}
     mid = model.get('component', 'axolotl')
-    if mid not in MODELS:
+    if not isinstance(mid, str) or mid not in MODELS:
         errs.append(f'模型只能用网站自带的（{"、".join(MODELS.values())}）：自己载入的模型文件只在你的浏览器里，发不上来')
         mid = 'axolotl'
     out['model'] = {'component': mid, 'face': model.get('face') if isinstance(model.get('face'), bool) else None}
@@ -177,16 +179,18 @@ def validate_project(p):
     layers = p.get('layers')
     if not isinstance(layers, list) or not layers: errs.append('工程里没有图层'); layers = []
     if len(layers) > LIM['layers']: errs.append(f"图层最多 {LIM['layers']} 个"); layers = layers[:LIM['layers']]
-    out['layers'] = []
+    out['layers'], ids = [], set()
     for i, l in enumerate(layers):
         where = f'第 {i + 1} 个图层'
         if not isinstance(l, dict): errs.append(f'{where}应该是一个对象'); continue
         bad = sorted(set(l) - LAYER_KEYS)
         if bad: errs.append(f'{where}有不认识的字段：' + '、'.join(show(k) for k in bad[:6]))
         t, comp = l.get('type'), l.get('component')
-        if t not in LAYER_TYPES: errs.append(f'{where}的类型不对：{show(t)}'); continue
+        if not isinstance(t, str) or t not in LAYER_TYPES: errs.append(f'{where}的类型不对：{show(t)}'); continue
         if not isinstance(comp, str) or not ID_RE.fullmatch(comp): errs.append(f'{where}的组件名不对：{show(comp)}'); continue
         q = {'id': str(l.get('id') or f'l{i}')[:40], 'type': t, 'component': comp}
+        if q['id'] in ids: errs.append(f'{where}的 id 和前面的图层重复了：{show(q["id"])}')
+        ids.add(q['id'])
         if 'params' in l:
             if not isinstance(l['params'], dict) or not plain(l['params']): errs.append(f'{where}的参数 params 格式不对')
             else: q['params'] = l['params']
@@ -205,7 +209,8 @@ def validate_project(p):
                 errs.append(f'{where}的文字里有不支持的字符：{show(bad)}（只能用{CATALOG["text"]["hint"].split("：", 1)[-1]}，用 / 换行）')
             q['text'] = text
             style = l.get('style', 'pink')
-            if not isinstance(style, str) or not ID_RE.fullmatch(style): errs.append(f'{where}的字色不对：{show(style)}'); style = 'pink'
+            if not isinstance(style, str) or style not in CATALOG['styles']:
+                errs.append(f'{where}的字色不对：{show(style)}（只能用内置的：{"、".join(CATALOG["styles"])}）'); style = 'pink'
             q['style'] = style
         if t == 'face' and l.get('face') is not None:
             if not isinstance(l['face'], dict) or not plain(l['face']): errs.append(f'{where}的表情部件 face 格式不对')
@@ -220,9 +225,21 @@ def title_of(p):
     t = next((l['text'] for l in p['layers'] if l['type'] == 'text' and l['text'] and not l.get('hidden')), '')
     return t.replace('/', ' ').strip() or p.get('name') or '美西螈'
 
+# 和 site/src/engine/project.js 的 DEFAULTS 一致：查重时没写的设置按默认值算
+DEFAULTS = {'fps': 15, 'frames': 48, 'background': {'mode': 'white', 'color': '#ffffff'},
+            'camera': {'yaw': 160, 'pitch': 28, 'zoom': 1, 'persp': 0.15},
+            'water': {'on': True, 'level': 405, 'calm': 1, 'bubbles': True, 'ripples': True, 'color': '#aadeff'},
+            'idle': {'look': 20, 'gill': 1, 'tail': 1, 'paddle': 1, 'bob': 4}}
+LAYER_DEFAULTS = {'start': 0, 'end': 1, 'strength': 1, 'hidden': False, 'params': {}}
+TEXT_DEFAULTS = {'style': 'pink', 'x': 0, 'y': 118, 'scale': 1}
+
 def digest(p):
-    """查重用：名字和随机种子不算（同一个工程改个种子不算新作品）。"""
-    core = {k: v for k, v in p.items() if k not in ('name', 'seed')}
+    """查重用：名字、随机种子、图层 id 不算，没写的设置按默认值算（换个写法的同一个工程不算新作品）。"""
+    core = {k: v for k, v in p.items() if k not in ('name', 'seed', 'layers', 'size')}
+    for k, d in DEFAULTS.items(): core[k] = {**d, **core[k]} if isinstance(d, dict) else core.get(k, d)
+    core['skin'] = {'params': {}, **core.get('skin', {})}
+    core['layers'] = [{**LAYER_DEFAULTS, **(TEXT_DEFAULTS if l['type'] == 'text' else {}), **(({'blink': True}) if l['type'] == 'face' else {}),
+                       **{k: v for k, v in l.items() if k != 'id'}} for l in p['layers']]
     return hashlib.sha256(json.dumps(core, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()[:20]
 
 def describe(p):
@@ -254,6 +271,8 @@ def submission(body):
             proj, errs = validate_project(obj)
     except ValueError as e:
         proj, errs = None, [str(e)]
+    except (TypeError, KeyError, AttributeError) as e:            # 结构怪到上面的检查没想到：当成格式不对，别让工作流崩掉
+        proj, errs = None, [f'工程的格式不对（{type(e).__name__}）']
     if not consented(body): errs.append('没勾选「授权」：要同意按 GPL-3.0-only 发布才能进工坊')
     return proj, errs
 
@@ -280,23 +299,23 @@ def problems(rep):
     if not out and rep.get('message'): out.append(str(rep['message'])[:300])
     return out or ['没出图（出图那一步没有交回 GIF）']
 
-def gif_frames(path):
-    """GIF -> ([RGBA 帧（透明只分有 / 没有）], [每帧毫秒])。"""
+def gif_frames(path, size=SIZE, max_frames=LIM['frames']):
+    """GIF -> ([RGBA 帧（透明只分有 / 没有）], [每帧毫秒])。尺寸必须正好是工程的出图尺寸，帧数不能比工程多。"""
     import numpy as np
     from PIL import Image, ImageSequence
     frames, durs = [], []
     with Image.open(path) as im:
-        if im.format != 'GIF' or max(im.size) > 512 or getattr(im, 'n_frames', 1) > 120:
-            raise RenderFailed([f'出的图不对：{im.format} {im.size} {getattr(im, "n_frames", 1)} 帧'])
+        if im.format != 'GIF' or im.size != (size, size) or getattr(im, 'n_frames', 1) > max_frames:
+            raise RenderFailed([f'出的图不对：{im.format} {im.size} {getattr(im, "n_frames", 1)} 帧（应该是 {size}×{size}、最多 {max_frames} 帧）'])
         for fr in ImageSequence.Iterator(im):
             a = np.array(fr.convert('RGBA')); solid = a[..., 3] >= 128
             a[~solid] = 0; a[solid, 3] = 255
             frames.append(a); durs.append(int(fr.info.get('duration') or 0))
     return frames, durs
 
-def adopt(src, gif, cover):
+def adopt(src, gif, cover, max_frames=LIM['frames']):
     """render 那边（跑过别人代码的容器）交回来的 GIF：当图片解码，查尺寸 / 帧数 / 大小，
-    用 Pillow 重新编码（调色板按每帧实际用到的颜色原样保留），第 cover 帧存成封面 PNG。
+    用 Pillow 重新编码（调色板按每帧实际用到的颜色原样保留），第一帧存成封面 PNG。
     重新编码的图会再解一遍，必须和交回来的逐帧一模一样。"""
     import numpy as np
     from PIL import Image
@@ -304,7 +323,7 @@ def adopt(src, gif, cover):
     path = os.path.join(src or '', 'out.gif')
     if not src or not os.path.isfile(path) or rep.get('errors'): raise RenderFailed(problems(rep))
     if os.path.getsize(path) > 3 << 20: raise RenderFailed(['出的图超过 3 MB'])
-    try: frames, durs = gif_frames(path)
+    try: frames, durs = gif_frames(path, SIZE, max_frames)
     except RenderFailed: raise
     except Exception as e: raise RenderFailed([f'出的图解不开：{type(e).__name__}'])
     durs = [min(1000, max(20, round(d / 10) * 10 or 70)) for d in durs]
@@ -326,13 +345,11 @@ def adopt(src, gif, cover):
         out.append(p)
     os.makedirs(os.path.dirname(gif), exist_ok=True); os.makedirs(os.path.dirname(cover), exist_ok=True)
     out[0].save(gif, save_all=True, append_images=out[1:], duration=sd, loop=0, disposal=2 if clear else 1, optimize=False)
-    k = rep.get('cover') if isinstance(rep.get('cover'), (int, float)) else 0
-    k = min(len(frames) - 1, max(0, int(k)))
-    Image.fromarray(frames[k], 'RGBA').save(cover, optimize=True)
-    got, gd = gif_frames(gif)
+    Image.fromarray(frames[0], 'RGBA').save(cover, optimize=True)      # 导出时已经把封面（字刚好出全）转到第一帧了
+    got, gd = gif_frames(gif, SIZE, max_frames)
     if len(got) != len(seq) or gd != sd or any((g != w).any() for g, w in zip(got, seq)):
         raise RenderFailed(['重新编码后的图和出的图对不上（维护者看一下 workshop.py 的 adopt）'])
-    return dict(frames=len(seq), kb=round(os.path.getsize(gif) / 1024), cover=k)
+    return dict(frames=len(seq), kb=round(os.path.getsize(gif) / 1024))
 
 # ---------------- index ----------------
 def load_index():
@@ -432,6 +449,26 @@ def still_current(num, body):
     if any(l.get('name') == 'rejected' for l in cur.get('labels', [])): raise Abort('stale')
     if cur.get('state') != 'open' or (cur.get('body') or '') != body: raise Abort('stale')
 
+def rejected_now(num):
+    """推送之后再看一眼有没有被打 rejected：维护者恰好在「提交前检查」和「推送」之间撤下的话，撤下的工作流可能没看到这张。"""
+    token, repo = os.environ.get('GITHUB_TOKEN'), os.environ.get('GITHUB_REPOSITORY')
+    if not token or not repo: return False
+    for k in range(3):
+        try: return any(l.get('name') == 'rejected' for l in api(f'issues/{num}', token, repo).get('labels', []))
+        except Exception as e: print('label check failed:', e); time.sleep(3 + 3 * k)
+    return False
+
+def remove(num, push):
+    """把第 num 张从 index 和文件里拿掉（总在最新的 main 上做），返回有没有拿掉东西。"""
+    paths, found = [f'workshop/gifs/{num}.gif', f'workshop/covers/{num}.png', f'workshop/projects/{num}.json'], []
+    for p in paths:
+        if os.path.exists(os.path.join(ROOT, p)): os.remove(os.path.join(ROOT, p))
+    def drop(idx):
+        found[:] = [e for e in idx['entries'] if e['issue'] == num]
+        idx['entries'] = [e for e in idx['entries'] if e['issue'] != num]
+    apply(drop, paths, f"工坊：撤下 #{num}", push)
+    return bool(found)
+
 MARK = '<!-- workshop:published -->'
 
 def published_comment(e, repo):
@@ -483,12 +520,12 @@ def cmd_publish(push, src):
         return outputs(status='invalid', number=num)
     gif, cover, pj = f'workshop/gifs/{num}.gif', f'workshop/covers/{num}.png', f'workshop/projects/{num}.json'
     try:
-        info = adopt(src, os.path.join(ROOT, gif), os.path.join(ROOT, cover))
+        info = adopt(src, os.path.join(ROOT, gif), os.path.join(ROOT, cover), proj['frames'])
     except RenderFailed as e:
         print('render failed:', e.lines)
         write_comment(failed_comment(e.lines))
         return outputs(status='failed', number=num)
-    print(f"adopted #{num}: {info['frames']} frames, {info['kb']} KB, cover frame {info['cover']}")
+    print(f"adopted #{num}: {info['frames']} frames, {info['kb']} KB")
     os.makedirs(os.path.join(WS, 'projects'), exist_ok=True)
     with open(os.path.join(ROOT, pj), 'w', encoding='utf-8', newline='\n') as f: json.dump(proj, f, ensure_ascii=False, indent=1)
     entry = dict(issue=num, v=2, text=title_of(proj), summary=describe(proj), project=pj, hash=h, author=author,
@@ -504,18 +541,15 @@ def cmd_publish(push, src):
         print('aborted:', a.status)
         if a.errs: write_comment(invalid_comment(a.errs))
         return outputs(status=a.status, number=num)
+    if push and rejected_now(num):                     # 推送的同时被撤下了：自己收回来
+        print('rejected while publishing, removing again'); remove(num, push)
+        return outputs(status='stale', number=num)
     write_comment(published_comment(entry, repo))
     outputs(status='published', number=num)
 
 def cmd_reject(push):
-    ev = event(); num = int(ev['issue']['number'])
-    hit = [e for e in load_index()['entries'] if e['issue'] == num]
-    paths = [e[k] for e in hit for k in ('gif', 'cover', 'project') if e.get(k)]
-    for p in paths:
-        if os.path.exists(os.path.join(ROOT, p)): os.remove(os.path.join(ROOT, p))
-    def drop(idx):
-        idx['entries'] = [e for e in idx['entries'] if e['issue'] != num]
-    if hit: apply(drop, paths, f'工坊：撤下 #{num}', push)
+    num = int(event()['issue']['number'])
+    hit = remove(num, push)                            # 在最新的 main 上查：发布的那次可能刚刚推上去
     write_comment('这张被维护者撤下了，工坊里不再展示。\n')
     outputs(status='removed' if hit else 'none', number=num)
 

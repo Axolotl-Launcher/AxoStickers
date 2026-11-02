@@ -33,6 +33,8 @@ export function normalizeProject(p = {}) {
       ...(l.type === 'face' ? { face: l.face && typeof l.face === 'object' ? l.face : null, blink: l.blink !== false } : {}),
     })),
   };
+  const ids = new Set();                                       // 图层 id 重复了就改名：编辑器按 id 找图层，重复会改错图层
+  for (const [i, l] of out.layers.entries()) { if (ids.has(l.id)) l.id = `${l.id}_${i}`; ids.add(l.id); }
   const c = out.camera; c.yaw = num(c.yaw, d.camera.yaw, -720, 720); c.pitch = num(c.pitch, d.camera.pitch, -89, 89);
   c.zoom = num(c.zoom, 1, 0.3, 3); c.persp = num(c.persp, d.camera.persp, 0, 0.6);
   const w = out.water; w.level = num(w.level, d.water.level, 200, 512); w.calm = num(w.calm, 1, 0, 3);

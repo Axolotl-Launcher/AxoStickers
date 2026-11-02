@@ -39,7 +39,9 @@ function show(v) {
   document.title = { gallery: '美西螈表情包 · AxoStickers', editor: '创意工坊 · 美西螈表情包', workshop: '工坊作品 · 美西螈表情包' }[v];
 }
 
+let routeSeq = 0;                                              // 每次换路由 +1：等载入的时候用户已经走开了，就别再把他拉回编辑器
 async function route() {
+  const seq = ++routeSeq, hash = location.hash;
   const [path, query] = location.hash.replace(/^#\/?/, '').split('?');   // 先拆再解码：配方里的 + 不能被当成空格
   const [head, arg] = path.split('/').map((x) => { try { return decodeURIComponent(x); } catch { return x; } });
   if (head === 'editor') {
@@ -56,8 +58,9 @@ async function route() {
         catch { toast('这张的工程没载进来，先打开一个空白草稿'); }
       } else if (e) recipe = e.recipe;
     }
+    if (seq !== routeSeq || location.hash !== hash) return;
     await m.openStudio($('#studio-root'), { recipe, project, shared: q.get('s') });
-    if (q.get('r') || q.get('w') || q.get('s')) history.replaceState(null, '', '#/editor');
+    if ((q.get('r') || q.get('w') || q.get('s')) && location.hash === hash) history.replaceState(null, '', '#/editor');
     return;
   }
   if (head === 'workshop' || head === 'w') {

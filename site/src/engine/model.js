@@ -1,8 +1,10 @@
 // 换模型：读 .glb / .gltf（Blockbench 导出的那种方块模型），按 kit/src/rig2.py 的办法拆成逐像素的体素面片：
 // 方块的每个面按贴图像素切成小格，薄片（鳃、尾巴）挤成 1 像素厚。骨骼按节点名对上（head、tail、leg1…），
 // 动作就都能用；整体缩放到和原版差不多大。不联网：外部 uri 一律不认，只吃内嵌的 buffer 和贴图。
+import { makeCanvas } from './core.js';
+
 const U = 1 / 16;
-const LIMIT = { bytes: 4 << 20, nodes: 80, quads: 60000, tex: 256 };
+const LIMIT = { bytes: 4 << 20, nodes: 80, quads: 60000, tex: 256, rows: 200000 };
 
 function parseContainer(bytes) {
   const b = new Uint8Array(bytes), dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
@@ -29,12 +31,22 @@ export async function loadModel(bytes) {
   for (const ext of g.extensionsRequired || []) throw new Error(`不支持模型扩展 ${ext}`);
   if ((g.nodes || []).length > LIMIT.nodes) throw new Error('节点太多了');
   const bufs = (g.buffers || []).map((bf) => (bf.uri ? dataUri(bf.uri) : bin));
-  const view = (i) => { const v = g.bufferViews[i]; return bufs[v.buffer].subarray(v.byteOffset || 0, (v.byteOffset || 0) + v.byteLength); };
+  const bad = (what) => { throw new Error(`模型文件坏了：${what}`); };
+  const int = (v) => Number.isInteger(v) && v >= 0;
+  const view = (i) => {                                               // 每个长度、偏移都按文件里真有的字节核对，不信文件自己报的数
+    const v = g.bufferViews?.[i], buf = v && bufs[v.buffer];
+    if (!v || !buf || !int(v.byteLength) || !int(v.byteOffset ?? 0) || (v.byteOffset || 0) + v.byteLength > buf.length) bad(`bufferView ${i}`);
+    return buf.subarray(v.byteOffset || 0, (v.byteOffset || 0) + v.byteLength);
+  };
+  let rowsLeft = LIMIT.rows;
   const acc = (i) => {
-    const a = g.accessors[i], n = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4 }[a.type];
-    const T = { 5126: Float32Array, 5123: Uint16Array, 5125: Uint32Array, 5121: Uint8Array }[a.componentType];
-    const v = view(a.bufferView), off = a.byteOffset || 0;
-    const arr = new T(v.buffer.slice(v.byteOffset + off, v.byteOffset + off + a.count * n * T.BYTES_PER_ELEMENT));
+    const a = g.accessors?.[i], n = a && { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4 }[a.type];
+    const T = a && { 5126: Float32Array, 5123: Uint16Array, 5125: Uint32Array, 5121: Uint8Array }[a.componentType];
+    if (!n || !T || !int(a.count) || !int(a.byteOffset ?? 0)) bad(`accessor ${i}`);
+    const v = view(a.bufferView), off = a.byteOffset || 0, len = a.count * n * T.BYTES_PER_ELEMENT;
+    if (off + len > v.byteLength) bad(`accessor ${i} 比数据长`);
+    if ((rowsLeft -= a.count) < 0) throw new Error('模型太细了（顶点太多）');
+    const arr = new T(v.buffer.slice(v.byteOffset + off, v.byteOffset + off + len));
     const rows = []; for (let k = 0; k < a.count; k++) rows.push(n === 1 ? arr[k] : Array.from(arr.subarray(k * n, k * n + n)));
     return rows;
   };
@@ -44,22 +56,30 @@ export async function loadModel(bytes) {
   const blob = new Blob([img.uri ? dataUri(img.uri) : view(img.bufferView)], { type: img.mimeType || 'image/png' });
   const bmp = await createImageBitmap(blob);
   if (bmp.width > LIMIT.tex || bmp.height > LIMIT.tex) throw new Error(`贴图太大了（上限 ${LIMIT.tex}×${LIMIT.tex}）`);
-  const cv = new OffscreenCanvas(bmp.width, bmp.height), cg = cv.getContext('2d');
+  const cv = makeCanvas(bmp.width, bmp.height), cg = cv.getContext('2d');
   cg.drawImage(bmp, 0, 0);
   const tex = cg.getImageData(0, 0, bmp.width, bmp.height), TW = tex.width, TH = tex.height;
   const texel = (x, y) => { const o = (y * TW + x) * 4; return [tex.data[o], tex.data[o + 1], tex.data[o + 2], tex.data[o + 3]]; };
 
-  const nodes = g.nodes.map((n) => ({ name: String(n.name || '').toLowerCase().replace(/[^a-z0-9_]/g, ''), t: n.translation || [0, 0, 0], q: n.rotation || null, children: n.children || [], mesh: n.mesh !== undefined }));
   const parent = {};
-  nodes.forEach((n, i) => n.children.forEach((c) => { parent[c] = i; }));
+  g.nodes.forEach((n, i) => (n.children || []).forEach((c) => { parent[c] = i; }));
+  // 节点的缩放（scale）直接烤进面片和子节点的位移里：引擎的骨骼只认位移和旋转。等比缩放是精确的，不等比的只在没转过的轴上精确。
+  const cum = (i, seen = 0) => { const s = g.nodes[i].scale || [1, 1, 1], up = i in parent && seen < 80 ? cum(parent[i], seen + 1) : [1, 1, 1]; return s.map((v, a) => v * up[a]); };
+  const nodes = g.nodes.map((n, i) => {
+    const up = i in parent ? cum(parent[i]) : [1, 1, 1];
+    return { name: String(n.name || '').toLowerCase().replace(/[^a-z0-9_]/g, ''), t: (n.translation || [0, 0, 0]).map((v, a) => v * up[a]), q: n.rotation || null, children: n.children || [], mesh: n.mesh !== undefined };
+  });
   const bones = {};
   nodes.forEach((n, i) => { if (n.children.length && !(n.name in bones)) bones[n.name] = i; });
   const mesh = {}, meshName = {};
   let total = 0;
   g.nodes.forEach((n, i) => {
     if (n.mesh === undefined) return;
-    const prim = g.meshes[n.mesh].primitives[0];
-    const P = acc(prim.attributes.POSITION), UV = acc(prim.attributes.TEXCOORD_0), N = acc(prim.attributes.NORMAL), idx = acc(prim.indices);
+    const prim = g.meshes?.[n.mesh]?.primitives?.[0];
+    if (!prim?.attributes || prim.indices === undefined) bad(`mesh ${n.mesh}`);
+    const sc = cum(i);
+    const P = acc(prim.attributes.POSITION).map((p) => p.map((v, a) => v * sc[a])), UV = acc(prim.attributes.TEXCOORD_0), N = acc(prim.attributes.NORMAL), idx = acc(prim.indices);
+    if (idx.some((k) => k >= P.length || k >= UV.length || k >= N.length)) bad(`mesh ${n.mesh} 的下标越界`);
     const name = nodes[parent[i] ?? i].name || nodes[i].name;
     const quads = quadsFor(P, UV, N, idx, TW, TH, texel);
     total += quads.length;

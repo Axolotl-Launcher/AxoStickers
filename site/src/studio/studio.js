@@ -203,8 +203,9 @@ function build(root) {
   S.runner.on('fatal', (m) => toast('沙盒出错：' + m.message));
   S.runner.on('boot-failed', () => {
     S.bootMsg.hidden = false;
-    fill(S.bootMsg, el('b', { text: '预览沙盒没能启动' }), el('p', { text: '可能被浏览器扩展拦下了（沙盒的请求来源是 null）。可以换个浏览器，或者在信任当前组件的前提下不用沙盒直接跑。' }),
-      el('button', { class: 'btn', type: 'button', text: '不用沙盒直接运行', onclick: () => { S.runner.sandboxed = false; S.runner.start(); S.bootMsg.textContent = '正在启动…'; } }));
+    const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);      // 不加沙盒只给本机开发用：网站上 sandbox.html 会拒绝在本站身份下运行
+    fill(S.bootMsg, el('b', { text: '预览沙盒没能启动' }), el('p', { text: local ? '可能被浏览器扩展拦下了（沙盒的请求来源是 null）。本机开发可以不用沙盒直接跑。' : '可能被浏览器扩展拦下了（沙盒的请求来源是 null）。换个浏览器，或者给这个网站关掉拦截类扩展再试试。' }),
+      local ? el('button', { class: 'btn', type: 'button', text: '不用沙盒直接运行', onclick: () => { S.runner.sandboxed = false; S.runner.start(); S.bootMsg.textContent = '正在启动…'; } }) : null);
   });
   S.runner.watch(() => { toast('沙盒没响应了，重开一次'); S.runner.start(); });
 
@@ -415,7 +416,7 @@ async function renderDrawer() {
       ...[...S.models].filter(([id]) => id.startsWith('file:')).map(([id, x]) => mtile(id, x.name, `载入的模型 · ${x.info || ''}`)),
       el('button', { class: 'btn small', type: 'button', onclick: () => pickFile('.glb,.gltf') }, '载入模型文件（.glb / .gltf）'),
       el('label', { class: 'st-field check' }, face, el('span', { text: '在头的正面画表情（别的模型脸不在那儿的话关掉）' })),
-      el('p', { class: 'st-note', text: '能用 Blockbench 做的方块模型：节点名叫 head、body、tail、leg1～leg4、top_gills、left_gills、right_gills 的会跟着动作动，其他的跟着身体走。贴图要内嵌，模型会自动缩放到和原版差不多大。载入的模型只在你这台电脑上用，发布到工坊只支持上面两个内置模型。' }));
+      el('p', { class: 'st-note', text: '能用 Blockbench 做的方块模型：节点名叫 head、body、tail、leg1～leg4、top_gills、left_gills、right_gills 的会跟着动作动，其他的跟着身体走。只支持贴图和数据都内嵌在文件里的 .glb / .gltf（带单独 .bin 或贴图文件的 .gltf 载不进来，导出时选 .glb 或勾上内嵌），模型会自动缩放到和原版差不多大。载入的模型只在你这台电脑上用，发布到工坊只支持上面两个内置模型。' }));
     return;
   }
   const list = (S.catalog.get(k) || []).filter((m) => match(m, q));
@@ -891,13 +892,35 @@ async function shareLink() {
   try { await navigator.clipboard.writeText(url); toast(url.length > 6000 ? '链接复制好了（有点长，有的聊天软件会截断）' : '链接复制好了'); } catch { prompt('复制这个链接：', url); }
 }
 
+// 发布前先按工坊机器人的规矩查一遍（和 workshop/tools/workshop.py 的 validate_project 一致），免得提交了才被打回来
+const PUB = { bytes: 60000, components: 8, component: 40000, layers: 40, texts: 4, text: 16, frames: 96 };
+const PUB_TEXT = new RegExp(`^[${CAT.text.chars}/ ]*$`);
+function preflight(p, json) {
+  const out = [], size = (s) => new Blob([s]).size, texts = p.layers.filter((l) => l.type === 'text');
+  if (!texts.some((l) => l.text.trim() && !l.hidden)) out.push('至少要有一行文字（表情包嘛）');
+  if (texts.length > PUB.texts) out.push(`文字图层最多 ${PUB.texts} 个，现在有 ${texts.length} 个`);
+  for (const l of texts) {
+    const n = [...l.text.replace(/[/ ]/g, '')].length;
+    if (n > PUB.text) out.push(`「${l.text}」太长了：最多 ${PUB.text} 个字`);
+    else if (!PUB_TEXT.test(l.text)) out.push(`「${l.text}」里有工坊不支持的字符：只能用${CAT.text.hint.split('：').pop()}，用 / 换行`);
+    if (!(l.style in CAT.styles)) out.push(`「${l.text}」的字色不是内置的那几种`);
+  }
+  if (p.layers.length > PUB.layers) out.push(`图层最多 ${PUB.layers} 个`);
+  if (p.frames > PUB.frames) out.push(`工坊最多 ${PUB.frames} 帧，现在是 ${p.frames} 帧（右边「工程设置」里改）`);
+  if (!['axolotl', 'logo'].includes(p.model.component)) out.push('自己载入的模型只在你的浏览器里，发不上去：先在「模型」里换回网站自带的');
+  if (p.components.length > PUB.components) out.push(`工程最多带 ${PUB.components} 段组件代码，现在有 ${p.components.length} 段`);
+  for (const c of p.components) if (size(c.source) > PUB.component) out.push(`组件代码「${c.origin}」超过 ${PUB.component / 1000} KB`);
+  if (size(json) > PUB.bytes) out.push(`工程太大了（${Math.round(size(json) / 1000)} KB，最多 ${PUB.bytes / 1000} KB）`);
+  if (S.errors.length || S.compileErrors.length) out.push('预览里还有组件报错（看左上角的红色角标）：出图时有报错就不会发布');
+  return out;
+}
+
 function publish() {
-  const p = S.store.p;
-  const hasText = p.layers.some((l) => l.type === 'text' && l.text.trim());
-  if (!hasText) { toast('先写点字再发布'); return; }
-  if (p.model.component.startsWith('file:')) { toast('自己载入的模型只在你的浏览器里，发不上去：先在「模型」里换回网站自带的'); return; }
-  const json = JSON.stringify(p);
-  if (new Blob([json]).size > 60000) { toast(`工程太大了（${Math.round(new Blob([json]).size / 1000)} KB，最多 60 KB）：少带点组件代码试试`); return; }
+  const p = S.store.p, json = JSON.stringify(p), problems = preflight(p, json);
+  if (problems.length) {
+    dialog('还不能发布', [el('p', { text: '工坊机器人会按这些规矩检查，先改一下：' }), el('ul', {}, ...problems.map((t) => el('li', { text: t })))], []);
+    return;
+  }
   const title = `[工坊] ${p.layers.find((l) => l.type === 'text')?.text || p.name || '美西螈'}`;
   const base = `https://github.com/${REPO}/issues/new?template=workshop.yml&title=${encodeURIComponent(title)}`;
   const url = `${base}&project=${encodeURIComponent(json)}`;

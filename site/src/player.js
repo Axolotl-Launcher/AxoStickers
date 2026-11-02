@@ -3,6 +3,7 @@ import { decodeGif } from './gifdecode.js';
 import { el } from './util.js';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
+const makeCanvas = (w, h) => (typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(w, h) : Object.assign(document.createElement('canvas'), { width: w, height: h }));
 
 export class FramePlayer {
   constructor(root) {
@@ -39,6 +40,7 @@ export class FramePlayer {
       this.canvas.width = g.width; this.canvas.height = g.height;
       this.frames = g.frames.map((f) => ({ img: new ImageData(f.data, g.width, g.height), delay: f.delay }));
       this.scrub.max = this.frames.length - 1;
+      this.truncated = g.truncated;                           // 太大的 GIF 只拆前面的帧（内存有上限）
       this.buildStrip(g.width, g.height);
       this.still.hidden = true; this.canvas.hidden = false;
       this.i = 0; this.show(0);
@@ -50,7 +52,7 @@ export class FramePlayer {
 
   buildStrip(w, h) {
     const tw = 64, th = Math.round(64 * h / w);
-    const tmp = new OffscreenCanvas(w, h), tg = tmp.getContext('2d');
+    const tmp = makeCanvas(w, h), tg = tmp.getContext('2d');
     this.thumbs = this.frames.map((f, k) => {
       const c = el('canvas', { class: 'frame', width: tw, height: th, role: 'option', title: `第 ${k + 1} 帧 · ${f.delay} ms`, 'data-i': k });
       tg.putImageData(f.img, 0, 0);
@@ -66,7 +68,7 @@ export class FramePlayer {
     this.i = (k + this.frames.length) % this.frames.length;
     this.ctx.putImageData(this.frames[this.i].img, 0, 0);
     this.scrub.value = this.i;
-    this.counter.textContent = `${this.i + 1} / ${this.frames.length} · ${this.frames[this.i].delay}ms`;
+    this.counter.textContent = `${this.i + 1} / ${this.frames.length}${this.truncated ? '（太大，只拆了前面这些）' : ''} · ${this.frames[this.i].delay}ms`;
     if (this.thumbs) {
       this.thumbs.forEach((t, j) => t.setAttribute('aria-selected', String(j === this.i)));
       const t = this.thumbs[this.i], s = this.strip;

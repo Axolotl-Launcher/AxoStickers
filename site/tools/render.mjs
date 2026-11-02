@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream', 'Access-Control-Allow-Origin': '*' });
   fs.createReadStream(file).pipe(res);
 });
-await new Promise((r) => server.listen(0, '127.0.0.1', r));
+await new Promise((r) => server.listen(+process.env.RENDER_PORT || 0, '127.0.0.1', r));   // RENDER_PORT：本机随机端口被系统占着时指定一个
 const base = `http://127.0.0.1:${server.address().port}/`;
 
 const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
@@ -89,8 +89,8 @@ const b64 = await page.evaluate(() => {
 });
 const bytes = Buffer.from(b64, 'base64');
 fs.writeFileSync(out, bytes);
-const cover = Math.min(scene.N - 1, Math.max(0, Math.round((scene.cover || 0) * scene.fps)));   // 封面：文字刚好出全的那一帧
-const report = { ok: true, kb: Math.round(bytes.length / 1024), frames: scene.N, fps: scene.fps, cover, errors: [], renderer: gl };
+// 封面就是 GIF 的第一帧（导出时已经把文字刚好出全的那一帧转到最前面了），publish 直接取第 0 帧
+const report = { ok: true, kb: Math.round(bytes.length / 1024), frames: scene.N, fps: scene.fps, errors: [], renderer: gl };
 fs.writeFileSync(out.replace(/\.gif$/i, '') + '.json', JSON.stringify(report, null, 1));
 console.log(JSON.stringify(report));
 clearTimeout(timer); await browser.close(); server.close();
