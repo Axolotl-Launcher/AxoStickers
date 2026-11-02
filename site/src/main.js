@@ -1,11 +1,10 @@
 // 入口：路由（#/ 图鉴、#/s/编号 大图、#/editor 创意工坊、#/workshop 工坊作品、#/w/issue 号）。
 import './gen/fonts.css';
 import './style.css';
-import { RELEASE, $ } from './util.js';
+import { RELEASE, $, encodePath, toast } from './util.js';
 import { G, initGallery } from './gallery.js';
 import { WS, initWorkshop, sorted } from './workshop.js';
 import { openDetail, closeDetail } from './detail.js';
-import { initEditor, loadRecipe, setEditorActive } from './editor.js';
 import { initHero } from './hero.js';
 
 $('#zip-link').href = RELEASE.url;
@@ -20,7 +19,8 @@ for (let i = 0; i < 14; i++) {
   bubbles.append(b);
 }
 
-let view = null;
+let view = null, studio = null;
+const loadStudio = () => (studio ||= import('./studio/studio.js'));
 const ready = { gallery: null, workshop: null };
 const retryable = (key, init) => (ready[key] ||= init().catch((e) => { ready[key] = null; console.error(e); }));
 const gallery = () => retryable('gallery', () => initGallery().then(() => { initHero(G.items, () => view === 'gallery').catch(console.error); }));
@@ -35,7 +35,7 @@ function show(v) {
     if (view !== null) window.scrollTo(0, 0);
     view = v;
   }
-  setEditorActive(v === 'editor');
+  if (studio) studio.then((m) => m.studioActive(v === 'editor'));
   document.title = { gallery: '美西螈表情包 · AxoStickers', editor: '创意工坊 · 美西螈表情包', workshop: '工坊作品 · 美西螈表情包' }[v];
 }
 
@@ -45,9 +45,19 @@ async function route() {
   if (head === 'editor') {
     closeDetail(true);
     show('editor');
-    const r = new URLSearchParams(query || '').get('r');
-    if (r) loadRecipe(r);
-    await initEditor();
+    const q = new URLSearchParams(query || ''), m = await loadStudio();
+    let recipe = null, project = null;
+    try { if (q.get('r')) recipe = JSON.parse(q.get('r')); } catch { /* 链接坏了就开草稿 */ }
+    if (q.get('w')) {                                          // 工坊作品「改一改」
+      await workshop();
+      const e = WS.entries.find((x) => String(x.issue) === q.get('w'));
+      if (e?.project) {                                        // 第二版的投稿：工程单独存一个文件
+        try { const r = await fetch(encodePath(e.project)); if (!r.ok) throw new Error(`HTTP ${r.status}`); project = await r.json(); }
+        catch { toast('这张的工程没载进来，先打开一个空白草稿'); }
+      } else if (e) recipe = e.recipe;
+    }
+    await m.openStudio($('#studio-root'), { recipe, project, shared: q.get('s') });
+    if (q.get('r') || q.get('w') || q.get('s')) history.replaceState(null, '', '#/editor');
     return;
   }
   if (head === 'workshop' || head === 'w') {

@@ -1,11 +1,11 @@
 // 首页头图：标题用表情同款立体字画（同一个 charSprite），右边是网页引擎实时渲染的随机一张。
-import { toRecipe, recipeToSpec } from './util.js';
 
 const TITLE = '美西螈表情包';
 const T = 3.2;
 
 export async function initHero(items, isActive) {
   const ENG = await import('./engine/index.js');
+  const reg = ENG.builtinRegistry();
   await ENG.loadFont(TITLE);
   const tc = document.getElementById('hero-title'), tg = tc.getContext('2d');
   const ch = 168, sprites = [...TITLE].map((c) => ENG.charSprite(c, ch, 'pink'));
@@ -18,7 +18,7 @@ export async function initHero(items, isActive) {
   async function next(now) {
     const it = pool[Math.floor(Math.random() * pool.length)];
     await ENG.loadFont(it.text);
-    stk = ENG.makeSticker(recipeToSpec(toRecipe(it)), ENG.renderer());
+    stk = new ENG.Scene(ENG.fromRecipe(it), reg, ENG.renderer());
     born = now; cap.textContent = `实时渲染 · #${it.key} ${it.text}`;
   }
   if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; }).observe(tc);

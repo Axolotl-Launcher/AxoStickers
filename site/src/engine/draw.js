@@ -1,12 +1,12 @@
 // 2D 部分：像素图标、立体字、Pillow 画图原语的 canvas 版（engine/axl.py）。
 // 注意 Pillow 在 RGBA 画布上用 ImageDraw 画半透明色时是直接写像素、最后转 RGB 时 alpha 被丢掉，
 // 所以引擎里直接画在主画布上的东西（星星、方块、线）实际都是不透明的；这里照着画不透明色。
-import { E, W, hx, pyRound } from './core.js';
+import { E, W, hx, pyRound, makeCanvas } from './core.js';
 
 export const FONT = 'AxoSans';
 const css = (c, a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 export const rgb = (c) => css(c);
-const canvas = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, w); c.height = Math.max(1, h); return c; };
+const canvas = makeCanvas;
 
 // ---------------- icons ----------------
 const ICONS = new Map();
@@ -101,8 +101,8 @@ function size(u) {
   for (let i = 0; i < 5; i++) if (u <= xs[i + 1]) return ys[i] + (ys[i + 1] - ys[i]) * (u - xs[i]);
   return ys[5];
 }
-// 返回 [[字, x, y, 字号], ...]，一行或两行
-export function layout(text, y0 = 118) {
+// 返回 [[字, x, y, 字号], ...]，一行或两行；scale 整体放大缩小，dx 整体左右挪
+export function layout(text, y0 = 118, scale = 1, dx = 0) {
   let lines = text.includes('/') ? text.split('/') : [text];
   if (lines.length === 1 && units(text) > 5.3) {
     const cs = [...text];
@@ -115,12 +115,13 @@ export function layout(text, y0 = 118) {
   }
   let ch = size(Math.max(...lines.map(units)));
   if (lines.length === 2) ch = Math.min(ch, 104);
+  ch *= scale;
   const out = [];
   lines.forEach((line, li) => {
     const cs = [...line];
     const adv = cs.map((c) => (isWide(c) ? ch + 2 : textLength(c, Math.floor(ch)) + ch * 0.14));
-    let x = W / 2 - adv.reduce((a, b) => a + b, 0) / 2;
-    const y = lines.length === 1 ? y0 : y0 - 52 + li * (ch + 18);
+    let x = W / 2 + dx - adv.reduce((a, b) => a + b, 0) / 2;
+    const y = lines.length === 1 ? y0 : y0 - 52 * scale + li * (ch + 18 * scale);
     cs.forEach((c, k) => { out.push([c, x + adv[k] / 2, y, Math.floor(ch)]); x += adv[k]; });
   });
   return out;
@@ -159,6 +160,7 @@ export function charSprite(c, ch, style = 'pink') {
 }
 
 export async function loadFont(text) {
-  if (!document.fonts) return;
-  try { await document.fonts.load(fontCss(100), text || '美西螈'); } catch { /* 字体没加载上就用系统字体 */ }
+  const fonts = globalThis.document?.fonts || globalThis.fonts;
+  if (!fonts) return;
+  try { await fonts.load(fontCss(100), text || '美西螈'); } catch { /* 字体没加载上就用系统字体 */ }
 }

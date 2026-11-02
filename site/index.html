@@ -74,39 +74,9 @@
     </div>
   </section>
 
-  <!-- ======== 创意工坊 · 编辑器 ======== -->
-  <section class="view" id="view-editor" data-view="editor" hidden>
-    <div class="wrap">
-      <h2 class="section-title">创意工坊</h2>
-      <p class="section-sub">挑文字、动作、表情、特效和道具，左边实时预览。满意了导出 GIF，或者发布到工坊给大家用。</p>
-      <div class="editor">
-        <div class="stage">
-          <div class="stage-frame" id="ed-frame">
-            <canvas id="ed-canvas" width="512" height="512" aria-label="实时预览"></canvas>
-            <span class="stage-badge">实时预览</span>
-            <button class="stage-play" id="ed-play" aria-label="暂停">❚❚</button>
-          </div>
-          <div class="stage-actions">
-            <button class="btn primary" id="ed-export">导出 GIF</button>
-            <button class="btn water" id="ed-publish">发布到工坊</button>
-            <button class="btn" id="ed-random">随便来一张</button>
-            <button class="btn" id="ed-copy">复制配方</button>
-          </div>
-          <div class="progress" id="ed-progress" hidden><i></i></div>
-          <p class="stage-status" id="ed-status" aria-live="polite"></p>
-          <div class="how">
-            <b>发布到工坊怎么回事</b>
-            <ol>
-              <li>点「发布到工坊」会打开一个填好配方的 GitHub issue（要登录 GitHub），直接提交。</li>
-              <li>GitHub Actions 用真引擎重新出图（和这里的预览基本一样），几分钟后出现在「工坊作品」。</li>
-              <li>别人给那个 issue 点 👍 就是点赞。维护者觉得不合适会撤下。</li>
-            </ol>
-          </div>
-        </div>
-        <div class="panel" id="ed-panel"></div>
-      </div>
-    </div>
-    <button class="mini" id="ed-mini" type="button" hidden aria-label="回到预览"><canvas width="264" height="264"></canvas></button>
+  <!-- ======== 创意工坊 · 编辑器（studio/studio.js 按需加载） ======== -->
+  <section class="view studio-view" id="view-editor" data-view="editor" hidden>
+    <div id="studio-root"><p class="empty"><b>正在打开创意工坊…</b></p></div>
   </section>
 
   <!-- ======== 工坊作品 ======== -->
@@ -131,7 +101,7 @@
 <dialog class="detail" id="detail" aria-labelledby="d-title">
   <button class="detail-close" id="d-close" aria-label="关闭">×</button>
   <div class="detail-body">
-    <div class="detail-pic"><img id="d-img" alt="" width="400" height="400"></div>
+    <div class="detail-pic player" id="d-player"></div>
     <div>
       <p class="meta" id="d-meta"></p>
       <h2 id="d-title"></h2>
@@ -146,8 +116,9 @@
     </div>
   </div>
   <div class="detail-nav">
-    <button class="btn" id="d-prev" type="button">← 上一张</button>
-    <button class="btn" id="d-next" type="button">下一张 →</button>
+    <button class="btn" id="d-prev" type="button" title="Shift + ←">← 上一张</button>
+    <span class="hint keys">空格 暂停 · ←/→ 逐帧 · Shift+←/→ 换一张</span>
+    <button class="btn" id="d-next" type="button" title="Shift + →">下一张 →</button>
   </div>
 </dialog>
 

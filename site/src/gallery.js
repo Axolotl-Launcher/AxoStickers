@@ -10,7 +10,7 @@ function normalize(s, special) {
     ...s, key, special, fx: s.fx || [], wear: s.wear || [],
     num: special ? 1000 : s.id,
     gif: encodePath(s.gif), cover: s.cover ? encodePath(s.cover) : encodePath(s.gif),
-    still: `thumbs/${encodeURIComponent(key)}.webp`,
+    still: `thumbs/${encodeURIComponent(key)}.webp`, preview: `previews/${encodeURIComponent(key)}.mp4`,
     search: [s.text, CAT.motions[s.motion]?.zh, CAT.faces[s.face], ...(s.fx || []).map(fxLabel), CAT.holds[s.hold],
       ...(s.wear || []).map((w) => CAT.wears[w]), special ? '水龙卷 特别篇' : ''].filter(Boolean).join(' ').toLowerCase(),
   };
@@ -36,7 +36,7 @@ export function loadOk(box) { box.parentElement.querySelector('.load-error')?.re
 function card(it) {
   const img = el('img', {
     class: 'pic', loading: 'lazy', decoding: 'async', width: 400, height: 400, alt: it.text || '水龙卷（无字）',
-    src: it.still, 'data-still': it.still, 'data-gif': it.gif,
+    src: it.still, 'data-still': it.still, 'data-gif': it.gif, 'data-preview': it.preview,
   });
   img.addEventListener('error', () => { if (img.src.includes('/thumbs/')) { img.dataset.still = it.cover; img.src = it.cover; } }, { once: true });
   const c = el('button', { class: 'card', type: 'button', 'data-key': it.key, onclick: () => { location.hash = `#/s/${encodeURIComponent(it.key)}`; } },

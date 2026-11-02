@@ -1,18 +1,18 @@
 name: 发布到创意工坊
-description: 把在网站「创意工坊」里做的美西螈表情发布出来。一般由网站上的「发布到工坊」按钮自动填好，直接提交就行。
+description: 把在网站编辑器里做的美西螈表情发布出来。一般由编辑器里的「发布到工坊」按钮自动填好，直接提交就行。
 title: "[工坊] "
 labels: ["workshop"]
 body:
   - type: markdown
     attributes:
       value: |
-        提交后 GitHub Actions 会用真引擎重新出图（要几分钟），出好的图会出现在 [工坊作品](https://axolotl-launcher.github.io/AxoStickers/#/workshop)，机器人会在这里回复，然后把 issue 关掉。
-        别人给这个 issue 点 👍 就是点赞。维护者觉得不合适会撤下。
+        提交后 GitHub Actions 会在隔离的环境里用网站同一个引擎重新出图（要几分钟），出好的图会出现在 [工坊作品](https://axolotl-launcher.github.io/AxoStickers/#/workshop)，机器人会在这里回复，然后把 issue 关掉。
+        工程里带的组件代码只在断网的沙盒里运行，维护者也会看。别人给这个 issue 点 👍 就是点赞；维护者觉得不合适会撤下。
   - type: textarea
-    id: recipe
+    id: project
     attributes:
-      label: 配方
-      description: 网站自动生成的 JSON。手改也行，但只能用网站上有的选项，文字 1～5 个字。
+      label: 工程
+      description: 编辑器自动生成的工程 JSON（太长放不进链接时，编辑器会先复制到剪贴板，粘贴到这里）。文字只能用汉字、字母、数字和常用标点。
       render: json
     validations:
       required: true
@@ -21,5 +21,5 @@ body:
     attributes:
       label: 授权
       options:
-        - label: 我同意这张表情和仓库里其他表情一样按 GPL-3.0-only 发布
+        - label: 我同意这张表情（包括工程里带的组件代码）和仓库里其他表情一样按 GPL-3.0-only 发布
           required: true

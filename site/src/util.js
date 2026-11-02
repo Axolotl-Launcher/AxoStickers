@@ -53,45 +53,46 @@ export function recipeRows(r) {
   rows.push(['文字动画', CAT.tmodes[r.tmode || 'stay'], r.tmode || 'stay']);
   return rows;
 }
-// 图鉴里的一张 -> 编辑器能用的配方（只保留工坊支持的部分）
-export function toRecipe(s) {
-  const C = CAT;
-  const m = C.motions[s.motion] ? s.motion : 'idle';
-  const r = {
-    v: 1, text: s.text || '', motion: m, face: C.faces[s.face] ? s.face : 'normal',
-    fx: (s.fx || []).filter((f) => C.fx[f]).slice(0, C.limits.fx),
-    hold: C.holds[s.hold] ? s.hold : null,
-    wear: (s.wear || []).filter((w) => C.wears[w]).slice(0, C.limits.wear),
-    style: C.styles[s.style] ? s.style : 'pink', tmode: C.tmodes[s.tmode] ? s.tmode : 'stay',
-  };
-  if (C.motions[m].noHold) r.hold = null;
-  if (C.motions[m].offscreen && C.entrance.includes(r.tmode)) r.tmode = 'stay';
-  return r;
-}
-export const recipeToSpec = (r) => ({ text: r.text, motion: r.motion, face: r.face, fx: r.fx, hold: r.hold || undefined, wear: r.wear, style: r.style, tmode: r.tmode });
 
-// ---------------- 卡片：先显示静态缩略图，悬停 / 手机上停在屏幕里才换成 GIF ----------------
+// ---------------- 卡片：先放静态缩略图；悬停（手机上停在屏幕里）就播 240px 的小视频预览（几十 KB，比 1 MB 的 GIF 快得多） ----------------
 const touch = matchMedia('(hover: none)').matches;
 const playing = new Set();
-const MAX_PLAYING = 9;
+const MAX_PLAYING = touch ? 6 : 9;
 function play(card) {
   const img = card.querySelector('.pic');
-  if (!img || img.dataset.playing) return;
-  img.dataset.playing = '1'; img.src = img.dataset.gif;
+  if (!img || card.dataset.playing) return;
+  card.dataset.playing = '1';
   playing.add(card);
   if (playing.size > MAX_PLAYING) stop(playing.values().next().value);
+  const src = img.dataset.preview;
+  if (!src || card.dataset.noVideo) { img.src = img.dataset.gif; return; }       // 没有预览就退回 GIF
+  let v = card.querySelector('.pic-video');
+  if (!v) {
+    v = el('video', { class: 'pic-video', muted: true, loop: true, playsinline: true, preload: 'auto', 'aria-hidden': 'true', disablepictureinpicture: true });
+    v.muted = true;
+    v.addEventListener('playing', () => { card.classList.remove('loading'); v.classList.add('on'); });
+    v.addEventListener('error', () => { card.dataset.noVideo = '1'; card.classList.remove('loading'); if (card.dataset.playing) img.src = img.dataset.gif; }, { once: true });
+    img.after(v);
+  }
+  if (!v.src) v.src = src;
+  clearTimeout(card._spin); card._spin = setTimeout(() => { if (card.dataset.playing && !v.classList.contains('on')) card.classList.add('loading'); }, 120);
+  v.currentTime = 0;
+  v.play().catch(() => {});
 }
 function stop(card) {
+  if (!card.dataset.playing) return;
+  delete card.dataset.playing; playing.delete(card);
+  clearTimeout(card._spin); card.classList.remove('loading');
+  const v = card.querySelector('.pic-video');
+  if (v) { v.pause(); v.classList.remove('on'); }
   const img = card.querySelector('.pic');
-  if (!img || !img.dataset.playing) return;
-  delete img.dataset.playing; img.src = img.dataset.still;
-  playing.delete(card);
+  if (img && img.src !== img.dataset.still && img.dataset.still) img.src = img.dataset.still;
 }
 const timers = new WeakMap();
 const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
   for (const e of entries) {
     clearTimeout(timers.get(e.target));
-    if (e.isIntersecting && e.intersectionRatio >= 0.6) timers.set(e.target, setTimeout(() => play(e.target), 350));
+    if (e.isIntersecting && e.intersectionRatio >= 0.6) timers.set(e.target, setTimeout(() => play(e.target), 250));
     else stop(e.target);
   }
 }, { threshold: [0, 0.6] }) : null;
@@ -99,8 +100,8 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries)
 export function animated(card) {
   if (touch && io) io.observe(card);
   else {
-    card.addEventListener('mouseenter', () => play(card));
-    card.addEventListener('mouseleave', () => stop(card));
+    card.addEventListener('pointerenter', () => play(card));
+    card.addEventListener('pointerleave', () => stop(card));
     card.addEventListener('focus', () => play(card));
     card.addEventListener('blur', () => stop(card));
   }

@@ -2,9 +2,11 @@
 import { AxoRenderer, W, FPS } from './core.js';
 
 export { W, FPS };
-export { makeSticker, MOTIONS } from './motions.js';
+export { Scene, normalizeProject, fromRecipe, DEFAULTS } from './scene.js';
+export { builtinRegistry, ICONS, EYES, MOUTHS } from './builtin.js';
+export { Registry, compile, TYPES, resolveParams, sourceFor, ComponentError } from './components.js';
 export { loadFont, charSprite } from './draw.js';
-export { exportGif } from './gif.js';
+export { exportGif, renderFrames } from './gif.js';
 
 let R = null;
 export function renderer() { return (R ||= new AxoRenderer(2)); }

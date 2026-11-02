@@ -9,7 +9,7 @@ export function loadWorkshop() {
     .catch((e) => { WS.ready = null; throw e; })    // 失败了不缓存，下次还能重试
     .then((d) => {
       WS.entries = (d.entries || []).map((e) => ({
-        ...e, key: String(e.issue), gifUrl: encodePath(e.gif), still: `thumbs/w${e.issue}.webp`, coverUrl: encodePath(e.cover),
+        ...e, key: String(e.issue), gifUrl: encodePath(e.gif), still: `thumbs/w${e.issue}.webp`, preview: `previews/w${e.issue}.mp4`, coverUrl: encodePath(e.cover),
       }));
       return WS;
     });
@@ -22,7 +22,7 @@ export function sorted() {
 }
 
 function card(e) {
-  const img = el('img', { class: 'pic', loading: 'lazy', decoding: 'async', width: 400, height: 400, alt: e.text, src: e.still, 'data-still': e.still, 'data-gif': e.gifUrl });
+  const img = el('img', { class: 'pic', loading: 'lazy', decoding: 'async', width: 400, height: 400, alt: e.text, src: e.still, 'data-still': e.still, 'data-gif': e.gifUrl, 'data-preview': e.preview });
   img.addEventListener('error', () => { if (img.src.includes('/thumbs/')) { img.dataset.still = e.coverUrl; img.src = e.coverUrl; } }, { once: true });
   return animated(el('button', { class: 'card ws-card', type: 'button', onclick: () => { location.hash = `#/w/${e.issue}`; } }, img,
     el('span', { class: 'cap' }, el('b', { text: e.text }), el('span', { class: 'likes', text: `👍 ${e.likes || 0}` }),
