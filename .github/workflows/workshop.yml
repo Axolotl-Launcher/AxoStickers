@@ -1,0 +1,86 @@
+# 创意工坊：issue 就是投稿。校验配方 → 真引擎出图 → 提交 GIF 和 workshop/index.json → 回复并关掉 issue → 重新部署网站。
+# 维护者给 issue 打上 rejected 标签就撤下。
+# issue 正文是不可信输入：只由 workshop/tools/workshop.py 从事件文件里读出来当 JSON 校验，从不拼进 shell 命令。
+name: 工坊 · 出图
+
+on:
+  issues:
+    types: [opened, edited, reopened, labeled]
+
+permissions: {}
+
+jobs:
+  publish:
+    if: >-
+      github.event.action != 'labeled' &&
+      github.event.issue.state == 'open' &&
+      !contains(github.event.issue.labels.*.name, 'rejected') &&
+      (contains(github.event.issue.labels.*.name, 'workshop') || startsWith(github.event.issue.title, '[工坊]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write   # 提交 GIF 和 index.json
+      issues: write     # 回复、打标签、关 issue
+      actions: write    # 触发网站部署
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: 依赖（numpy、Pillow、ffmpeg）
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
+          pip install -q 'numpy>=2,<3' 'pillow>=11,<13'
+      - name: 校验配方、出图、提交
+        id: ws
+        run: python workshop/tools/workshop.py publish --push
+      - name: 回复 issue
+        if: steps.ws.outputs.status == 'published' || steps.ws.outputs.status == 'invalid'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ steps.ws.outputs.number }}
+          STATUS: ${{ steps.ws.outputs.status }}
+        run: |
+          gh label create workshop --color fe3e8c --description '创意工坊投稿' 2>/dev/null || true
+          gh label create rejected --color 6e1446 --description '创意工坊：维护者撤下' 2>/dev/null || true
+          gh issue comment "$NUMBER" --body-file "$RUNNER_TEMP/workshop/comment.md"
+          if [ "$STATUS" = published ]; then
+            gh issue edit "$NUMBER" --add-label workshop
+            gh issue close "$NUMBER" --reason completed
+            gh workflow run pages.yml --ref main
+          fi
+
+  reject:
+    if: github.event.action == 'labeled' && github.event.label.name == 'rejected'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      issues: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: 撤下
+        id: ws
+        run: python workshop/tools/workshop.py reject --push
+      - name: 回复 issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ steps.ws.outputs.number }}
+          STATUS: ${{ steps.ws.outputs.status }}
+        run: |
+          if [ "$STATUS" = removed ]; then
+            gh issue comment "$NUMBER" --body-file "$RUNNER_TEMP/workshop/comment.md"
+            gh workflow run pages.yml --ref main
+          fi
+          gh issue close "$NUMBER" --reason 'not planned' || true

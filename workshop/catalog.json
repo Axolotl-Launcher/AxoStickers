@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "_说明": "创意工坊的可选项和中文名。网页编辑器和发布工作流（workshop/tools/workshop.py）都读这一份：不在这里的值一律拒绝。",
+  "text": { "min": 1, "max": 5, "chars": "一-鿯A-Za-z0-9!?！？~～…。，、·+-", "hint": "1～5 个字：汉字、字母、数字和 ！？～…。，、·+-" },
+  "limits": { "fx": 2, "hold": 1, "wear": 1 },
+  "categories": { "support": "群里答疑", "daily": "日常回复", "mood": "情绪", "minecraft": "我的世界", "life": "生活", "special": "特别篇" },
+  "motions": {
+    "idle": { "zh": "发呆" }, "nod": { "zh": "点头" }, "shake": { "zh": "摇头" }, "hop": { "zh": "蹦跶" },
+    "sidehop": { "zh": "横跳" }, "jump": { "zh": "跳水" }, "flip": { "zh": "空翻" }, "spin": { "zh": "转圈" },
+    "sink": { "zh": "潜水", "offscreen": true }, "popup": { "zh": "冒出来", "offscreen": true }, "peek": { "zh": "探头" },
+    "hide": { "zh": "躲起来" }, "tremble": { "zh": "发抖" }, "rage": { "zh": "暴怒" }, "tantrum": { "zh": "撒泼" },
+    "dance": { "zh": "跳舞" }, "wag": { "zh": "摇尾巴" }, "bow": { "zh": "鞠躬" }, "kowtow": { "zh": "磕头" },
+    "doze": { "zh": "打瞌睡" }, "flop": { "zh": "瘫着" }, "melt": { "zh": "化了" }, "dash": { "zh": "溜走", "offscreen": true },
+    "slidein": { "zh": "滑进来", "offscreen": true }, "look": { "zh": "张望" }, "lookup": { "zh": "抬头" },
+    "wave": { "zh": "挥手" }, "cheer": { "zh": "欢呼" }, "clap": { "zh": "鼓掌" }, "belly": { "zh": "翻肚皮" },
+    "flipover": { "zh": "翻个身" }, "float": { "zh": "仰泳" }, "zoom": { "zh": "凑近" }, "pounce": { "zh": "扑过来" },
+    "approach": { "zh": "游过来" }, "tilt": { "zh": "歪头" }, "shrink": { "zh": "缩小" }, "puff": { "zh": "鼓气" },
+    "grow": { "zh": "变大" }, "drift": { "zh": "漂着" }, "buoy": { "zh": "浮浮沉沉" }, "sway": { "zh": "摇摆" },
+    "headbang": { "zh": "甩头" }, "headbob": { "zh": "晃脑袋" }, "roll": { "zh": "打滚" }, "circle": { "zh": "绕圈游" },
+    "stare": { "zh": "盯" }, "shy": { "zh": "害羞" }, "turnaway": { "zh": "扭头不理" }, "think": { "zh": "思考" },
+    "boing": { "zh": "弹弹" }, "wobble": { "zh": "果冻抖" }, "faint": { "zh": "晕倒" }, "run": { "zh": "狂奔" },
+    "launch": { "zh": "起飞", "offscreen": true }, "stretch": { "zh": "伸懒腰" }, "slosh": { "zh": "拍水" },
+    "petrify": { "zh": "石化" }, "glitch": { "zh": "卡了", "offscreen": true }, "squish": { "zh": "被砸扁" },
+    "hiccup": { "zh": "打嗝" }, "shakeoff": { "zh": "甩水" }, "nuzzle": { "zh": "蹭蹭" }, "rise": { "zh": "登场" },
+    "recoil": { "zh": "往后一缩" }, "bonk": { "zh": "撞墙" },
+    "swing": { "zh": "挥工具", "prop": "pickaxe" }, "flagwave": { "zh": "挥来挥去", "prop": "flag" },
+    "offer": { "zh": "递给你", "prop": "heart" }, "chomp": { "zh": "啃", "prop": "cookie" }, "drink": { "zh": "喝", "prop": "boba" },
+    "read": { "zh": "看书", "prop": "book" }, "scan": { "zh": "拿放大镜找", "prop": "magnifier" },
+    "typing": { "zh": "敲键盘", "noHold": true }, "umbrella": { "zh": "撑伞", "noHold": true }
+  },
+  "faces": {
+    "normal": "原版", "smile": "微笑", "happy": "开心", "joy": "大笑", "grin": "咧嘴", "xd": "笑出泪", "love": "爱心眼",
+    "star": "星星眼", "sparkle": "闪闪", "shock": "吓一跳", "surprise": "惊讶", "angry": "生气", "rage": "暴怒", "pout": "嘟嘴",
+    "sad": "难过", "worried": "担心", "cry": "大哭", "sob": "抽泣", "teary": "泪汪汪", "sleep": "睡着", "sleepy": "犯困",
+    "tired": "累了", "meh": "无语", "blank": "放空", "dead": "寄", "dizzy": "晕", "smug": "得意", "wink": "眨眼",
+    "focus": "专注", "struggle": "用力", "determined": "坚定", "blep": "吐舌头", "drool": "流口水", "eat": "干饭",
+    "money": "钱眼", "awkward": "尴尬", "side": "斜眼", "cool": "淡定", "shy": "害羞", "tiny": "豆豆眼", "up": "望天",
+    "catface": "猫猫嘴"
+  },
+  "fx": {
+    "hearts": "爱心", "flowers": "小花", "notes": "音符", "sparkles": "闪光", "twinkle": "小星星", "confetti": "彩纸",
+    "fireworks": "烟花", "question": "问号", "exclaim": "感叹号", "shock": "震惊", "dots": "省略号", "loading": "转圈圈",
+    "bulb": "灵光一闪", "check": "对勾", "cross": "叉", "thumb": "点赞", "plus1": "+1", "anger": "怒", "steam": "冒烟",
+    "fire": "着火", "bolt": "闪电", "boom": "爆炸", "flash": "闪光灯", "sweat": "流汗", "panic": "慌", "tears": "掉眼泪",
+    "stream": "宽面条泪", "rain": "头顶下雨", "gloom": "阴郁", "brokenheart": "心碎", "skull": "骷髅", "ghost": "灵魂出窍",
+    "stars": "冒金星", "swirl": "漩涡", "zzz": "呼噜", "blush": "脸红", "bubbles": "吐泡泡", "speed": "速度线",
+    "sun": "太阳", "moon": "月亮", "snow": "下雪", "leaves": "落叶", "coins": "撒钱"
+  },
+  "fxKinds": { "float": "飘", "pop": "冒出", "stay": "挂着", "say": "气泡", "orbit": "环绕", "fall": "掉落", "emit": "喷出" },
+  "icons": {
+    "heart": "爱心", "star": "星星", "mail": "信", "pin": "图钉", "bug": "虫子", "clock": "闹钟", "controller": "手柄",
+    "check": "对勾", "cross": "叉", "question": "问号", "exclaim": "感叹号", "cookie": "曲奇", "flag": "旗子", "diamond": "钻石",
+    "money": "钞票", "apple": "苹果", "lemon": "柠檬", "thumb": "赞", "creeper": "苦力怕", "fish": "鱼", "flower": "花",
+    "drop": "水滴", "arrow": "箭头"
+  },
+  "holds": {
+    "pickaxe": "钻石镐", "sword": "钻石剑", "wrench": "扳手", "rod": "钓竿", "flag": "小旗", "torch": "火把", "rtorch": "红石火把",
+    "magnifier": "放大镜", "book": "书", "phone": "手机", "laptop": "笔记本", "controller": "手柄", "mail": "信", "key": "钥匙",
+    "sign": "牌子", "heart": "爱心", "flower": "花", "gift": "礼物", "trophy": "奖杯", "star": "星星", "diamond": "钻石",
+    "emerald": "绿宝石", "money": "钞票", "clock": "闹钟", "bulb": "灯泡", "potion": "药水", "cup": "咖啡", "boba": "奶茶",
+    "bucket": "水桶", "cookie": "曲奇", "apple": "苹果", "melon": "西瓜", "carrot": "胡萝卜", "cake": "蛋糕", "bowl": "饭碗",
+    "popcorn": "爆米花", "fish": "鱼", "bone": "骨头", "tnt": "TNT", "grass": "草方块", "brick": "砖", "umbrella": "伞"
+  },
+  "wears": {
+    "party": "派对帽", "crown": "王冠", "nightcap": "睡帽", "chef": "厨师帽", "grad": "学士帽", "helmet": "矿工帽",
+    "halo": "光环", "horns": "小恶魔角", "bow": "蝴蝶结", "flowers": "花环", "towel": "毛巾", "ice": "冰袋", "band": "头带",
+    "phones": "耳机", "shades": "墨镜", "glasses": "眼镜", "mask": "口罩"
+  },
+  "styles": { "pink": "粉", "blue": "蓝", "purple": "紫", "red": "红", "green": "绿", "gold": "金", "gray": "灰", "cyan": "青" },
+  "tmodes": {
+    "stay": "轻轻晃", "wave": "波浪", "bounce": "弹跳", "pulse": "心跳", "swing": "摇摆", "droop": "耷拉", "shake": "抖动",
+    "shiver": "哆嗦", "zoom": "冲击", "spin": "翻转", "pop": "蹦出来", "type": "打字机", "slam": "砸下来"
+  },
+  "entrance": ["pop", "type", "slam"]
+}

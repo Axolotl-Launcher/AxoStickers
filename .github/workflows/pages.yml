@@ -1,0 +1,79 @@
+# 网站：site/ 构建 + out/ 的表情 + workshop/ 的投稿 → GitHub Pages。
+# 推到 main 时自动跑；工坊出图 / 数点赞之后由那两个工作流用 workflow_dispatch 触发。
+name: 网站 · 部署到 GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'out/**'
+      - 'workshop/**'
+      - 'engine/**'
+      - 'kit/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - name: Python 依赖
+        run: pip install -q 'numpy>=2,<3' 'pillow>=11,<13' 'fonttools>=4.50,<5' 'brotli>=1.1'
+      - name: 网页字体（缓存）
+        id: fonts
+        uses: actions/cache@v6
+        with:
+          path: |
+            site/src/gen/fonts
+            site/src/gen/fonts.css
+          key: fonts-${{ hashFiles('kit/fonts/NotoSansSC.ttf', 'site/tools/make_fonts.py') }}
+      - name: 切字体
+        if: steps.fonts.outputs.cache-hit != 'true'
+        run: python site/tools/make_fonts.py
+      - name: 导出引擎数据
+        run: python site/tools/export_engine.py
+      - name: 构建
+        working-directory: site
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+      - name: 拼网站（缩略图、表情、工坊投稿）
+        run: python site/tools/assemble.py
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

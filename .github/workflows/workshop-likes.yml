@@ -1,0 +1,39 @@
+# 工坊的点赞 = 投稿 issue 上的 👍。每 6 小时数一次写进 workshop/index.json，访客不用每人都去调 GitHub API。
+name: 工坊 · 数点赞
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: workshop-likes
+
+jobs:
+  likes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write   # 提交 index.json
+      issues: read      # 读 👍
+      actions: write    # 触发网站部署
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: 数 👍
+        id: likes
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python workshop/tools/workshop.py likes --push
+      - name: 更新网站
+        if: steps.likes.outputs.changed != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh workflow run pages.yml --ref main

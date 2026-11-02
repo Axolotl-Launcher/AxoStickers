@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>预览对照（开发用）</title>
+<style>
+  body { font: 14px system-ui; margin: 16px; background: #eef6ff; }
+  .row { display: flex; gap: 8px; margin-bottom: 12px; align-items: flex-start; }
+  .row canvas, .row img { width: 200px; height: 200px; background: #fff; }
+  .row b { width: 120px; }
+</style>
+</head>
+<body>
+<p>左：网页预览（three.js 版）；右：Python 引擎同一帧（先跑 python site/tools/ref_frames.py）。</p>
+<div id="rows"></div>
+<script type="module">
+import './src/gen/fonts.css';
+import { AxoRenderer, W, FPS } from './src/engine/core.js';
+import { makeSticker } from './src/engine/motions.js';
+import { loadFont } from './src/engine/draw.js';
+const refs = await (await fetch('_ref/index.json')).json();
+const R = new AxoRenderer(2);
+for (const r of refs) {
+  await loadFont(r.spec.text);
+  const s = makeSticker(r.spec, R);
+  const row = document.createElement('div'); row.className = 'row';
+  row.innerHTML = `<b>${r.spec.text}<br>${r.spec.motion}</b>`;
+  for (const fi of r.frames) {
+    const c = document.createElement('canvas'); c.width = c.height = W;
+    s.frame(c.getContext('2d'), fi / FPS);
+    const img = document.createElement('img'); img.src = `_ref/${r.name}_${fi}.png`;
+    row.append(c, img);
+  }
+  document.getElementById('rows').append(row);
+}
+</script>
+</body>
+</html>
