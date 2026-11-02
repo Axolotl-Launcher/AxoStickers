@@ -430,10 +430,19 @@ def apply(change, paths, message, push):
         print('push rejected, retrying'); time.sleep(3 + attempt * 4)
     raise SystemExit('push failed 6 times')
 
+def entry_hash(e):
+    """index 里一条的查重值。第一版的投稿没存 hash：按它的配方现算。"""
+    if e.get('hash'): return e['hash']
+    try:
+        rec, errs = validate(e['recipe'])
+        proj, more = validate_project(from_recipe(rec))
+        return digest(proj) if not errs and not more else None
+    except Exception: return None
+
 def limits(idx, h, author, num):
     """查重 + 每人每天的配额，按给定的 index 算（发布前查一次，重放到最新 index 上时再查一次）。"""
     errs, others = [], [e for e in idx['entries'] if e['issue'] != num]
-    same = next((e for e in others if e.get('hash') == h), None)
+    same = next((e for e in others if entry_hash(e) == h), None)
     if same: errs.append(f"工坊里已经有一模一样的了：#{same['issue']}（@{same['author']}）。换个表情或者特效再来")
     now = datetime.now(timezone.utc)
     recent = [e for e in others if e['author'] == author and now - datetime.fromisoformat(e['date']) < timedelta(days=1)]
@@ -444,8 +453,11 @@ def still_current(num, body):
     """出图要一两分钟：提交前再看一眼 issue，被改过正文（新的那次运行会处理）、关了或被撤下就不发了。"""
     token, repo = os.environ.get('GITHUB_TOKEN'), os.environ.get('GITHUB_REPOSITORY')
     if not token or not repo: return
-    try: cur = api(f'issues/{num}', token, repo)
-    except Exception as e: print('issue check skipped:', e); return   # 查不到就按事件里的来，别让抖动卡住发布
+    cur = None
+    for k in range(4):                                     # 查不到就不发：宁可让投稿人再保存一次，也别把撤下 / 改过的发出去
+        try: cur = api(f'issues/{num}', token, repo); break
+        except Exception as e: print('issue check failed:', e); time.sleep(3 + 4 * k)
+    if cur is None: raise Abort('invalid', ['机器人这会儿查不到 issue 的最新状态（GitHub 接口出错），过一会儿随便改一下正文保存，会再试一次'])
     if any(l.get('name') == 'rejected' for l in cur.get('labels', [])): raise Abort('stale')
     if cur.get('state') != 'open' or (cur.get('body') or '') != body: raise Abort('stale')
 
@@ -530,7 +542,10 @@ def cmd_publish(push, src):
     with open(os.path.join(ROOT, pj), 'w', encoding='utf-8', newline='\n') as f: json.dump(proj, f, ensure_ascii=False, indent=1)
     entry = dict(issue=num, v=2, text=title_of(proj), summary=describe(proj), project=pj, hash=h, author=author,
                  date=datetime.now(timezone.utc).replace(microsecond=0).isoformat(), likes=0, gif=gif, cover=cover, frames=info['frames'])
+    existing = []
     def add(idx):
+        existing[:] = [e for e in idx['entries'] if e['issue'] == num]
+        if existing: raise Abort('skip')             # 同一个 issue 的另一次运行刚发完：保留那条（和它的点赞数），只补收尾
         errs = limits(idx, h, author, num)           # 别的投稿可能刚抢先落库
         if errs: raise Abort('invalid', errs)
         still_current(num, body)
@@ -540,6 +555,7 @@ def cmd_publish(push, src):
     except Abort as a:
         print('aborted:', a.status)
         if a.errs: write_comment(invalid_comment(a.errs))
+        if a.status == 'skip' and existing: write_comment(published_comment(existing[0], repo))
         return outputs(status=a.status, number=num)
     if push and rejected_now(num):                     # 推送的同时被撤下了：自己收回来
         print('rejected while publishing, removing again'); remove(num, push)

@@ -1,6 +1,7 @@
 // 沙盒里的那一半：编译组件、拼场景、播放、导出。和外面只通过 postMessage 说话（协议见 studio/runner.js）。
 import './gen/fonts.css';
-import { W, Scene, builtinRegistry, renderer, loadFont, exportGif, renderFrames } from './engine/index.js';
+import { W, Scene, builtinRegistry, renderer, loadFont, exportGif } from './engine/index.js';
+import { eachFrame } from './engine/gif.js';
 import { compile, sourceFor } from './engine/components.js';
 import { makeCanvas, canvasBytes } from './engine/core.js';
 import { zipStore } from './engine/zip.js';
@@ -11,6 +12,7 @@ import { lockEval } from './engine/loopguard.js';
 // 只在不透明来源里干活（<iframe sandbox="allow-scripts">）：别的网站要是不加 sandbox 直接嵌这个页面，
 // 组件代码就会以本站的身份运行，能读本站的存储。本机开发 / CI 出图（localhost、127.0.0.1）例外，但只认同源发来的消息。
 const OPAQUE = self.origin === 'null';
+const HOME = new URL(location.href).origin;                  // 本站（沙盒页面地址的来源）：只听本站页面发来的消息
 const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 if (!OPAQUE && !LOCAL) {
   document.body.textContent = '这个页面只能在创意工坊编辑器的沙盒里打开。';
@@ -84,6 +86,7 @@ function loop(now) {
   if (scene.errors.size !== reported) { reported = scene.errors.size; post({ type: 'errors', errors: errorsOf(scene) }); }
 }
 
+let loaded = 0;                                               // 这次新编进来几段（用来决定要不要更新素材库）
 function loadUser(items) {                                   // 用户 / 文件 / 工程自带的组件；没变的不重编
   const errors = [];
   for (const { source, origin } of items) {
@@ -91,7 +94,7 @@ function loadUser(items) {                                   // 用户 / 文件 
     try {
       const defs = compile(source, origin, { guard: true });
       for (const d of defs) reg.put(d, source, origin);
-      userSources.set(origin, source);
+      userSources.set(origin, source); loaded++;
     } catch (e) {
       errors.push({ origin, message: e.message, line: e.line ?? null });     // 编译失败：保留上一个能用的版本
     }
@@ -102,6 +105,7 @@ function loadUser(items) {                                   // 用户 / 文件 
 // 组件有两个来源：「我的组件」（components 消息）和工程自带的（project 消息）。
 // 某个来源不再带某段代码了，就把它注册的组件撤掉（顶掉的内置组件恢复原样），免得新工程用到上一个工程的旧代码。
 const owned = { mine: new Set(), project: new Set() };
+let hadErrors = false;
 function dropOrigin(origin) {
   let n = 0;
   for (const [key, e] of [...reg.items]) {
@@ -136,8 +140,11 @@ const handlers = {
     post({ type: 'catalog', errors: [], catalog: catalog() }); if (project) await build(); },
   async project({ project: p }) {
     project = p;
+    loaded = 0;
     const { errors, dropped } = syncUser('project', p.components || []);
-    if (errors.length || dropped) post({ type: 'catalog', errors, catalog: catalog() });
+    // 素材库只在组件有变化、或者报错有变化（包括刚修好）的时候更新
+    if (loaded || dropped || errors.length || hadErrors) post({ type: 'catalog', errors, catalog: catalog() });
+    hadErrors = errors.length > 0;
     await build();
   },
   transport({ playing: pl, speed: sp, t, onion: on }) {
@@ -151,19 +158,15 @@ const handlers = {
     if (scene) scene.dirty = true;
   },
   async export({ req, format = 'gif', size, colors, maxKb }) {
-    if (!scene) return;
+    if (!scene) { post({ type: 'export-error', req, message: '预览还没准备好，等一下再导出' }); return; }
     try {
       const progress = (p) => post({ type: 'progress', req, p });
       const s = new Scene(project, reg, R);                   // 独立一份，不打断预览
       let bytes, mime = 'image/gif';
       if (format === 'gif') bytes = await exportGif(s, { size, colors, maxKb }, progress);
-      else if (format === 'png-zip') {
-        const frames = await renderFrames(s, size || s.P.size, progress), c = makeCanvas(size || s.P.size, size || s.P.size), g = c.getContext('2d');
+      else if (format === 'png-zip') {                         // 按时间顺序从第一帧开始，每帧马上压成 PNG（不把整帧像素都留在内存里）
         const files = [];
-        for (let i = 0; i < frames.length; i++) {
-          g.putImageData(new ImageData(frames[i], c.width, c.height), 0, 0);
-          files.push({ name: `frame_${String(i + 1).padStart(3, '0')}.png`, data: await canvasBytes(c) });
-        }
+        await eachFrame(s, size || s.P.size, async (_, i, c) => { files.push({ name: `frame_${String(i + 1).padStart(3, '0')}.png`, data: await canvasBytes(c) }); }, { fromCover: false, onProgress: progress });
         bytes = zipStore(files); mime = 'application/zip';
       } else if (format === 'png') {
         const c = makeCanvas(size || s.P.size, size || s.P.size), b = makeCanvas(W, W);
@@ -176,7 +179,7 @@ const handlers = {
     }
   },
   async filmstrip({ req, n, size = 64 }) {
-    if (!scene) return;
+    if (!scene) { post({ type: 'filmstrip-done', req, bitmaps: [] }); return; }
     const s = new Scene(project, reg, R), big = makeCanvas(W, W), bg = big.getContext('2d'), out = [];
     const count = Math.min(n || s.N, s.N);
     for (let k = 0; k < count; k++) {
@@ -227,9 +230,15 @@ const asyncFail = (err) => {
 window.addEventListener('error', (e) => asyncFail(e.error || e.message));
 window.addEventListener('unhandledrejection', (e) => asyncFail(e.reason));
 
+// 导出要好几秒：期间改工程 / 换组件 / 换模型的消息先排队，等导出完再处理，免得一张 GIF 里混着两个版本
+let busy = Promise.resolve();
+const CHANGES = new Set(['project', 'components', 'remove', 'model']);
 window.addEventListener('message', async (e) => {
   if (e.source !== parent || !e.data || typeof e.data.type !== 'string' || !handlers[e.data.type]) return;
-  if (!OPAQUE && e.origin !== location.origin) return;                // 本机不加沙盒跑的时候只认同源
+  if (e.origin !== HOME) return;                                       // 别的网站嵌了这个页面也指挥不动它
+  const type = e.data.type;
+  if (type === 'export') { const run = busy.then(() => handlers.export(e.data)); busy = run.catch(() => {}); return; }
+  if (CHANGES.has(type)) { const run = busy.then(() => handlers[type](e.data)); busy = run.catch(() => {}); run.catch((err) => post({ type: 'fatal', message: String(err && err.message || err) })); return; }
   try { await handlers[e.data.type](e.data); } catch (err) { post({ type: 'fatal', message: String(err && err.message || err) }); }
 });
 

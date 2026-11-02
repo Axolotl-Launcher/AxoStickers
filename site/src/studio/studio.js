@@ -108,6 +108,7 @@ export async function openStudio(root, { recipe = null, project = null, shared =
   if (shared) { try { S.store.replace(await decodeShare(shared)); toast('打开了分享的工程'); } catch { toast('分享链接坏了'); } }
   else if (project) S.store.replace(project);
   else if (recipe) S.store.replace(fromRecipe(recipe));
+  ensureModel();                                               // 草稿 / 打开的工程用的是 Logo 模型：先把模型送进沙盒
   studioActive(true);
 }
 
@@ -210,11 +211,14 @@ function build(root) {
   S.runner.watch(() => { toast('沙盒没响应了，重开一次'); S.runner.start(); });
 
   store.on((why) => {
+    if (why === 'foreign') { toast('这份草稿在另一个标签页里改过了：这边的改动不再自动保存（想接着用那边的就刷新页面；这边的可以「保存」成文件）'); return; }
+    if (why === 'mine') { if (S.drawer === 'mine') renderDrawer(); return; }
     if (why === 'select') { renderInspector(); renderTimeline(); loadCode(); return; }
-    name.value = store.p.name;
-    sendProject(); renderInspector(); renderTimeline(); updateHistory();
+    if (document.activeElement !== name) name.value = store.p.name;
+    sendProject(); renderTimeline(); updateHistory(); ensureModel();
+    if (S.quiet !== 'inspector') renderInspector();              // 正在打字 / 拖滑块的那个面板不重建，不然输入框会被换掉、失去焦点
     if (why !== 'change') loadCode();
-    if (['text', 'skin', 'mine', 'model'].includes(S.drawer)) renderDrawer();
+    if (S.quiet !== 'drawer' && ['text', 'skin', 'mine', 'model'].includes(S.drawer)) renderDrawer();
   });
 
   // 舞台看不见的时候（手机上往下翻）挂一个小提示
@@ -227,6 +231,23 @@ function build(root) {
 
   openDrawer(S.drawer); setDock('timeline'); setMobile('drawer');
   renderInspector(); renderTimeline(); updateHistory(); layoutStage();
+}
+
+// 面板里的输入框改工程时用：这次改动不重建这个面板（输入框本身已经是新值了）
+function quietly(panel, fn) { S.quiet = panel; try { fn(); } finally { S.quiet = null; } }
+
+// 工程用到了网站自带的 Logo 模型、但这个页面还没载入过（打开分享 / 工坊作品 / 草稿时）：载入并送进沙盒
+let modelLoading = null;
+function ensureModel(id = S.store.p.model.component) {
+  if (id !== 'logo' || S.models.has('logo')) return Promise.resolve();
+  return modelLoading ||= (async () => {
+    try {
+      const bytes = await (await fetch('models/axolotl_logo.glb')).arrayBuffer();
+      S.models.set('logo', { name: 'Logo 版', bytes });
+      const r = await S.runner.request({ type: 'model', id: 'logo', bytes: bytes.slice(0) });
+      if (!r.ok) toast('模型没读出来：' + r.message);
+    } catch { toast('Logo 模型没下载下来'); } finally { modelLoading = null; }
+  })();
 }
 
 // ---------------- 沙盒通信 ----------------
@@ -276,14 +297,15 @@ function layoutStage() {
 }
 function updateHistory() { S.undoBtn.disabled = !S.store.past.length; S.redoBtn.disabled = !S.store.future.length; }
 
-let filmTimer;
+let filmTimer, filmSeq = 0;
 function scheduleFilmstrip() {
   clearTimeout(filmTimer);
   filmTimer = setTimeout(async () => {
     if (S.dock !== 'timeline') return;
-    const n = Math.min(S.N, 48);
-    const { bitmaps } = await S.runner.request({ type: 'filmstrip', n, size: 56 });
-    S.filmBitmaps = bitmaps; drawFilmstrip();
+    const n = Math.min(S.N, 48), my = ++filmSeq;              // 晚回来的旧请求不能盖掉新的胶片条
+    const r = await S.runner.request({ type: 'filmstrip', n, size: 56 }).catch(() => null);
+    if (!r || my !== filmSeq) return;
+    S.filmBitmaps = r.bitmaps; drawFilmstrip();
   }, 700);
 }
 function drawFilmstrip() {
@@ -387,7 +409,7 @@ async function renderDrawer() {
     fill(body, 
       ...texts.map((l) => {
         const inp = el('input', { class: 'input st-textinput', value: l.text, maxlength: 24, placeholder: '写点字', 'aria-label': '文字' });
-        inp.addEventListener('input', () => st.change((p) => { p.layers.find((x) => x.id === l.id).text = inp.value; }, { coalesce: `text:${l.id}` }));
+        inp.addEventListener('input', () => quietly('drawer', () => st.change((p) => { p.layers.find((x) => x.id === l.id).text = inp.value; }, { coalesce: `text:${l.id}` })));
         inp.addEventListener('focus', () => st.select(l.id));
         return el('div', { class: 'st-textrow' }, inp, el('button', { class: 'st-btn icon', type: 'button', title: '删掉这行字', onclick: () => st.change((p) => { p.layers = p.layers.filter((x) => x.id !== l.id); }) }, '×'));
       }),
@@ -448,15 +470,11 @@ function applyNew(type, id) {
 }
 const sniff = (src) => ({ id: (/id:\s*['"]([^'"]+)['"]/.exec(src) || [])[1], type: (/type:\s*['"](\w+)['"]/.exec(src) || [])[1], name: (/name:\s*['"]([^'"]+)['"]/.exec(src) || [])[1] });
 
+let modelPick = 0;                                             // 选模型要等载入：只认最后一次选的
 async function chooseModel(id) {
-  if (id === 'logo' && !S.models.has('logo')) {
-    try {
-      const bytes = await (await fetch('models/axolotl_logo.glb')).arrayBuffer();
-      S.models.set('logo', { name: 'Logo 版', bytes });
-      const r = await S.runner.request({ type: 'model', id, bytes: bytes.slice(0) });
-      if (!r.ok) { toast('模型没读出来：' + r.message); return; }
-    } catch (e) { toast('模型没下载下来'); return; }
-  }
+  const my = ++modelPick;
+  await ensureModel(id);
+  if (my !== modelPick || (id === 'logo' && !S.models.has('logo'))) return;
   S.store.change((p) => { p.model = { component: id, face: null }; });
 }
 
@@ -630,7 +648,7 @@ function renderInspector() {
   if (!S.inspector) return;
   const st = S.store, l = st.layer();
   if (!l) { renderProjectInspector(); return; }
-  const set = (fn, key) => st.change((p) => fn(p.layers.find((x) => x.id === l.id)), { coalesce: `${l.id}:${key}` });
+  const set = (fn, key) => quietly('inspector', () => st.change((p) => fn(p.layers.find((x) => x.id === l.id)), { coalesce: `${l.id}:${key}` }));
   const idx = st.p.layers.indexOf(l);
   const metas = l.type === 'text' ? (S.catalog.get('textanim') || []) : (S.catalog.get(l.type) || []);
   const meta = metaOf(l.type === 'text' ? 'textanim' : l.type, l.component);
@@ -704,7 +722,7 @@ function moveLayer(i, d) {
 
 function renderProjectInspector() {
   const st = S.store, P = st.p;
-  const set = (fn, key) => st.change(fn, { coalesce: `proj:${key}` });
+  const set = (fn, key) => quietly('inspector', () => st.change(fn, { coalesce: `proj:${key}` }));
   const skinMeta = metaOf('skin', P.skin.component);
   const skinSel = el('select', { class: 'select' }, ...(S.catalog.get('skin') || []).map((m) => el('option', { value: m.id, text: m.name, selected: m.id === P.skin.component ? true : null })));
   skinSel.addEventListener('change', () => st.change((p) => { p.skin = { component: skinSel.value, params: {} }; }));
@@ -845,10 +863,11 @@ function pickFile(accept = '.js,.json,.axo,.glb,.gltf,application/json,text/java
 async function importFile(f) {
   if (/\.(glb|gltf)$/i.test(f.name)) {
     if (f.size > 4 << 20) { toast(`${f.name} 太大了（模型上限 4 MB）`); return; }
-    const id = `file:${f.name}`, bytes = await f.arrayBuffer();
-    const r = await S.runner.request({ type: 'model', id, bytes: bytes.slice(0) });
+    const id = `file:${f.name}`, bytes = await f.arrayBuffer(), my = ++modelPick;
+    const r = await S.runner.request({ type: 'model', id, bytes: bytes.slice(0) }).catch((e) => ({ ok: false, message: e.message }));
     if (!r.ok) { toast(`模型没读出来：${r.message}`); return; }
     S.models.set(id, { name: f.name, bytes, info: `${r.quads} 个面片 · 骨骼 ${r.bones.join(' ') || '无'}` });
+    if (my !== modelPick) return;                                // 载入期间又选了别的模型：以后选的为准
     S.store.change((p) => { p.model = { component: id, face: false }; });
     openDrawer('model');
     toast(`换上了 ${f.name}`);
@@ -880,11 +899,24 @@ async function encodeShare(p) {
   let s = ''; for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode(...buf.subarray(i, i + 0x8000));
   return 'z' + btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
+const SHARE_MAX = 400000, SHARE_OUT_MAX = 1 << 20;            // 链接最多 40 万字符，解压出来最多 1 MB（再大就是压缩炸弹）
 async function decodeShare(code) {
+  if (code.length > SHARE_MAX) throw new Error('分享链接太长了');
   const raw = atob(code.slice(1).replace(/-/g, '+').replace(/_/g, '/'));
   const bytes = Uint8Array.from(raw, (c) => c.charCodeAt(0));
-  const text = code[0] === 'z' ? await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text() : new TextDecoder().decode(bytes);
-  return normalizeProject(JSON.parse(text));
+  let out = bytes;
+  if (code[0] === 'z') {
+    const reader = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')).getReader(), parts = [];
+    let n = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if ((n += value.length) > SHARE_OUT_MAX) { reader.cancel(); throw new Error('分享的工程太大了'); }
+      parts.push(value);
+    }
+    out = new Uint8Array(n); let o = 0; for (const v of parts) { out.set(v, o); o += v.length; }
+  }
+  return normalizeProject(JSON.parse(new TextDecoder().decode(out)));
 }
 async function shareLink() {
   const code = await encodeShare(S.store.p);

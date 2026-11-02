@@ -14,6 +14,20 @@ function repoFiles() {
   return {
     name: 'repo-files',
     configureServer(server) {
+      // 沙盒 iframe 是不透明来源（Origin: null，不带 Referer），开发时要靠 CORS 取模块、样式和字体。不能笼统放行 null：
+      // 任何网页开个 sandbox iframe 就能读开发服务器上的文件。所以只放行沙盒自己的模块图用得到的路径（site/src、Vite 的运行时、依赖），
+      // /@fs/（仓库里任意文件）和 out/、workshop/ 这些数据目录不放行，?raw 读源码只给 src/components/（内置组件本来就这么载入）。
+      // 剩下的代价：开发服务器开着时，恶意网页能读到 site/src 下的源码模块。正式网站不受影响（GitHub Pages 上都是公开的静态文件）。
+      server.middlewares.use((req, res, next) => {
+        if (req.headers.origin === 'null') {
+          const [p, q = ''] = (req.url || '').split('?');
+          const fsFile = p.startsWith('/@fs/') ? path.resolve(decodeURIComponent(p.slice(5))) : null;   // 仓库外层的文件只放行可选项清单
+          const ok = (/^\/(src|@vite|@id|node_modules)\//.test(p) || fsFile === path.join(ROOT, 'workshop', 'catalog.json')) && !p.includes('..') &&
+            (!/(^|&)raw(&|=|$)/.test(q) || p.startsWith('/src/components/'));
+          if (ok) { res.setHeader('Access-Control-Allow-Origin', 'null'); res.setHeader('Vary', 'Origin'); }
+        }
+        next();
+      });
       server.middlewares.use((req, res, next) => {
         const url = decodeURIComponent((req.url || '').split('?')[0]);
         if (url === '/components/index.json') {                  // 组件库清单：和 tools/assemble.py 一样，只读文件头
@@ -39,8 +53,8 @@ function repoFiles() {
 export default defineConfig({
   base: './',
   plugins: [repoFiles()],
-  // 沙盒 iframe 是不透明来源（Origin: null），开发服务器要允许它跨源取脚本和字体；GitHub Pages 本来就发 ACAO: *
-  server: { port: 5173, strictPort: true, fs: { allow: [ROOT] }, cors: { origin: [/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/, 'null'] } },
+  // 沙盒 iframe 取资源的 CORS 见上面 repoFiles 里的中间件；GitHub Pages 本来就发 ACAO: *
+  server: { port: 5173, strictPort: true, fs: { allow: [ROOT] }, cors: { origin: [/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/] } },
   build: {
     outDir: 'dist', emptyOutDir: true, assetsInlineLimit: 0, chunkSizeWarningLimit: 1500,
     rollupOptions: { input: { index: path.join(import.meta.dirname, 'index.html'), sandbox: path.join(import.meta.dirname, 'sandbox.html') } },

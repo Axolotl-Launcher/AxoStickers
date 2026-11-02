@@ -4,21 +4,35 @@ import { W, makeCanvas } from './core.js';
 
 const tick = () => new Promise((r) => setTimeout(r));
 
-// 按顺序渲出每一帧（已经转好，第一帧 = 封面），返回 ImageData 数据数组
-export async function renderFrames(scene, size, onProgress) {
+// GIF 编码要把所有帧留在内存里：帧数 × 边长² 有个上限（120 帧 800px 要 300 MB，手机上会把标签页撑崩）
+export const EXPORT_BYTES = 160 << 20;
+export function checkBudget(scene, size) {
+  const need = scene.N * size * size * 4;
+  if (need > EXPORT_BYTES) throw new Error(`一次导出的画面太多了（${scene.N} 帧 × ${size}px，约 ${Math.round(need / 1048576)} MB）：把边长或帧数调小一点`);
+}
+
+// 一帧一帧渲出来交给 each(像素, 第几帧)。fromCover：GIF 从封面（文字刚好出全）开始；逐帧 PNG 按时间顺序从头开始
+export async function eachFrame(scene, size, each, { fromCover = true, onProgress } = {}) {
   const big = makeCanvas(W, W), small = makeCanvas(size, size);
   const bctx = big.getContext('2d'), sctx = small.getContext('2d', { willReadFrequently: true });
   sctx.imageSmoothingEnabled = true; sctx.imageSmoothingQuality = 'high';
-  const N = scene.N, c = Math.round(scene.coverTime() * scene.FPS) % N, frames = [];
+  const N = scene.N, c = fromCover ? Math.round(scene.coverTime() * scene.FPS) % N : 0;
   for (let k = 0; k < N; k++) {
     const i = (k + c) % N;
     scene.frame(bctx, i / scene.FPS);
     sctx.clearRect(0, 0, size, size);
     sctx.drawImage(big, 0, 0, size, size);
-    frames.push(sctx.getImageData(0, 0, size, size).data);
+    await each(sctx.getImageData(0, 0, size, size).data, k, small);
     onProgress?.(0.6 * (k + 1) / N);
     if (k % 4 === 3) await tick();
   }
+}
+
+// 按顺序渲出每一帧（已经转好，第一帧 = 封面），返回 ImageData 数据数组
+export async function renderFrames(scene, size, onProgress) {
+  checkBudget(scene, size);
+  const frames = [];
+  await eachFrame(scene, size, (f) => { frames.push(f); }, { onProgress });
   return frames;
 }
 

@@ -28,9 +28,17 @@ export class Store {
     this.selected = null;                                    // 选中的图层 id；null = 工程设置
     this.mine = load(MINE, []);                              // [{ origin, name, type, source, at }]
     this.lastPush = 0;
+    this.foreign = false;                                    // 另一个标签页存过草稿以后，这边就不再自动覆盖它
+    try {
+      window.addEventListener('storage', (e) => {
+        if (e.key === DRAFT && e.newValue && !this.foreign) { this.foreign = true; this.tell('foreign'); }
+        if (e.key === MINE) { this.mine = load(MINE, []); this.tell('mine'); }
+      });
+    } catch { /* 没有 window（测试环境） */ }
   }
   on(f) { this.listeners.add(f); return () => this.listeners.delete(f); }
-  emit(why) { for (const f of this.listeners) f(why); save(DRAFT, this.p); }
+  tell(why) { for (const f of this.listeners) f(why); }
+  emit(why) { this.tell(why); if (!this.foreign) save(DRAFT, this.p); }
 
   // 改工程：fn 直接改 draft；coalesce 用来把拖滑块这种连续操作合成一步撤销
   change(fn, { coalesce = null } = {}) {
@@ -63,11 +71,12 @@ export class Store {
   dropComponent(origin) { this.change((p) => { p.components = p.components.filter((c) => c.origin !== origin); }); }
 
   saveMine(entry) {
+    this.mine = load(MINE, this.mine);                       // 先读一遍：别的标签页可能刚存过
     const i = this.mine.findIndex((m) => m.origin === entry.origin);
     if (i >= 0) this.mine[i] = { ...this.mine[i], ...entry, at: Date.now() }; else this.mine.unshift({ ...entry, at: Date.now() });
     return save(MINE, this.mine);
   }
-  removeMine(origin) { this.mine = this.mine.filter((m) => m.origin !== origin); save(MINE, this.mine); }
+  removeMine(origin) { this.mine = load(MINE, this.mine).filter((m) => m.origin !== origin); save(MINE, this.mine); }
 }
 
 export { DEFAULTS };

@@ -55,13 +55,16 @@ function fxLayer(f) {
 }
 
 // v1 配方（网站第一版 / 图鉴里的一张）→ 工程
+// 第一版的配方 / 引擎 specs 把动作参数（n、s、dir、flip、debris）直接写在顶层，种子和 idle 也是：一并搬进工程
+const MOTION_KEYS = ['n', 's', 'debris', 'dir', 'flip'];
 export function fromRecipe(r) {
-  const layers = [{ type: 'motion', component: r.motion || 'idle', params: r.params || {} }];
+  const params = { ...Object.fromEntries(MOTION_KEYS.filter((k) => r[k] !== undefined && r[k] !== null).map((k) => [k, r[k]])), ...(r.params || {}) };
+  const layers = [{ type: 'motion', component: r.motion || 'idle', params }];
   layers.push({ type: 'face', component: typeof r.face === 'string' ? r.face : 'normal' });
   if (r.hold) layers.push({ type: 'prop', component: r.hold });
   for (const w of r.wear || []) layers.push({ type: 'wear', component: w });
   for (const f of r.fx || []) layers.push(fxLayer(f));
   if (r.text !== undefined) layers.push({ type: 'text', component: r.tmode || 'stay', text: r.text, style: r.style || 'pink' });
-  return normalizeProject({ name: r.text, layers: layers.map((l, i) => ({ id: `l${i}`, ...l })) });
+  return normalizeProject({ name: r.text, seed: r.seed ?? 0, ...(r.idle && typeof r.idle === 'object' ? { idle: r.idle } : {}), layers: layers.map((l, i) => ({ id: `l${i}`, ...l })) });
 }
 

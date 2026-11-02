@@ -11,7 +11,7 @@ import { parse } from 'acorn';
 export const GUARD = { until: Infinity, free: 0 };
 const TOO_LONG = '一个循环跑了太久，像是死循环（已停下这个组件）';
 const tick = typeof MessageChannel !== 'undefined' ? new MessageChannel() : null;
-if (tick) tick.port1.onmessage = () => { GUARD.free = 0; };    // 任务让出线程以后才会收到：说明上一段没卡住
+if (tick) { tick.port1.onmessage = () => { GUARD.free = 0; }; tick.port1.unref?.(); }   // 任务让出线程以后才会收到：说明上一段没卡住
 function check() {
   const now = performance.now();
   if (GUARD.until !== Infinity) { if (now > GUARD.until) throw new Error(TOO_LONG); return; }
@@ -44,6 +44,15 @@ export function instrument(src) {
       const b = node.body;
       if (b.type === 'BlockStatement') edits.push([b.start + 1, call]);
       else { edits.push([b.start, `{${call}`]); edits.push([b.end, '}']); }
+    }
+    // 每个函数一进来也查一次：没有循环的无限链（queueMicrotask / then / await 递归）会饿死页面，靠这个停下来
+    if (/^(FunctionDeclaration|FunctionExpression|ArrowFunctionExpression)$/.test(node.type)) {
+      const b = node.body;
+      if (b.type === 'BlockStatement') {
+        let at = b.start + 1;                                 // 插在 "use strict" 这类指令后面，别改变函数的严格模式
+        for (const st of b.body) { if (st.type === 'ExpressionStatement' && st.directive !== undefined) at = st.end; else break; }
+        edits.push([at, call]);
+      } else { edits.push([b.start, `(${LOOP}(), `]); edits.push([b.end, ')']); }
     }
     for (const k in node) {
       const v = node[k];

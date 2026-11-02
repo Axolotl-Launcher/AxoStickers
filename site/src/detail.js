@@ -41,7 +41,7 @@ function fill() {
   down.download = `${name}.gif`;
   const remix = $('#d-remix');
   remix.hidden = !!it.special;
-  remix.href = kind === 'workshop' ? `#/editor?w=${it.issue}` : '#/editor?r=' + encodeURIComponent(JSON.stringify({ text: it.text, motion: it.motion, face: it.face, fx: it.fx, hold: it.hold, wear: it.wear, style: it.style, tmode: it.tmode }));
+  remix.href = kind === 'workshop' ? `#/editor?w=${it.issue}` : '#/editor?r=' + encodeURIComponent(JSON.stringify(Object.fromEntries(['text', 'motion', 'face', 'fx', 'hold', 'wear', 'style', 'tmode', 'n', 's', 'debris', 'dir', 'flip', 'seed', 'idle', 'params'].filter((k) => it[k] !== undefined).map((k) => [k, it[k]]))));   // 动作参数和种子也带上，改一改时和原图一样
   const issue = $('#d-issue');
   issue.hidden = kind !== 'workshop';
   if (kind === 'workshop') { issue.href = `https://github.com/${REPO}/issues/${it.issue}`; issue.textContent = `去 GitHub 点 👍（${it.likes || 0}）`; }

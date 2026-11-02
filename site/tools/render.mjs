@@ -38,7 +38,7 @@ if (arg2 === '--studio') {
   await page.goto(base + 'index.html#/editor');
   const frame = await page.waitForSelector('.st-stage-box iframe', { timeout: 30000 });
   const sandboxAttr = await frame.getAttribute('sandbox');
-  await page.waitForFunction(() => document.querySelector('.st-boot')?.hidden === true, null, { timeout: 30000 }).catch(() => {});
+  await page.waitForFunction(() => document.querySelector('.st-boot')?.hidden === true, null, { timeout: 30000, polling: 200 }).catch(() => {});
   const booted = await page.evaluate(() => document.querySelector('.st-boot')?.hidden === true);
   const tiles = await page.evaluate(async () => {
     document.querySelector('.st-railbtn[data-k="face"]').click();
@@ -57,7 +57,7 @@ await page.addInitScript(() => {
   window.addEventListener('message', (e) => { if (e.data && ['ready', 'scene', 'catalog', 'errors', 'model-done', 'exported', 'export-error', 'fatal'].includes(e.data.type)) window.__msgs.push(e.data); });
 });
 await page.goto(base + 'sandbox.html');
-const waitFor = (type) => page.waitForFunction((t) => window.__msgs.some((m) => m.type === t || m.type === 'fatal' || m.type === 'export-error'), type, { timeout: 60000 })
+const waitFor = (type) => page.waitForFunction((t) => window.__msgs.some((m) => m.type === t || m.type === 'fatal' || m.type === 'export-error'), type, { timeout: 60000, polling: 100 })   // 按时间间隔查：组件卡过一阵以后 requestAnimationFrame 的轮询会停
   .then(() => page.evaluate((t) => window.__msgs.find((m) => m.type === t || m.type === 'fatal' || m.type === 'export-error'), type));
 // 组件编译 / 运行时报的错：有就不出图（不然发出去的是缺了一块的图）
 const reported = () => page.evaluate(() => window.__msgs.flatMap((m) => (m.type === 'catalog' || m.type === 'errors' || m.type === 'scene' ? m.errors || [] : []))

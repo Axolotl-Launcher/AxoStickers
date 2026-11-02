@@ -81,7 +81,8 @@ export class Scene {
     if (this.R && this.reg) {
       this.R.lookup = (kind) => this.reg.get('prop', kind) || this.reg.get('wear', kind);
       if (this.R.regVersion !== this.reg.version) { this.R.itemGeo.clear(); this.R.regVersion = this.reg.version; }
-      this.R.setSkin(this.skinFn(), JSON.stringify(P.skin) + this.reg.version);
+      this.skin = [this.skinFn(), JSON.stringify(P.skin) + this.reg.version];
+      this.R.setSkin(...this.skin);
     }
   }
 
@@ -128,6 +129,7 @@ export class Scene {
     for (let i = 0; i < n; i++) {
       const ang = r.uniform(200 * Math.PI / 180, 340 * Math.PI / 180), sp = r.uniform(140, 330) * power;
       this.stage.droplets.push({
+        layer: this.layer?.id ? this.layer : null,             // 哪一层溅的：水花跟着那一层的时间段和强度
         t0, x: W / 2 + x + r.uniform(-spread, spread), vx: Math.cos(ang) * sp * 0.7, vy: Math.sin(ang) * sp,
         s: r.choice([7, 9, 11, 13]), c: r.choice([[150, 215, 255], [200, 236, 255], [255, 255, 255]]),
       });
@@ -223,10 +225,16 @@ export class Scene {
   eyePts() { return [this.headPt([3.6, 6.5, -10.2]), this.headPt([-3.6, 6.5, -10.2])]; }
   itemPt(idx = 0, p = [0, 0, 0]) { return this.proj(xfPoint(itemXf(this.A.pose, this.A.pose._items[idx]), p)); }
 
-  hooks(ctx, name, t) {
-    for (const s of this.scenes) if (this.weight(s.layer, t) > 0) this.call(s, name, ctx, t);
-    for (const m of this.motions) if (this.weight(m.layer, t) > 0) this.call(m, name, ctx, t);
+  hooks(ctx, name, t) {                                  // 动作 / 场景自己画的东西也跟着图层的强度和淡入淡出
+    for (const x of [...this.scenes, ...this.motions]) {
+      const k = Math.min(1, this.weight(x.layer, t));
+      if (k <= 0) continue;
+      if (k >= 1) { this.call(x, name, ctx, t); continue; }
+      ctx.save(); ctx.globalAlpha *= k; this.call(x, name, ctx, t); ctx.restore();
+    }
   }
+  // 渲染器（three.js）是几个场景共用的：画之前把自己的皮肤换回来（素材缩略图、导出用的场景会改它）
+  renderAx(a) { if (this.skin) this.R.setSkin(...this.skin); return this.R.render(a, this.P.camera); }
   drawFx(ctx, t, layer) {
     for (const f of this.fx) {
       const k = Math.min(1, this.weight(f.layer, t));
@@ -241,7 +249,7 @@ export class Scene {
   // 把美西螈画好、摆好，返回一张 W×H 的图层（this.A / this.LAST 也会更新）
   axLayer(a) {
     this.A = a;
-    this.LAST = this.R.render(a, this.P.camera);
+    this.LAST = this.renderAx(a);
     const g = this.axCanvas.getContext('2d');
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H);
     g.globalAlpha = a.alpha; g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
@@ -298,7 +306,7 @@ export class Scene {
     const a = this.motion(t); this.A = a;
     let layer = null;
     if (a.show && this.R) {
-      this.LAST = this.R.render(a, this.P.camera);
+      this.LAST = this.renderAx(a);
       layer = this.axCanvas;
       const g = layer.getContext('2d');
       g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H);
@@ -355,10 +363,12 @@ export class Scene {
       ctx.drawImage(this.lipCanvas, 0, 0);
     }
     for (const p of this.droplets) {
-      const tt = mod(t - p.t0, this.T);
-      if (tt < 1.2) {
+      const tt = mod(t - p.t0, this.T), k = p.layer ? Math.min(1, this.weight(p.layer, t)) : 1;
+      if (tt < 1.2 && k > 0.001) {
         const x = p.x + p.vx * tt, y = this.wl + p.vy * tt + 520 * tt * tt;
+        if (k < 1) { ctx.save(); ctx.globalAlpha *= k; }
         if (y < this.waterY(x, t) + 4) sq(ctx, x, y, p.s * (1 - tt / 1.6), p.c, [90, 170, 235]);
+        if (k < 1) ctx.restore();
       }
     }
     this.hooks(ctx, 'drawFront', t);

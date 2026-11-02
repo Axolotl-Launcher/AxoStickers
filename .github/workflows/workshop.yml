@@ -80,6 +80,11 @@ jobs:
   publish:
     needs: render
     if: ${{ !cancelled() && needs.render.result != 'skipped' }}
+    # 同一个 issue 的发布一次只跑一个（不同 issue 互不影响）：两次运行同时查「回复过没有」会各发一条。
+    # 排队时更新的那次会顶掉更早还没开始的那次，正好：要发的就是最新的正文。撤下不进这个组（它不能被顶掉）
+    concurrency:
+      group: workshop-publish-${{ github.event.issue.number }}
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
