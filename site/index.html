@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>美西螈表情包 · AxoStickers</title>
+<meta name="description" content="Axolotl Launcher 的美西螈动图表情包：300 张 + 水龙卷特别篇，在线挑、直接下载，还能在创意工坊里自己做一张。">
+<meta name="theme-color" content="#aadeff">
+<meta property="og:title" content="美西螈表情包 · AxoStickers">
+<meta property="og:description" content="300 张美西螈动图表情 + 创意工坊。群里答疑专用，不保证能解决问题，但能表达情绪。">
+<meta property="og:image" content="https://axolotl-launcher.github.io/AxoStickers/out/_%E6%80%BB%E8%A7%88.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='2' width='14' height='12' rx='3' fill='%23fe3e8c'/%3E%3Crect x='1' y='11' width='14' height='3' fill='%23c41660'/%3E%3Crect x='4' y='6' width='2' height='2' fill='%2342147a'/%3E%3Crect x='10' y='6' width='2' height='2' fill='%2342147a'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#/"><i class="brand-dot" aria-hidden="true"></i><span>美西螈表情包</span></a>
+    <nav class="nav" aria-label="主导航">
+      <a href="#/" data-view="gallery">图鉴</a>
+      <a href="#/editor" data-view="editor">创意工坊</a>
+      <a href="#/workshop" data-view="workshop">工坊作品</a>
+    </nav>
+    <a class="gh-link" href="https://github.com/Axolotl-Launcher/AxoStickers" target="_blank" rel="noopener" aria-label="GitHub 仓库">
+      <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+  </div>
+</header>
+
+<main>
+  <!-- ======== 图鉴 ======== -->
+  <section class="view" id="view-gallery" data-view="gallery">
+    <div class="hero">
+      <div class="bubbles" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <div>
+          <h1 class="hero-h1"><span class="hero-fallback">美西螈表情包</span>
+            <canvas class="hero-title" id="hero-title" width="1280" height="300" aria-hidden="true"></canvas></h1>
+          <p class="hero-copy">Axolotl Launcher 的美西螈动图表情包：<b>300 张</b> + 水龙卷特别篇，400×400 GIF，每张不到 1 MB。
+            群里答疑专用，不保证能解决问题，但能表达情绪。</p>
+          <div class="hero-actions">
+            <a class="btn primary" id="zip-link" href="#">打包下载全部 <small id="zip-size"></small></a>
+            <a class="btn water" href="#/editor">去创意工坊做一张</a>
+          </div>
+        </div>
+        <figure class="hero-live" id="hero-live" aria-hidden="true">
+          <canvas width="512" height="512"></canvas>
+          <figcaption></figcaption>
+        </figure>
+      </div>
+      <svg class="water-edge" viewBox="0 0 1200 34" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 14 Q 50 4 100 14 T 200 14 T 300 14 T 400 14 T 500 14 T 600 14 T 700 14 T 800 14 T 900 14 T 1000 14 T 1100 14 T 1200 14 V 34 H 0 Z" fill="#aadeff"/>
+        <path d="M0 14 Q 50 4 100 14 T 200 14 T 300 14 T 400 14 T 500 14 T 600 14 T 700 14 T 800 14 T 900 14 T 1000 14 T 1100 14 T 1200 14" fill="none" stroke="#fff" stroke-width="5" vector-effect="non-scaling-stroke"/>
+      </svg>
+    </div>
+    <div class="water-band" aria-hidden="true"></div>
+    <div class="wrap">
+      <h2 class="section-title">图鉴</h2>
+      <p class="section-sub">鼠标放上去（手机上滑到）就会动；点开看大图、配方和下载。</p>
+      <div class="toolbar">
+        <div class="chips" id="cat-chips" role="group" aria-label="分类"></div>
+        <div class="toolbar-row">
+          <label class="search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
+            <span class="sr-only">搜索文字</span>
+            <input class="input" id="q" type="search" placeholder="搜文字，比如：下班" autocomplete="off">
+          </label>
+          <label class="field"><span class="sr-only">动作</span><select class="select" id="f-motion"><option value="">全部动作</option></select></label>
+          <div class="swatches" id="f-style" role="group" aria-label="字色"></div>
+          <span class="result-count" id="count" aria-live="polite"></span>
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="g-empty" hidden><b>没有这张</b>换个词试试，或者去<a href="#/editor">创意工坊</a>自己做一张。</div>
+    </div>
+  </section>
+
+  <!-- ======== 创意工坊 · 编辑器 ======== -->
+  <section class="view" id="view-editor" data-view="editor" hidden>
+    <div class="wrap">
+      <h2 class="section-title">创意工坊</h2>
+      <p class="section-sub">挑文字、动作、表情、特效和道具，左边实时预览。满意了导出 GIF，或者发布到工坊给大家用。</p>
+      <div class="editor">
+        <div class="stage">
+          <div class="stage-frame" id="ed-frame">
+            <canvas id="ed-canvas" width="512" height="512" aria-label="实时预览"></canvas>
+            <span class="stage-badge">实时预览</span>
+            <button class="stage-play" id="ed-play" aria-label="暂停">❚❚</button>
+          </div>
+          <div class="stage-actions">
+            <button class="btn primary" id="ed-export">导出 GIF</button>
+            <button class="btn water" id="ed-publish">发布到工坊</button>
+            <button class="btn" id="ed-random">随便来一张</button>
+            <button class="btn" id="ed-copy">复制配方</button>
+          </div>
+          <div class="progress" id="ed-progress" hidden><i></i></div>
+          <p class="stage-status" id="ed-status" aria-live="polite"></p>
+          <div class="how">
+            <b>发布到工坊怎么回事</b>
+            <ol>
+              <li>点「发布到工坊」会打开一个填好配方的 GitHub issue（要登录 GitHub），直接提交。</li>
+              <li>GitHub Actions 用真引擎重新出图（和这里的预览基本一样），几分钟后出现在「工坊作品」。</li>
+              <li>别人给那个 issue 点 👍 就是点赞。维护者觉得不合适会撤下。</li>
+            </ol>
+          </div>
+        </div>
+        <div class="panel" id="ed-panel"></div>
+      </div>
+    </div>
+    <button class="mini" id="ed-mini" type="button" hidden aria-label="回到预览"><canvas width="264" height="264"></canvas></button>
+  </section>
+
+  <!-- ======== 工坊作品 ======== -->
+  <section class="view" id="view-workshop" data-view="workshop" hidden>
+    <div class="wrap">
+      <div class="ws-head">
+        <div>
+          <h2 class="section-title">工坊作品</h2>
+          <p class="section-sub" style="margin:0">大家在创意工坊里做的，GitHub Actions 用真引擎出的图。👍 是 GitHub issue 上的点赞，每 6 小时数一次。</p>
+        </div>
+        <div class="chips" id="ws-sort" role="group" aria-label="排序">
+          <button class="chip" data-sort="new" aria-pressed="true">最新</button>
+          <button class="chip" data-sort="likes" aria-pressed="false">最多赞</button>
+        </div>
+      </div>
+      <div class="grid" id="ws-grid"></div>
+      <div class="empty" id="ws-empty" hidden><b>还没有人发布</b>第一个发的可以自称开山鼻祖。<br><br><a class="btn primary" href="#/editor">去做一张</a></div>
+    </div>
+  </section>
+</main>
+
+<dialog class="detail" id="detail" aria-labelledby="d-title">
+  <button class="detail-close" id="d-close" aria-label="关闭">×</button>
+  <div class="detail-body">
+    <div class="detail-pic"><img id="d-img" alt="" width="400" height="400"></div>
+    <div>
+      <p class="meta" id="d-meta"></p>
+      <h2 id="d-title"></h2>
+      <dl class="recipe" id="d-recipe"></dl>
+      <div class="detail-actions">
+        <a class="btn primary" id="d-download" download>下载 GIF</a>
+        <a class="btn water" id="d-remix" href="#/editor">在工坊里改一改</a>
+        <button class="btn" id="d-share" type="button" hidden>分享</button>
+        <a class="btn" id="d-issue" target="_blank" rel="noopener" hidden>去 GitHub 点 👍</a>
+      </div>
+      <p class="note" id="d-note"></p>
+    </div>
+  </div>
+  <div class="detail-nav">
+    <button class="btn" id="d-prev" type="button">← 上一张</button>
+    <button class="btn" id="d-next" type="button">下一张 →</button>
+  </div>
+</dialog>
+
+<footer>
+  <svg class="water-edge" viewBox="0 0 1200 34" preserveAspectRatio="none" aria-hidden="true" style="background:var(--bg)">
+    <path d="M0 14 Q 50 4 100 14 T 200 14 T 300 14 T 400 14 T 500 14 T 600 14 T 700 14 T 800 14 T 900 14 T 1000 14 T 1100 14 T 1200 14 V 34 H 0 Z" fill="#aadeff"/>
+    <path d="M0 14 Q 50 4 100 14 T 200 14 T 300 14 T 400 14 T 500 14 T 600 14 T 700 14 T 800 14 T 900 14 T 1000 14 T 1100 14 T 1200 14" fill="none" stroke="#fff" stroke-width="5" vector-effect="non-scaling-stroke"/>
+  </svg>
+  <div class="wrap">
+    <div>表情、代码和引擎都在 <a href="https://github.com/Axolotl-Launcher/AxoStickers" target="_blank" rel="noopener">Axolotl-Launcher/AxoStickers</a>，GPL-3.0-only。美西螈模型来自 <a href="https://github.com/Axolotl-Launcher/Axolotl" target="_blank" rel="noopener">Axolotl Launcher</a>，字体是思源黑体（SIL OFL 1.1）。</div>
+    <div>不含任何 Minecraft 游戏文件。Minecraft 是 Mojang Synergies AB 的商标，本项目与 Mojang 无关。</div>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

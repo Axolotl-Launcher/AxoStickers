@@ -4,3 +4,13 @@ __pycache__/
 *.pyc
 *.zip
 out/_build_log.tsv
+
+# 网站（构建产物和生成的数据）
+site/node_modules/
+site/dist/
+site/src/gen/
+site/.thumbs/
+site/.ref/
+_site/
+_tmp/
+.spike/

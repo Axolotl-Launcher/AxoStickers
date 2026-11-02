@@ -1,0 +1,21 @@
+{
+  "name": "axostickers-site",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "美西螈表情包展示网站 + 创意工坊",
+  "license": "GPL-3.0-only",
+  "scripts": {
+    "data": "python tools/export_engine.py && python tools/make_fonts.py",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "gifenc": "1.0.3",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "vite": "8.3.4"
+  }
+}
