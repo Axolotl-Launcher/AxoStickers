@@ -1,0 +1,6 @@
+kit/mc/
+ref/
+__pycache__/
+*.pyc
+*.zip
+out/_build_log.tsv

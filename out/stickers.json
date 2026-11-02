@@ -1,0 +1,5158 @@
+{
+ "version": 1,
+ "size": [
+  400,
+  400
+ ],
+ "fps": 15,
+ "count": 300,
+ "categories": {
+  "群里答疑": "support",
+  "打招呼 / 日常回复": "daily",
+  "情绪": "mood",
+  "我的世界": "minecraft",
+  "生活": "life"
+ },
+ "stickers": [
+  {
+   "id": 1,
+   "text": "先看日志",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "read",
+   "face": "focus",
+   "fx": [],
+   "hold": "book",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/001_先看日志.gif",
+   "cover": "out/_封面/001_先看日志.png"
+  },
+  {
+   "id": 2,
+   "text": "重启试试",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "spin",
+   "face": "smile",
+   "fx": [
+    "loading"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/002_重启试试.gif",
+   "cover": "out/_封面/002_重启试试.png"
+  },
+  {
+   "id": 3,
+   "text": "清下缓存",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "shakeoff",
+   "face": "focus",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/003_清下缓存.gif",
+   "cover": "out/_封面/003_清下缓存.png"
+  },
+  {
+   "id": 4,
+   "text": "更新一下",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "boing",
+   "face": "smile",
+   "fx": [
+    "pop:arrow"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/004_更新一下.gif",
+   "cover": "out/_封面/004_更新一下.png"
+  },
+  {
+   "id": 5,
+   "text": "换个Java",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "swing",
+   "face": "focus",
+   "fx": [],
+   "hold": "wrench",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/005_换个Java.gif",
+   "cover": "out/_封面/005_换个Java.png"
+  },
+  {
+   "id": 6,
+   "text": "已修复",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "sidehop",
+   "face": "happy",
+   "fx": [
+    "check"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "green",
+   "tmode": "stay",
+   "gif": "out/006_已修复.gif",
+   "cover": "out/_封面/006_已修复.png"
+  },
+  {
+   "id": 7,
+   "text": "已反馈",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "headbob",
+   "face": "smile",
+   "fx": [
+    "float:mail"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/007_已反馈.gif",
+   "cover": "out/_封面/007_已反馈.png"
+  },
+  {
+   "id": 8,
+   "text": "复现一下",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "think",
+   "face": "up",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/008_复现一下.gif",
+   "cover": "out/_封面/008_复现一下.png"
+  },
+  {
+   "id": 9,
+   "text": "提issue",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "slidein",
+   "face": "smile",
+   "fx": [],
+   "hold": "mail",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/009_提issue.gif",
+   "cover": "out/_封面/009_提issue.png"
+  },
+  {
+   "id": 10,
+   "text": "啥版本",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "tilt",
+   "face": "surprise",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/010_啥版本.gif",
+   "cover": "out/_封面/010_啥版本.png"
+  },
+  {
+   "id": 11,
+   "text": "报错发我",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "wave",
+   "face": "smile",
+   "fx": [
+    "say:mail"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/011_报错发我.gif",
+   "cover": "out/_封面/011_报错发我.png"
+  },
+  {
+   "id": 12,
+   "text": "别私聊",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "shake",
+   "face": "meh",
+   "fx": [
+    "cross"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "slam",
+   "gif": "out/012_别私聊.gif",
+   "cover": "out/_封面/012_别私聊.png"
+  },
+  {
+   "id": 13,
+   "text": "先搜一下",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "scan",
+   "face": "focus",
+   "fx": [],
+   "hold": "magnifier",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/013_先搜一下.gif",
+   "cover": "out/_封面/013_先搜一下.png"
+  },
+  {
+   "id": 14,
+   "text": "看置顶",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "stare",
+   "face": "normal",
+   "fx": [
+    "pop:pin"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/014_看置顶.gif",
+   "cover": "out/_封面/014_看置顶.png"
+  },
+  {
+   "id": 15,
+   "text": "不是bug",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "shake",
+   "face": "smug",
+   "fx": [
+    "stay:bug"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/015_不是bug.gif",
+   "cover": "out/_封面/015_不是bug.png"
+  },
+  {
+   "id": 16,
+   "text": "是bug",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "tantrum",
+   "face": "shock",
+   "fx": [
+    "orbit:bug"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "shake",
+   "gif": "out/016_是bug.gif",
+   "cover": "out/_封面/016_是bug.png"
+  },
+  {
+   "id": 17,
+   "text": "修好了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "jump",
+   "face": "happy",
+   "fx": [
+    "check",
+    "confetti"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "green",
+   "tmode": "bounce",
+   "gif": "out/017_修好了.gif",
+   "cover": "out/_封面/017_修好了.png"
+  },
+  {
+   "id": 18,
+   "text": "在修了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "swing",
+   "face": "focus",
+   "fx": [
+    "sweat"
+   ],
+   "hold": "wrench",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/018_在修了.gif",
+   "cover": "out/_封面/018_在修了.png"
+  },
+  {
+   "id": 19,
+   "text": "内存爆了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "puff",
+   "face": "struggle",
+   "fx": [
+    "boom"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/019_内存爆了.gif",
+   "cover": "out/_封面/019_内存爆了.png"
+  },
+  {
+   "id": 20,
+   "text": "模组冲突",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "rage",
+   "face": "rage",
+   "fx": [
+    "bolt",
+    "anger"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "shake",
+   "gif": "out/020_模组冲突.gif",
+   "cover": "out/_封面/020_模组冲突.png"
+  },
+  {
+   "id": 21,
+   "text": "崩了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "faint",
+   "face": "dead",
+   "fx": [
+    "skull"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/021_崩了.gif",
+   "cover": "out/_封面/021_崩了.png"
+  },
+  {
+   "id": 22,
+   "text": "卡加载",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "glitch",
+   "face": "tired",
+   "fx": [
+    "loading"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/022_卡加载.gif",
+   "cover": "out/_封面/022_卡加载.png"
+  },
+  {
+   "id": 23,
+   "text": "下载好慢",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "flop",
+   "face": "tired",
+   "fx": [
+    "stay:clock"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "droop",
+   "gif": "out/023_下载好慢.gif",
+   "cover": "out/_封面/023_下载好慢.png"
+  },
+  {
+   "id": 24,
+   "text": "进不去",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "bonk",
+   "face": "cry",
+   "fx": [
+    "stream"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "stay",
+   "gif": "out/024_进不去.gif",
+   "cover": "out/_封面/024_进不去.png"
+  },
+  {
+   "id": 25,
+   "text": "能进了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "popup",
+   "face": "star",
+   "fx": [
+    "confetti"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/025_能进了.gif",
+   "cover": "out/_封面/025_能进了.png"
+  },
+  {
+   "id": 26,
+   "text": "闪退了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "glitch",
+   "face": "shock",
+   "fx": [
+    "speed"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/026_闪退了.gif",
+   "cover": "out/_封面/026_闪退了.png"
+  },
+  {
+   "id": 27,
+   "text": "开服啦",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "cheer",
+   "face": "joy",
+   "fx": [
+    "fireworks"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "bounce",
+   "gif": "out/027_开服啦.gif",
+   "cover": "out/_封面/027_开服啦.png"
+  },
+  {
+   "id": 28,
+   "text": "来联机",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "wave",
+   "face": "smile",
+   "fx": [
+    "say:controller"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/028_来联机.gif",
+   "cover": "out/_封面/028_来联机.png"
+  },
+  {
+   "id": 29,
+   "text": "求带",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "kowtow",
+   "face": "teary",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "droop",
+   "gif": "out/029_求带.gif",
+   "cover": "out/_封面/029_求带.png"
+  },
+  {
+   "id": 30,
+   "text": "发错群了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "sink",
+   "face": "awkward",
+   "fx": [
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/030_发错群了.gif",
+   "cover": "out/_封面/030_发错群了.png"
+  },
+  {
+   "id": 31,
+   "text": "新版来啦",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "launch",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/031_新版来啦.gif",
+   "cover": "out/_封面/031_新版来啦.png"
+  },
+  {
+   "id": 32,
+   "text": "别催了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "rage",
+   "face": "angry",
+   "fx": [
+    "steam"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "shake",
+   "gif": "out/032_别催了.gif",
+   "cover": "out/_封面/032_别催了.png"
+  },
+  {
+   "id": 33,
+   "text": "在写了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "typing",
+   "face": "focus",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "type",
+   "gif": "out/033_在写了.gif",
+   "cover": "out/_封面/033_在写了.png"
+  },
+  {
+   "id": 34,
+   "text": "看教程",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "read",
+   "face": "smile",
+   "fx": [
+    "bulb"
+   ],
+   "hold": "book",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/034_看教程.gif",
+   "cover": "out/_封面/034_看教程.png"
+  },
+  {
+   "id": 35,
+   "text": "存档没了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "idle",
+   "face": "sob",
+   "fx": [
+    "stream"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "droop",
+   "gif": "out/035_存档没了.gif",
+   "cover": "out/_封面/035_存档没了.png"
+  },
+  {
+   "id": 36,
+   "text": "好用",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "pounce",
+   "face": "happy",
+   "fx": [
+    "thumb"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/036_好用.gif",
+   "cover": "out/_封面/036_好用.png"
+  },
+  {
+   "id": 37,
+   "text": "禁言了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "petrify",
+   "face": "meh",
+   "fx": [
+    "cross"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "slam",
+   "gif": "out/037_禁言了.gif",
+   "cover": "out/_封面/037_禁言了.png"
+  },
+  {
+   "id": 38,
+   "text": "管理来了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "rise",
+   "face": "cool",
+   "fx": [],
+   "hold": null,
+   "wear": [
+    "shades"
+   ],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/038_管理来了.gif",
+   "cover": "out/_封面/038_管理来了.png"
+  },
+  {
+   "id": 39,
+   "text": "别刷屏",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "slosh",
+   "face": "angry",
+   "fx": [
+    "anger"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/039_别刷屏.gif",
+   "cover": "out/_封面/039_别刷屏.png"
+  },
+  {
+   "id": 40,
+   "text": "稍等",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "buoy",
+   "face": "smile",
+   "fx": [
+    "loading"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/040_稍等.gif",
+   "cover": "out/_封面/040_稍等.png"
+  },
+  {
+   "id": 41,
+   "text": "马上",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "run",
+   "face": "determined",
+   "fx": [
+    "speed"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/041_马上.gif",
+   "cover": "out/_封面/041_马上.png"
+  },
+  {
+   "id": 42,
+   "text": "搞定",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "dance",
+   "face": "cool",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [
+    "shades"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/042_搞定.gif",
+   "cover": "out/_封面/042_搞定.png"
+  },
+  {
+   "id": 43,
+   "text": "说重点",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "zoom",
+   "face": "meh",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "zoom",
+   "gif": "out/043_说重点.gif",
+   "cover": "out/_封面/043_说重点.png"
+  },
+  {
+   "id": 44,
+   "text": "私信我",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "shy",
+   "face": "wink",
+   "fx": [
+    "say:mail"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/044_私信我.gif",
+   "cover": "out/_封面/044_私信我.png"
+  },
+  {
+   "id": 45,
+   "text": "图呢",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "look",
+   "face": "side",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/045_图呢.gif",
+   "cover": "out/_封面/045_图呢.png"
+  },
+  {
+   "id": 46,
+   "text": "没看懂",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "circle",
+   "face": "dizzy",
+   "fx": [
+    "swirl"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/046_没看懂.gif",
+   "cover": "out/_封面/046_没看懂.png"
+  },
+  {
+   "id": 47,
+   "text": "懂了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "lookup",
+   "face": "star",
+   "fx": [
+    "bulb"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/047_懂了.gif",
+   "cover": "out/_封面/047_懂了.png"
+  },
+  {
+   "id": 48,
+   "text": "学到了",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "read",
+   "face": "star",
+   "fx": [
+    "bulb"
+   ],
+   "hold": "book",
+   "wear": [
+    "glasses"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/048_学到了.gif",
+   "cover": "out/_封面/048_学到了.png"
+  },
+  {
+   "id": 49,
+   "text": "我也是",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "sway",
+   "face": "worried",
+   "fx": [
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/049_我也是.gif",
+   "cover": "out/_封面/049_我也是.png"
+  },
+  {
+   "id": 50,
+   "text": "+1",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "hop",
+   "face": "smile",
+   "fx": [
+    "plus1"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/050_+1.gif",
+   "cover": "out/_封面/050_+1.png"
+  },
+  {
+   "id": 51,
+   "text": "顶",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "hop",
+   "face": "determined",
+   "fx": [
+    "pop:arrow"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/051_顶.gif",
+   "cover": "out/_封面/051_顶.png"
+  },
+  {
+   "id": 52,
+   "text": "同问",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "tilt",
+   "face": "normal",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/052_同问.gif",
+   "cover": "out/_封面/052_同问.png"
+  },
+  {
+   "id": 53,
+   "text": "萌新求助",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "shrink",
+   "face": "teary",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "stay",
+   "gif": "out/053_萌新求助.gif",
+   "cover": "out/_封面/053_萌新求助.png"
+  },
+  {
+   "id": 54,
+   "text": "大佬带带",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "kowtow",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/054_大佬带带.gif",
+   "cover": "out/_封面/054_大佬带带.png"
+  },
+  {
+   "id": 55,
+   "text": "已读",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "stare",
+   "face": "meh",
+   "fx": [
+    "pop:check"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/055_已读.gif",
+   "cover": "out/_封面/055_已读.png"
+  },
+  {
+   "id": 56,
+   "text": "早安",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "stretch",
+   "face": "happy",
+   "fx": [
+    "sun"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/056_早安.gif",
+   "cover": "out/_封面/056_早安.png"
+  },
+  {
+   "id": 57,
+   "text": "午安",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "doze",
+   "face": "sleep",
+   "fx": [
+    "sun"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/057_午安.gif",
+   "cover": "out/_封面/057_午安.png"
+  },
+  {
+   "id": 58,
+   "text": "晚上好",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "wave",
+   "face": "smile",
+   "fx": [
+    "moon"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/058_晚上好.gif",
+   "cover": "out/_封面/058_晚上好.png"
+  },
+  {
+   "id": 59,
+   "text": "晚安",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "doze",
+   "face": "sleep",
+   "fx": [
+    "zzz",
+    "moon"
+   ],
+   "hold": null,
+   "wear": [
+    "nightcap"
+   ],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/059_晚安.gif",
+   "cover": "out/_封面/059_晚安.png"
+  },
+  {
+   "id": 60,
+   "text": "你好",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "wave",
+   "face": "happy",
+   "fx": [
+    "twinkle"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "pop",
+   "gif": "out/060_你好.gif",
+   "cover": "out/_封面/060_你好.png"
+  },
+  {
+   "id": 61,
+   "text": "哈喽",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "wave",
+   "face": "joy",
+   "fx": [
+    "notes"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/061_哈喽.gif",
+   "cover": "out/_封面/061_哈喽.png"
+  },
+  {
+   "id": 62,
+   "text": "拜拜",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "wave",
+   "face": "wink",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "wave",
+   "gif": "out/062_拜拜.gif",
+   "cover": "out/_封面/062_拜拜.png"
+  },
+  {
+   "id": 63,
+   "text": "明天见",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "sink",
+   "face": "happy",
+   "fx": [
+    "moon"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/063_明天见.gif",
+   "cover": "out/_封面/063_明天见.png"
+  },
+  {
+   "id": 64,
+   "text": "好的",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "nod",
+   "face": "smile",
+   "fx": [
+    "twinkle"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/064_好的.gif",
+   "cover": "out/_封面/064_好的.png"
+  },
+  {
+   "id": 65,
+   "text": "OK",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "rise",
+   "face": "cool",
+   "fx": [
+    "thumb"
+   ],
+   "hold": null,
+   "wear": [
+    "shades"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/065_OK.gif",
+   "cover": "out/_封面/065_OK.png"
+  },
+  {
+   "id": 66,
+   "text": "嗯嗯",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "nod",
+   "face": "happy",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/066_嗯嗯.gif",
+   "cover": "out/_封面/066_嗯嗯.png"
+  },
+  {
+   "id": 67,
+   "text": "对对对",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "nod",
+   "face": "grin",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/067_对对对.gif",
+   "cover": "out/_封面/067_对对对.png"
+  },
+  {
+   "id": 68,
+   "text": "没问题",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "boing",
+   "face": "determined",
+   "fx": [
+    "thumb"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/068_没问题.gif",
+   "cover": "out/_封面/068_没问题.png"
+  },
+  {
+   "id": 69,
+   "text": "可以",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "nod",
+   "face": "smile",
+   "fx": [
+    "pop:check"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/069_可以.gif",
+   "cover": "out/_封面/069_可以.png"
+  },
+  {
+   "id": 70,
+   "text": "不行",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "shake",
+   "face": "angry",
+   "fx": [
+    "cross"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "slam",
+   "gif": "out/070_不行.gif",
+   "cover": "out/_封面/070_不行.png"
+  },
+  {
+   "id": 71,
+   "text": "好吧",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "flop",
+   "face": "meh",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "droop",
+   "gif": "out/071_好吧.gif",
+   "cover": "out/_封面/071_好吧.png"
+  },
+  {
+   "id": 72,
+   "text": "谢谢",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "bow",
+   "face": "happy",
+   "fx": [
+    "hearts"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/072_谢谢.gif",
+   "cover": "out/_封面/072_谢谢.png"
+  },
+  {
+   "id": 73,
+   "text": "谢谢老板",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "bow",
+   "face": "money",
+   "fx": [
+    "coins"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/073_谢谢老板.gif",
+   "cover": "out/_封面/073_谢谢老板.png"
+  },
+  {
+   "id": 74,
+   "text": "辛苦了",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "approach",
+   "face": "smile",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "cup",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/074_辛苦了.gif",
+   "cover": "out/_封面/074_辛苦了.png"
+  },
+  {
+   "id": 75,
+   "text": "不客气",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "wag",
+   "face": "joy",
+   "fx": [
+    "flowers"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/075_不客气.gif",
+   "cover": "out/_封面/075_不客气.png"
+  },
+  {
+   "id": 76,
+   "text": "对不起",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "bow",
+   "face": "sad",
+   "fx": [
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "stay",
+   "gif": "out/076_对不起.gif",
+   "cover": "out/_封面/076_对不起.png"
+  },
+  {
+   "id": 77,
+   "text": "欢迎",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "cheer",
+   "face": "joy",
+   "fx": [
+    "confetti"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "pop",
+   "gif": "out/077_欢迎.gif",
+   "cover": "out/_封面/077_欢迎.png"
+  },
+  {
+   "id": 78,
+   "text": "欢迎新人",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "clap",
+   "face": "happy",
+   "fx": [
+    "confetti"
+   ],
+   "hold": null,
+   "wear": [
+    "party"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/078_欢迎新人.gif",
+   "cover": "out/_封面/078_欢迎新人.png"
+  },
+  {
+   "id": 79,
+   "text": "来了来了",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "run",
+   "face": "determined",
+   "fx": [
+    "speed"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/079_来了来了.gif",
+   "cover": "out/_封面/079_来了来了.png"
+  },
+  {
+   "id": 80,
+   "text": "在吗",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "peek",
+   "face": "normal",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/080_在吗.gif",
+   "cover": "out/_封面/080_在吗.png"
+  },
+  {
+   "id": 81,
+   "text": "人呢",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "look",
+   "face": "surprise",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/081_人呢.gif",
+   "cover": "out/_封面/081_人呢.png"
+  },
+  {
+   "id": 82,
+   "text": "在干嘛",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "peek",
+   "face": "up",
+   "fx": [
+    "dots"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/082_在干嘛.gif",
+   "cover": "out/_封面/082_在干嘛.png"
+  },
+  {
+   "id": 83,
+   "text": "好嘞",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "hop",
+   "face": "grin",
+   "fx": [
+    "notes"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/083_好嘞.gif",
+   "cover": "out/_封面/083_好嘞.png"
+  },
+  {
+   "id": 84,
+   "text": "冲",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "launch",
+   "face": "determined",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "zoom",
+   "gif": "out/084_冲.gif",
+   "cover": "out/_封面/084_冲.png"
+  },
+  {
+   "id": 85,
+   "text": "冲冲冲",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "run",
+   "face": "determined",
+   "fx": [
+    "speed",
+    "fire"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "zoom",
+   "gif": "out/085_冲冲冲.gif",
+   "cover": "out/_封面/085_冲冲冲.png"
+  },
+  {
+   "id": 86,
+   "text": "加油",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "flagwave",
+   "face": "determined",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "flag",
+   "wear": [
+    "band"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/086_加油.gif",
+   "cover": "out/_封面/086_加油.png"
+  },
+  {
+   "id": 87,
+   "text": "厉害",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "clap",
+   "face": "star",
+   "fx": [
+    "orbit:star"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/087_厉害.gif",
+   "cover": "out/_封面/087_厉害.png"
+  },
+  {
+   "id": 88,
+   "text": "太强了",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "grow",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/088_太强了.gif",
+   "cover": "out/_封面/088_太强了.png"
+  },
+  {
+   "id": 89,
+   "text": "666",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "clap",
+   "face": "grin",
+   "fx": [
+    "fireworks"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "bounce",
+   "gif": "out/089_666.gif",
+   "cover": "out/_封面/089_666.png"
+  },
+  {
+   "id": 90,
+   "text": "好耶",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "jump",
+   "face": "happy",
+   "fx": [
+    "confetti"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/090_好耶.gif",
+   "cover": "out/_封面/090_好耶.png"
+  },
+  {
+   "id": 91,
+   "text": "哈哈哈",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "roll",
+   "face": "xd",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/091_哈哈哈.gif",
+   "cover": "out/_封面/091_哈哈哈.png"
+  },
+  {
+   "id": 92,
+   "text": "笑死",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "flipover",
+   "face": "xd",
+   "fx": [
+    "stream"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/092_笑死.gif",
+   "cover": "out/_封面/092_笑死.png"
+  },
+  {
+   "id": 93,
+   "text": "嘿嘿",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "wag",
+   "face": "smug",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/093_嘿嘿.gif",
+   "cover": "out/_封面/093_嘿嘿.png"
+  },
+  {
+   "id": 94,
+   "text": "呜呜",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "idle",
+   "face": "cry",
+   "fx": [
+    "stream"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "droop",
+   "gif": "out/094_呜呜.gif",
+   "cover": "out/_封面/094_呜呜.png"
+  },
+  {
+   "id": 95,
+   "text": "哼",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "turnaway",
+   "face": "pout",
+   "fx": [
+    "anger"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/095_哼.gif",
+   "cover": "out/_封面/095_哼.png"
+  },
+  {
+   "id": 96,
+   "text": "啊这",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "stare",
+   "face": "awkward",
+   "fx": [
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/096_啊这.gif",
+   "cover": "out/_封面/096_啊这.png"
+  },
+  {
+   "id": 97,
+   "text": "啊？",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "zoom",
+   "face": "surprise",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/097_啊？.gif",
+   "cover": "out/_封面/097_啊？.png"
+  },
+  {
+   "id": 98,
+   "text": "嗯？",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "tilt",
+   "face": "normal",
+   "fx": [
+    "pop:question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/098_嗯？.gif",
+   "cover": "out/_封面/098_嗯？.png"
+  },
+  {
+   "id": 99,
+   "text": "什么",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "grow",
+   "face": "shock",
+   "fx": [
+    "exclaim"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "zoom",
+   "gif": "out/099_什么.gif",
+   "cover": "out/_封面/099_什么.png"
+  },
+  {
+   "id": 100,
+   "text": "真的吗",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "approach",
+   "face": "star",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/100_真的吗.gif",
+   "cover": "out/_封面/100_真的吗.png"
+  },
+  {
+   "id": 101,
+   "text": "不会吧",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "recoil",
+   "face": "shock",
+   "fx": [
+    "shock"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/101_不会吧.gif",
+   "cover": "out/_封面/101_不会吧.png"
+  },
+  {
+   "id": 102,
+   "text": "绝了",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "sidehop",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/102_绝了.gif",
+   "cover": "out/_封面/102_绝了.png"
+  },
+  {
+   "id": 103,
+   "text": "可爱",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "wag",
+   "face": "love",
+   "fx": [
+    "hearts"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/103_可爱.gif",
+   "cover": "out/_封面/103_可爱.png"
+  },
+  {
+   "id": 104,
+   "text": "爱你",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "offer",
+   "face": "love",
+   "fx": [
+    "hearts"
+   ],
+   "hold": "heart",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/104_爱你.gif",
+   "cover": "out/_封面/104_爱你.png"
+  },
+  {
+   "id": 105,
+   "text": "贴贴",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "nuzzle",
+   "face": "happy",
+   "fx": [
+    "hearts",
+    "blush"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/105_贴贴.gif",
+   "cover": "out/_封面/105_贴贴.png"
+  },
+  {
+   "id": 106,
+   "text": "抱抱",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "cheer",
+   "face": "teary",
+   "fx": [
+    "hearts"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/106_抱抱.gif",
+   "cover": "out/_封面/106_抱抱.png"
+  },
+  {
+   "id": 107,
+   "text": "摸摸头",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "nuzzle",
+   "face": "happy",
+   "fx": [
+    "flowers"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/107_摸摸头.gif",
+   "cover": "out/_封面/107_摸摸头.png"
+  },
+  {
+   "id": 108,
+   "text": "比心",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "wobble",
+   "face": "wink",
+   "fx": [
+    "float:heart"
+   ],
+   "hold": "heart",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/108_比心.gif",
+   "cover": "out/_封面/108_比心.png"
+  },
+  {
+   "id": 109,
+   "text": "想你了",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "drift",
+   "face": "teary",
+   "fx": [
+    "hearts"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/109_想你了.gif",
+   "cover": "out/_封面/109_想你了.png"
+  },
+  {
+   "id": 110,
+   "text": "吃了吗",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "popup",
+   "face": "smile",
+   "fx": [
+    "say:cookie"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/110_吃了吗.gif",
+   "cover": "out/_封面/110_吃了吗.png"
+  },
+  {
+   "id": 111,
+   "text": "起床",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "stretch",
+   "face": "surprise",
+   "fx": [
+    "sun"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/111_起床.gif",
+   "cover": "out/_封面/111_起床.png"
+  },
+  {
+   "id": 112,
+   "text": "赖床",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "belly",
+   "face": "sleep",
+   "fx": [
+    "zzz"
+   ],
+   "hold": null,
+   "wear": [
+    "nightcap"
+   ],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/112_赖床.gif",
+   "cover": "out/_封面/112_赖床.png"
+  },
+  {
+   "id": 113,
+   "text": "来啦",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "slidein",
+   "face": "joy",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "pop",
+   "gif": "out/113_来啦.gif",
+   "cover": "out/_封面/113_来啦.png"
+  },
+  {
+   "id": 114,
+   "text": "我来了",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "launch",
+   "face": "determined",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/114_我来了.gif",
+   "cover": "out/_封面/114_我来了.png"
+  },
+  {
+   "id": 115,
+   "text": "给你",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "offer",
+   "face": "happy",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "gift",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/115_给你.gif",
+   "cover": "out/_封面/115_给你.png"
+  },
+  {
+   "id": 116,
+   "text": "送你",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "pounce",
+   "face": "love",
+   "fx": [],
+   "hold": "flower",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/116_送你.gif",
+   "cover": "out/_封面/116_送你.png"
+  },
+  {
+   "id": 117,
+   "text": "干杯",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "drink",
+   "face": "joy",
+   "fx": [
+    "confetti"
+   ],
+   "hold": "cup",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/117_干杯.gif",
+   "cover": "out/_封面/117_干杯.png"
+  },
+  {
+   "id": 118,
+   "text": "收藏了",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "circle",
+   "face": "star",
+   "fx": [
+    "float:star"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/118_收藏了.gif",
+   "cover": "out/_封面/118_收藏了.png"
+  },
+  {
+   "id": 119,
+   "text": "借过",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "dash",
+   "face": "side",
+   "fx": [
+    "speed"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/119_借过.gif",
+   "cover": "out/_封面/119_借过.png"
+  },
+  {
+   "id": 120,
+   "text": "前排",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "hop",
+   "face": "happy",
+   "fx": [
+    "pop:flag"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/120_前排.gif",
+   "cover": "out/_封面/120_前排.png"
+  },
+  {
+   "id": 121,
+   "text": "去忙了",
+   "category": "daily",
+   "category_zh": "打招呼 / 日常回复",
+   "motion": "dash",
+   "face": "smile",
+   "fx": [
+    "speed"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/121_去忙了.gif",
+   "cover": "out/_封面/121_去忙了.png"
+  },
+  {
+   "id": 122,
+   "text": "开心",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "dance",
+   "face": "happy",
+   "fx": [
+    "notes"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/122_开心.gif",
+   "cover": "out/_封面/122_开心.png"
+  },
+  {
+   "id": 123,
+   "text": "好开心",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "sidehop",
+   "face": "joy",
+   "fx": [
+    "flowers"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/123_好开心.gif",
+   "cover": "out/_封面/123_好开心.png"
+  },
+  {
+   "id": 124,
+   "text": "难过",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "hide",
+   "face": "sad",
+   "fx": [
+    "rain"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "droop",
+   "gif": "out/124_难过.gif",
+   "cover": "out/_封面/124_难过.png"
+  },
+  {
+   "id": 125,
+   "text": "emo了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "drift",
+   "face": "sad",
+   "fx": [
+    "gloom",
+    "rain"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/125_emo了.gif",
+   "cover": "out/_封面/125_emo了.png"
+  },
+  {
+   "id": 126,
+   "text": "委屈",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "shrink",
+   "face": "teary",
+   "fx": [
+    "tears"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "stay",
+   "gif": "out/126_委屈.gif",
+   "cover": "out/_封面/126_委屈.png"
+  },
+  {
+   "id": 127,
+   "text": "生气",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "rage",
+   "face": "angry",
+   "fx": [
+    "anger",
+    "steam"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "shake",
+   "gif": "out/127_生气.gif",
+   "cover": "out/_封面/127_生气.png"
+  },
+  {
+   "id": 128,
+   "text": "气死了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "puff",
+   "face": "rage",
+   "fx": [
+    "steam",
+    "fire"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "zoom",
+   "gif": "out/128_气死了.gif",
+   "cover": "out/_封面/128_气死了.png"
+  },
+  {
+   "id": 129,
+   "text": "震惊",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "grow",
+   "face": "shock",
+   "fx": [
+    "shock",
+    "exclaim"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "zoom",
+   "gif": "out/129_震惊.gif",
+   "cover": "out/_封面/129_震惊.png"
+  },
+  {
+   "id": 130,
+   "text": "害怕",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "tremble",
+   "face": "worried",
+   "fx": [
+    "panic"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "shiver",
+   "gif": "out/130_害怕.gif",
+   "cover": "out/_封面/130_害怕.png"
+  },
+  {
+   "id": 131,
+   "text": "尴尬",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "hide",
+   "face": "awkward",
+   "fx": [
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "shiver",
+   "gif": "out/131_尴尬.gif",
+   "cover": "out/_封面/131_尴尬.png"
+  },
+  {
+   "id": 132,
+   "text": "无语",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "stare",
+   "face": "meh",
+   "fx": [
+    "dots"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/132_无语.gif",
+   "cover": "out/_封面/132_无语.png"
+  },
+  {
+   "id": 133,
+   "text": "裂开",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "petrify",
+   "face": "struggle",
+   "fx": [
+    "bolt"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "shake",
+   "gif": "out/133_裂开.gif",
+   "cover": "out/_封面/133_裂开.png"
+  },
+  {
+   "id": 134,
+   "text": "心碎",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "idle",
+   "face": "sob",
+   "fx": [
+    "brokenheart"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "droop",
+   "gif": "out/134_心碎.gif",
+   "cover": "out/_封面/134_心碎.png"
+  },
+  {
+   "id": 135,
+   "text": "崩溃",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "headbang",
+   "face": "struggle",
+   "fx": [
+    "bolt",
+    "panic"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "shake",
+   "gif": "out/135_崩溃.gif",
+   "cover": "out/_封面/135_崩溃.png"
+  },
+  {
+   "id": 136,
+   "text": "救命",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "tremble",
+   "face": "cry",
+   "fx": [
+    "panic"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "shake",
+   "gif": "out/136_救命.gif",
+   "cover": "out/_封面/136_救命.png"
+  },
+  {
+   "id": 137,
+   "text": "晕了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "circle",
+   "face": "dizzy",
+   "fx": [
+    "stars"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/137_晕了.gif",
+   "cover": "out/_封面/137_晕了.png"
+  },
+  {
+   "id": 138,
+   "text": "困了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "doze",
+   "face": "sleepy",
+   "fx": [
+    "zzz"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/138_困了.gif",
+   "cover": "out/_封面/138_困了.png"
+  },
+  {
+   "id": 139,
+   "text": "累了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "flop",
+   "face": "tired",
+   "fx": [
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "droop",
+   "gif": "out/139_累了.gif",
+   "cover": "out/_封面/139_累了.png"
+  },
+  {
+   "id": 140,
+   "text": "饿了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "lookup",
+   "face": "drool",
+   "fx": [
+    "float:apple",
+    "float:cookie"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/140_饿了.gif",
+   "cover": "out/_封面/140_饿了.png"
+  },
+  {
+   "id": 141,
+   "text": "好冷",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "tremble",
+   "face": "struggle",
+   "fx": [
+    "snow"
+   ],
+   "hold": null,
+   "wear": [
+    "ice"
+   ],
+   "style": "blue",
+   "tmode": "shiver",
+   "gif": "out/141_好冷.gif",
+   "cover": "out/_封面/141_好冷.png"
+  },
+  {
+   "id": 142,
+   "text": "好热",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "melt",
+   "face": "tired",
+   "fx": [
+    "sun",
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/142_好热.gif",
+   "cover": "out/_封面/142_好热.png"
+  },
+  {
+   "id": 143,
+   "text": "酸了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "turnaway",
+   "face": "side",
+   "fx": [
+    "float:lemon"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "green",
+   "tmode": "stay",
+   "gif": "out/143_酸了.gif",
+   "cover": "out/_封面/143_酸了.png"
+  },
+  {
+   "id": 144,
+   "text": "羡慕",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "lookup",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/144_羡慕.gif",
+   "cover": "out/_封面/144_羡慕.png"
+  },
+  {
+   "id": 145,
+   "text": "得意",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "wag",
+   "face": "smug",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [
+    "crown"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/145_得意.gif",
+   "cover": "out/_封面/145_得意.png"
+  },
+  {
+   "id": 146,
+   "text": "害羞",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "shy",
+   "face": "shy",
+   "fx": [
+    "blush"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/146_害羞.gif",
+   "cover": "out/_封面/146_害羞.png"
+  },
+  {
+   "id": 147,
+   "text": "疑惑",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "tilt",
+   "face": "up",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/147_疑惑.gif",
+   "cover": "out/_封面/147_疑惑.png"
+  },
+  {
+   "id": 148,
+   "text": "思考中",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "think",
+   "face": "up",
+   "fx": [
+    "dots"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/148_思考中.gif",
+   "cover": "out/_封面/148_思考中.png"
+  },
+  {
+   "id": 149,
+   "text": "无聊",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "flop",
+   "face": "meh",
+   "fx": [
+    "bubbles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/149_无聊.gif",
+   "cover": "out/_封面/149_无聊.png"
+  },
+  {
+   "id": 150,
+   "text": "好烦",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "slosh",
+   "face": "angry",
+   "fx": [
+    "anger"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/150_好烦.gif",
+   "cover": "out/_封面/150_好烦.png"
+  },
+  {
+   "id": 151,
+   "text": "头秃",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "typing",
+   "face": "struggle",
+   "fx": [
+    "panic"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/151_头秃.gif",
+   "cover": "out/_封面/151_头秃.png"
+  },
+  {
+   "id": 152,
+   "text": "摆烂",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "flipover",
+   "face": "meh",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/152_摆烂.gif",
+   "cover": "out/_封面/152_摆烂.png"
+  },
+  {
+   "id": 153,
+   "text": "躺平",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "float",
+   "face": "happy",
+   "fx": [
+    "twinkle"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/153_躺平.gif",
+   "cover": "out/_封面/153_躺平.png"
+  },
+  {
+   "id": 154,
+   "text": "摸鱼",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "flagwave",
+   "face": "happy",
+   "fx": [],
+   "hold": "fish",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/154_摸鱼.gif",
+   "cover": "out/_封面/154_摸鱼.png"
+  },
+  {
+   "id": 155,
+   "text": "潜水",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "sink",
+   "face": "normal",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/155_潜水.gif",
+   "cover": "out/_封面/155_潜水.png"
+  },
+  {
+   "id": 156,
+   "text": "冒泡",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "peek",
+   "face": "happy",
+   "fx": [
+    "bubbles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/156_冒泡.gif",
+   "cover": "out/_封面/156_冒泡.png"
+  },
+  {
+   "id": 157,
+   "text": "溜了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "dash",
+   "face": "xd",
+   "fx": [
+    "speed"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/157_溜了.gif",
+   "cover": "out/_封面/157_溜了.png"
+  },
+  {
+   "id": 158,
+   "text": "跑路",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "dash",
+   "face": "shock",
+   "fx": [
+    "speed",
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/158_跑路.gif",
+   "cover": "out/_封面/158_跑路.png"
+  },
+  {
+   "id": 159,
+   "text": "寄了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "faint",
+   "face": "dead",
+   "fx": [
+    "ghost"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/159_寄了.gif",
+   "cover": "out/_封面/159_寄了.png"
+  },
+  {
+   "id": 160,
+   "text": "完蛋",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "tantrum",
+   "face": "shock",
+   "fx": [
+    "panic",
+    "bolt"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "shake",
+   "gif": "out/160_完蛋.gif",
+   "cover": "out/_封面/160_完蛋.png"
+  },
+  {
+   "id": 161,
+   "text": "傻眼",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "zoom",
+   "face": "tiny",
+   "fx": [
+    "exclaim"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/161_傻眼.gif",
+   "cover": "out/_封面/161_傻眼.png"
+  },
+  {
+   "id": 162,
+   "text": "期待",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "wobble",
+   "face": "sparkle",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/162_期待.gif",
+   "cover": "out/_封面/162_期待.png"
+  },
+  {
+   "id": 163,
+   "text": "兴奋",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "dance",
+   "face": "xd",
+   "fx": [
+    "notes",
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/163_兴奋.gif",
+   "cover": "out/_封面/163_兴奋.png"
+  },
+  {
+   "id": 164,
+   "text": "感动",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "idle",
+   "face": "teary",
+   "fx": [
+    "tears",
+    "hearts"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/164_感动.gif",
+   "cover": "out/_封面/164_感动.png"
+  },
+  {
+   "id": 165,
+   "text": "大哭",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "tremble",
+   "face": "cry",
+   "fx": [
+    "stream"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "shake",
+   "gif": "out/165_大哭.gif",
+   "cover": "out/_封面/165_大哭.png"
+  },
+  {
+   "id": 166,
+   "text": "偷笑",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "peek",
+   "face": "xd",
+   "fx": [
+    "blush"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/166_偷笑.gif",
+   "cover": "out/_封面/166_偷笑.png"
+  },
+  {
+   "id": 167,
+   "text": "坏笑",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "headbob",
+   "face": "smug",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [
+    "horns"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/167_坏笑.gif",
+   "cover": "out/_封面/167_坏笑.png"
+  },
+  {
+   "id": 168,
+   "text": "吃瓜",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "chomp",
+   "face": "eat",
+   "fx": [],
+   "hold": "melon",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/168_吃瓜.gif",
+   "cover": "out/_封面/168_吃瓜.png"
+  },
+  {
+   "id": 169,
+   "text": "看戏",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "chomp",
+   "face": "smug",
+   "fx": [],
+   "hold": "popcorn",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/169_看戏.gif",
+   "cover": "out/_封面/169_看戏.png"
+  },
+  {
+   "id": 170,
+   "text": "点赞",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "nod",
+   "face": "happy",
+   "fx": [
+    "float:thumb"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/170_点赞.gif",
+   "cover": "out/_封面/170_点赞.png"
+  },
+  {
+   "id": 171,
+   "text": "鼓掌",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "clap",
+   "face": "happy",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/171_鼓掌.gif",
+   "cover": "out/_封面/171_鼓掌.png"
+  },
+  {
+   "id": 172,
+   "text": "撒花",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "cheer",
+   "face": "joy",
+   "fx": [
+    "fall:flower"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/172_撒花.gif",
+   "cover": "out/_封面/172_撒花.png"
+  },
+  {
+   "id": 173,
+   "text": "庆祝",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "jump",
+   "face": "joy",
+   "fx": [
+    "fireworks"
+   ],
+   "hold": null,
+   "wear": [
+    "party"
+   ],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/173_庆祝.gif",
+   "cover": "out/_封面/173_庆祝.png"
+  },
+  {
+   "id": 174,
+   "text": "恭喜",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "clap",
+   "face": "happy",
+   "fx": [
+    "confetti"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/174_恭喜.gif",
+   "cover": "out/_封面/174_恭喜.png"
+  },
+  {
+   "id": 175,
+   "text": "发财",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "circle",
+   "face": "money",
+   "fx": [
+    "coins"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/175_发财.gif",
+   "cover": "out/_封面/175_发财.png"
+  },
+  {
+   "id": 176,
+   "text": "暴富",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "spin",
+   "face": "money",
+   "fx": [
+    "coins",
+    "float:money"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "bounce",
+   "gif": "out/176_暴富.gif",
+   "cover": "out/_封面/176_暴富.png"
+  },
+  {
+   "id": 177,
+   "text": "许愿",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "bow",
+   "face": "sleep",
+   "fx": [
+    "sparkles",
+    "float:star"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/177_许愿.gif",
+   "cover": "out/_封面/177_许愿.png"
+  },
+  {
+   "id": 178,
+   "text": "求求了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "kowtow",
+   "face": "teary",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "droop",
+   "gif": "out/178_求求了.gif",
+   "cover": "out/_封面/178_求求了.png"
+  },
+  {
+   "id": 179,
+   "text": "可怜",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "shrink",
+   "face": "teary",
+   "fx": [
+    "rain"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "stay",
+   "gif": "out/179_可怜.gif",
+   "cover": "out/_封面/179_可怜.png"
+  },
+  {
+   "id": 180,
+   "text": "我不听",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "headbob",
+   "face": "focus",
+   "fx": [
+    "notes"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/180_我不听.gif",
+   "cover": "out/_封面/180_我不听.png"
+  },
+  {
+   "id": 181,
+   "text": "起不来",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "doze",
+   "face": "sleep",
+   "fx": [
+    "zzz"
+   ],
+   "hold": null,
+   "wear": [
+    "nightcap"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/181_起不来.gif",
+   "cover": "out/_封面/181_起不来.png"
+  },
+  {
+   "id": 182,
+   "text": "再睡会",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "float",
+   "face": "sleep",
+   "fx": [
+    "zzz"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/182_再睡会.gif",
+   "cover": "out/_封面/182_再睡会.png"
+  },
+  {
+   "id": 183,
+   "text": "失眠",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "stare",
+   "face": "tired",
+   "fx": [
+    "moon"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/183_失眠.gif",
+   "cover": "out/_封面/183_失眠.png"
+  },
+  {
+   "id": 184,
+   "text": "熬夜",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "typing",
+   "face": "tired",
+   "fx": [
+    "moon"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/184_熬夜.gif",
+   "cover": "out/_封面/184_熬夜.png"
+  },
+  {
+   "id": 185,
+   "text": "养生",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "drink",
+   "face": "smile",
+   "fx": [],
+   "hold": "cup",
+   "wear": [
+    "towel"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/185_养生.gif",
+   "cover": "out/_封面/185_养生.png"
+  },
+  {
+   "id": 186,
+   "text": "离谱",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "recoil",
+   "face": "dizzy",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/186_离谱.gif",
+   "cover": "out/_封面/186_离谱.png"
+  },
+  {
+   "id": 187,
+   "text": "真香",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "chomp",
+   "face": "drool",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "apple",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/187_真香.gif",
+   "cover": "out/_封面/187_真香.png"
+  },
+  {
+   "id": 188,
+   "text": "我太难了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "melt",
+   "face": "sob",
+   "fx": [
+    "rain"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "droop",
+   "gif": "out/188_我太难了.gif",
+   "cover": "out/_封面/188_我太难了.png"
+  },
+  {
+   "id": 189,
+   "text": "人麻了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "petrify",
+   "face": "blank",
+   "fx": [
+    "bolt"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/189_人麻了.gif",
+   "cover": "out/_封面/189_人麻了.png"
+  },
+  {
+   "id": 190,
+   "text": "妙啊",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "wobble",
+   "face": "star",
+   "fx": [
+    "bulb"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/190_妙啊.gif",
+   "cover": "out/_封面/190_妙啊.png"
+  },
+  {
+   "id": 191,
+   "text": "你说得对",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "nod",
+   "face": "smile",
+   "fx": [
+    "check"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/191_你说得对.gif",
+   "cover": "out/_封面/191_你说得对.png"
+  },
+  {
+   "id": 192,
+   "text": "我错了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "hide",
+   "face": "teary",
+   "fx": [
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "blue",
+   "tmode": "stay",
+   "gif": "out/192_我错了.gif",
+   "cover": "out/_封面/192_我错了.png"
+  },
+  {
+   "id": 193,
+   "text": "等等我",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "run",
+   "face": "worried",
+   "fx": [
+    "speed",
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/193_等等我.gif",
+   "cover": "out/_封面/193_等等我.png"
+  },
+  {
+   "id": 194,
+   "text": "慢慢来",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "drift",
+   "face": "smile",
+   "fx": [
+    "twinkle"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/194_慢慢来.gif",
+   "cover": "out/_封面/194_慢慢来.png"
+  },
+  {
+   "id": 195,
+   "text": "冷静",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "sway",
+   "face": "focus",
+   "fx": [
+    "snow"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "cyan",
+   "tmode": "stay",
+   "gif": "out/195_冷静.gif",
+   "cover": "out/_封面/195_冷静.png"
+  },
+  {
+   "id": 196,
+   "text": "淡定",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "drink",
+   "face": "cool",
+   "fx": [],
+   "hold": "cup",
+   "wear": [
+    "shades"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/196_淡定.gif",
+   "cover": "out/_封面/196_淡定.png"
+  },
+  {
+   "id": 197,
+   "text": "盯",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "zoom",
+   "face": "custom",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/197_盯.gif",
+   "cover": "out/_封面/197_盯.png"
+  },
+  {
+   "id": 198,
+   "text": "看我",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "zoom",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/198_看我.gif",
+   "cover": "out/_封面/198_看我.png"
+  },
+  {
+   "id": 199,
+   "text": "帅",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "rise",
+   "face": "cool",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [
+    "shades"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/199_帅.gif",
+   "cover": "out/_封面/199_帅.png"
+  },
+  {
+   "id": 200,
+   "text": "哇",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "grow",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/200_哇.gif",
+   "cover": "out/_封面/200_哇.png"
+  },
+  {
+   "id": 201,
+   "text": "哇哦",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "pounce",
+   "face": "surprise",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/201_哇哦.gif",
+   "cover": "out/_封面/201_哇哦.png"
+  },
+  {
+   "id": 202,
+   "text": "诶嘿",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "tilt",
+   "face": "wink",
+   "fx": [
+    "twinkle"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/202_诶嘿.gif",
+   "cover": "out/_封面/202_诶嘿.png"
+  },
+  {
+   "id": 203,
+   "text": "略略略",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "shake",
+   "face": "blep",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/203_略略略.gif",
+   "cover": "out/_封面/203_略略略.png"
+  },
+  {
+   "id": 204,
+   "text": "才不是",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "turnaway",
+   "face": "pout",
+   "fx": [
+    "blush"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/204_才不是.gif",
+   "cover": "out/_封面/204_才不是.png"
+  },
+  {
+   "id": 205,
+   "text": "傲娇",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "shy",
+   "face": "pout",
+   "fx": [
+    "blush"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/205_傲娇.gif",
+   "cover": "out/_封面/205_傲娇.png"
+  },
+  {
+   "id": 206,
+   "text": "哈？",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "zoom",
+   "face": "meh",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/206_哈？.gif",
+   "cover": "out/_封面/206_哈？.png"
+  },
+  {
+   "id": 207,
+   "text": "服了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "squish",
+   "face": "meh",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/207_服了.gif",
+   "cover": "out/_封面/207_服了.png"
+  },
+  {
+   "id": 208,
+   "text": "绝绝子",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "dance",
+   "face": "star",
+   "fx": [
+    "sparkles",
+    "notes"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/208_绝绝子.gif",
+   "cover": "out/_封面/208_绝绝子.png"
+  },
+  {
+   "id": 209,
+   "text": "芜湖",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "launch",
+   "face": "joy",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/209_芜湖.gif",
+   "cover": "out/_封面/209_芜湖.png"
+  },
+  {
+   "id": 210,
+   "text": "冲鸭",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "run",
+   "face": "determined",
+   "fx": [
+    "speed"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/210_冲鸭.gif",
+   "cover": "out/_封面/210_冲鸭.png"
+  },
+  {
+   "id": 211,
+   "text": "稳了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "buoy",
+   "face": "cool",
+   "fx": [
+    "check"
+   ],
+   "hold": null,
+   "wear": [
+    "shades"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/211_稳了.gif",
+   "cover": "out/_封面/211_稳了.png"
+  },
+  {
+   "id": 212,
+   "text": "悬了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "buoy",
+   "face": "worried",
+   "fx": [
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/212_悬了.gif",
+   "cover": "out/_封面/212_悬了.png"
+  },
+  {
+   "id": 213,
+   "text": "慌了",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "tremble",
+   "face": "shock",
+   "fx": [
+    "panic"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "shake",
+   "gif": "out/213_慌了.gif",
+   "cover": "out/_封面/213_慌了.png"
+  },
+  {
+   "id": 214,
+   "text": "别慌",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "buoy",
+   "face": "cool",
+   "fx": [
+    "twinkle"
+   ],
+   "hold": null,
+   "wear": [
+    "glasses"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/214_别慌.gif",
+   "cover": "out/_封面/214_别慌.png"
+  },
+  {
+   "id": 215,
+   "text": "大问题",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "grow",
+   "face": "shock",
+   "fx": [
+    "exclaim"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/215_大问题.gif",
+   "cover": "out/_封面/215_大问题.png"
+  },
+  {
+   "id": 216,
+   "text": "想要",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "stare",
+   "face": "sparkle",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/216_想要.gif",
+   "cover": "out/_封面/216_想要.png"
+  },
+  {
+   "id": 217,
+   "text": "冲浪",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "drift",
+   "face": "cool",
+   "fx": [
+    "bubbles"
+   ],
+   "hold": null,
+   "wear": [
+    "shades"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/217_冲浪.gif",
+   "cover": "out/_封面/217_冲浪.png"
+  },
+  {
+   "id": 218,
+   "text": "唉",
+   "category": "mood",
+   "category_zh": "情绪",
+   "motion": "flop",
+   "face": "sad",
+   "fx": [
+    "dots"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/218_唉.gif",
+   "cover": "out/_封面/218_唉.png"
+  },
+  {
+   "id": 219,
+   "text": "挖矿",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "swing",
+   "face": "focus",
+   "fx": [],
+   "hold": "pickaxe",
+   "wear": [
+    "helmet"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/219_挖矿.gif",
+   "cover": "out/_封面/219_挖矿.png"
+  },
+  {
+   "id": 220,
+   "text": "挖到钻石",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "flip",
+   "face": "star",
+   "fx": [
+    "float:diamond"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/220_挖到钻石.gif",
+   "cover": "out/_封面/220_挖到钻石.png"
+  },
+  {
+   "id": 221,
+   "text": "钻石!",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "offer",
+   "face": "sparkle",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "diamond",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/221_钻石!.gif",
+   "cover": "out/_封面/221_钻石!.png"
+  },
+  {
+   "id": 222,
+   "text": "下矿",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "sink",
+   "face": "determined",
+   "fx": [],
+   "hold": null,
+   "wear": [
+    "helmet"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/222_下矿.gif",
+   "cover": "out/_封面/222_下矿.png"
+  },
+  {
+   "id": 223,
+   "text": "苦力怕",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "recoil",
+   "face": "shock",
+   "fx": [
+    "stay:creeper"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "green",
+   "tmode": "stay",
+   "gif": "out/223_苦力怕.gif",
+   "cover": "out/_封面/223_苦力怕.png"
+  },
+  {
+   "id": 224,
+   "text": "嘶嘶嘶",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "turnaway",
+   "face": "tiny",
+   "fx": [
+    "pop:creeper",
+    "flash"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "green",
+   "tmode": "stay",
+   "gif": "out/224_嘶嘶嘶.gif",
+   "cover": "out/_封面/224_嘶嘶嘶.png"
+  },
+  {
+   "id": 225,
+   "text": "炸了",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "faint",
+   "face": "dead",
+   "fx": [
+    "boom"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/225_炸了.gif",
+   "cover": "out/_封面/225_炸了.png"
+  },
+  {
+   "id": 226,
+   "text": "家没了",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "idle",
+   "face": "sob",
+   "fx": [
+    "boom",
+    "stream"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/226_家没了.gif",
+   "cover": "out/_封面/226_家没了.png"
+  },
+  {
+   "id": 227,
+   "text": "建家",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "sidehop",
+   "face": "happy",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "grass",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/227_建家.gif",
+   "cover": "out/_封面/227_建家.png"
+  },
+  {
+   "id": 228,
+   "text": "种地",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "headbob",
+   "face": "happy",
+   "fx": [],
+   "hold": "carrot",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/228_种地.gif",
+   "cover": "out/_封面/228_种地.png"
+  },
+  {
+   "id": 229,
+   "text": "钓鱼",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "flagwave",
+   "face": "focus",
+   "fx": [
+    "float:fish"
+   ],
+   "hold": "rod",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/229_钓鱼.gif",
+   "cover": "out/_封面/229_钓鱼.png"
+  },
+  {
+   "id": 230,
+   "text": "打怪",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "swing",
+   "face": "angry",
+   "fx": [],
+   "hold": "sword",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/230_打怪.gif",
+   "cover": "out/_封面/230_打怪.png"
+  },
+  {
+   "id": 231,
+   "text": "屠龙",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "swing",
+   "face": "determined",
+   "fx": [
+    "fire"
+   ],
+   "hold": "sword",
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/231_屠龙.gif",
+   "cover": "out/_封面/231_屠龙.png"
+  },
+  {
+   "id": 232,
+   "text": "去下界",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "dash",
+   "face": "determined",
+   "fx": [
+    "fire"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/232_去下界.gif",
+   "cover": "out/_封面/232_去下界.png"
+  },
+  {
+   "id": 233,
+   "text": "去末地",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "launch",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/233_去末地.gif",
+   "cover": "out/_封面/233_去末地.png"
+  },
+  {
+   "id": 234,
+   "text": "红石",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "lookup",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "rtorch",
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/234_红石.gif",
+   "cover": "out/_封面/234_红石.png"
+  },
+  {
+   "id": 235,
+   "text": "附魔",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "spin",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "book",
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/235_附魔.gif",
+   "cover": "out/_封面/235_附魔.png"
+  },
+  {
+   "id": 236,
+   "text": "掉岩浆",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "tantrum",
+   "face": "shock",
+   "fx": [
+    "fire"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "shake",
+   "gif": "out/236_掉岩浆.gif",
+   "cover": "out/_封面/236_掉岩浆.png"
+  },
+  {
+   "id": 237,
+   "text": "迷路了",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "look",
+   "face": "worried",
+   "fx": [
+    "question"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/237_迷路了.gif",
+   "cover": "out/_封面/237_迷路了.png"
+  },
+  {
+   "id": 238,
+   "text": "别挖脚下",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "shake",
+   "face": "shock",
+   "fx": [
+    "stay:exclaim"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/238_别挖脚下.gif",
+   "cover": "out/_封面/238_别挖脚下.png"
+  },
+  {
+   "id": 239,
+   "text": "天亮了",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "stretch",
+   "face": "happy",
+   "fx": [
+    "sun"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/239_天亮了.gif",
+   "cover": "out/_封面/239_天亮了.png"
+  },
+  {
+   "id": 240,
+   "text": "天黑了",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "hide",
+   "face": "worried",
+   "fx": [
+    "moon"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/240_天黑了.gif",
+   "cover": "out/_封面/240_天黑了.png"
+  },
+  {
+   "id": 241,
+   "text": "复活了",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "popup",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "green",
+   "tmode": "stay",
+   "gif": "out/241_复活了.gif",
+   "cover": "out/_封面/241_复活了.png"
+  },
+  {
+   "id": 242,
+   "text": "找村庄",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "scan",
+   "face": "focus",
+   "fx": [],
+   "hold": "magnifier",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/242_找村庄.gif",
+   "cover": "out/_封面/242_找村庄.png"
+  },
+  {
+   "id": 243,
+   "text": "交易",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "rise",
+   "face": "money",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "emerald",
+   "wear": [],
+   "style": "green",
+   "tmode": "stay",
+   "gif": "out/243_交易.gif",
+   "cover": "out/_封面/243_交易.png"
+  },
+  {
+   "id": 244,
+   "text": "掉线了",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "glitch",
+   "face": "shock",
+   "fx": [
+    "pop:cross"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/244_掉线了.gif",
+   "cover": "out/_封面/244_掉线了.png"
+  },
+  {
+   "id": 245,
+   "text": "开光影",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "spin",
+   "face": "star",
+   "fx": [
+    "sparkles",
+    "sun"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/245_开光影.gif",
+   "cover": "out/_封面/245_开光影.png"
+  },
+  {
+   "id": 246,
+   "text": "装模组",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "typing",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/246_装模组.gif",
+   "cover": "out/_封面/246_装模组.png"
+  },
+  {
+   "id": 247,
+   "text": "整合包",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "popup",
+   "face": "happy",
+   "fx": [],
+   "hold": "gift",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/247_整合包.gif",
+   "cover": "out/_封面/247_整合包.png"
+  },
+  {
+   "id": 248,
+   "text": "换皮肤",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "spin",
+   "face": "joy",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [
+    "bow"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/248_换皮肤.gif",
+   "cover": "out/_封面/248_换皮肤.png"
+  },
+  {
+   "id": 249,
+   "text": "一起玩",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "cheer",
+   "face": "happy",
+   "fx": [
+    "float:controller"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/249_一起玩.gif",
+   "cover": "out/_封面/249_一起玩.png"
+  },
+  {
+   "id": 250,
+   "text": "GG",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "faint",
+   "face": "dead",
+   "fx": [
+    "ghost"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/250_GG.gif",
+   "cover": "out/_封面/250_GG.png"
+  },
+  {
+   "id": 251,
+   "text": "喝药水",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "wobble",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "potion",
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/251_喝药水.gif",
+   "cover": "out/_封面/251_喝药水.png"
+  },
+  {
+   "id": 252,
+   "text": "有TNT",
+   "category": "minecraft",
+   "category_zh": "我的世界",
+   "motion": "tremble",
+   "face": "shock",
+   "fx": [
+    "exclaim"
+   ],
+   "hold": "tnt",
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/252_有TNT.gif",
+   "cover": "out/_封面/252_有TNT.png"
+  },
+  {
+   "id": 253,
+   "text": "上班",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "melt",
+   "face": "tired",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/253_上班.gif",
+   "cover": "out/_封面/253_上班.png"
+  },
+  {
+   "id": 254,
+   "text": "下班",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "launch",
+   "face": "joy",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "green",
+   "tmode": "stay",
+   "gif": "out/254_下班.gif",
+   "cover": "out/_封面/254_下班.png"
+  },
+  {
+   "id": 255,
+   "text": "下班啦",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "flip",
+   "face": "happy",
+   "fx": [
+    "confetti"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "bounce",
+   "gif": "out/255_下班啦.gif",
+   "cover": "out/_封面/255_下班啦.png"
+  },
+  {
+   "id": 256,
+   "text": "加班",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "typing",
+   "face": "cry",
+   "fx": [
+    "moon"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "purple",
+   "tmode": "stay",
+   "gif": "out/256_加班.gif",
+   "cover": "out/_封面/256_加班.png"
+  },
+  {
+   "id": 257,
+   "text": "开会",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "doze",
+   "face": "sleepy",
+   "fx": [
+    "dots"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/257_开会.gif",
+   "cover": "out/_封面/257_开会.png"
+  },
+  {
+   "id": 258,
+   "text": "打工",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "swing",
+   "face": "tired",
+   "fx": [
+    "sweat"
+   ],
+   "hold": "pickaxe",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/258_打工.gif",
+   "cover": "out/_封面/258_打工.png"
+  },
+  {
+   "id": 259,
+   "text": "搬砖",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "squish",
+   "face": "struggle",
+   "fx": [
+    "sweat"
+   ],
+   "hold": "brick",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/259_搬砖.gif",
+   "cover": "out/_封面/259_搬砖.png"
+  },
+  {
+   "id": 260,
+   "text": "干饭",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "chomp",
+   "face": "eat",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "bowl",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/260_干饭.gif",
+   "cover": "out/_封面/260_干饭.png"
+  },
+  {
+   "id": 261,
+   "text": "点外卖",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "think",
+   "face": "drool",
+   "fx": [
+    "say:cookie"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/261_点外卖.gif",
+   "cover": "out/_封面/261_点外卖.png"
+  },
+  {
+   "id": 262,
+   "text": "奶茶",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "drink",
+   "face": "happy",
+   "fx": [
+    "hearts"
+   ],
+   "hold": "boba",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/262_奶茶.gif",
+   "cover": "out/_封面/262_奶茶.png"
+  },
+  {
+   "id": 263,
+   "text": "多喝水",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "buoy",
+   "face": "wink",
+   "fx": [
+    "bubbles"
+   ],
+   "hold": "cup",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/263_多喝水.gif",
+   "cover": "out/_封面/263_多喝水.png"
+  },
+  {
+   "id": 264,
+   "text": "咖啡续命",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "drink",
+   "face": "tired",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "cup",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/264_咖啡续命.gif",
+   "cover": "out/_封面/264_咖啡续命.png"
+  },
+  {
+   "id": 265,
+   "text": "学习",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "read",
+   "face": "focus",
+   "fx": [],
+   "hold": "book",
+   "wear": [
+    "glasses"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/265_学习.gif",
+   "cover": "out/_封面/265_学习.png"
+  },
+  {
+   "id": 266,
+   "text": "考试",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "read",
+   "face": "worried",
+   "fx": [
+    "sweat"
+   ],
+   "hold": "book",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/266_考试.gif",
+   "cover": "out/_封面/266_考试.png"
+  },
+  {
+   "id": 267,
+   "text": "写作业",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "typing",
+   "face": "cry",
+   "fx": [
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/267_写作业.gif",
+   "cover": "out/_封面/267_写作业.png"
+  },
+  {
+   "id": 268,
+   "text": "不想上班",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "belly",
+   "face": "tired",
+   "fx": [],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/268_不想上班.gif",
+   "cover": "out/_封面/268_不想上班.png"
+  },
+  {
+   "id": 269,
+   "text": "周末",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "dance",
+   "face": "joy",
+   "fx": [
+    "notes",
+    "sun"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/269_周末.gif",
+   "cover": "out/_封面/269_周末.png"
+  },
+  {
+   "id": 270,
+   "text": "放假",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "jump",
+   "face": "star",
+   "fx": [
+    "fireworks"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/270_放假.gif",
+   "cover": "out/_封面/270_放假.png"
+  },
+  {
+   "id": 271,
+   "text": "开学",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "shrink",
+   "face": "cry",
+   "fx": [
+    "rain"
+   ],
+   "hold": null,
+   "wear": [
+    "grad"
+   ],
+   "style": "blue",
+   "tmode": "stay",
+   "gif": "out/271_开学.gif",
+   "cover": "out/_封面/271_开学.png"
+  },
+  {
+   "id": 272,
+   "text": "来活了",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "slidein",
+   "face": "determined",
+   "fx": [
+    "exclaim"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/272_来活了.gif",
+   "cover": "out/_封面/272_来活了.png"
+  },
+  {
+   "id": 273,
+   "text": "请假",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "bow",
+   "face": "sad",
+   "fx": [
+    "say:mail"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/273_请假.gif",
+   "cover": "out/_封面/273_请假.png"
+  },
+  {
+   "id": 274,
+   "text": "发工资",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "flip",
+   "face": "money",
+   "fx": [
+    "coins"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/274_发工资.gif",
+   "cover": "out/_封面/274_发工资.png"
+  },
+  {
+   "id": 275,
+   "text": "没钱了",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "squish",
+   "face": "teary",
+   "fx": [
+    "float:money"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/275_没钱了.gif",
+   "cover": "out/_封面/275_没钱了.png"
+  },
+  {
+   "id": 276,
+   "text": "买买买",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "run",
+   "face": "money",
+   "fx": [
+    "coins"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/276_买买买.gif",
+   "cover": "out/_封面/276_买买买.png"
+  },
+  {
+   "id": 277,
+   "text": "快递到了",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "popup",
+   "face": "star",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "gift",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/277_快递到了.gif",
+   "cover": "out/_封面/277_快递到了.png"
+  },
+  {
+   "id": 278,
+   "text": "下雨了",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "umbrella",
+   "face": "worried",
+   "fx": [
+    "rain"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/278_下雨了.gif",
+   "cover": "out/_封面/278_下雨了.png"
+  },
+  {
+   "id": 279,
+   "text": "洗澡",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "shakeoff",
+   "face": "happy",
+   "fx": [
+    "bubbles"
+   ],
+   "hold": null,
+   "wear": [
+    "towel"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/279_洗澡.gif",
+   "cover": "out/_封面/279_洗澡.png"
+  },
+  {
+   "id": 280,
+   "text": "运动",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "hop",
+   "face": "determined",
+   "fx": [
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [
+    "band"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/280_运动.gif",
+   "cover": "out/_封面/280_运动.png"
+  },
+  {
+   "id": 281,
+   "text": "吃撑了",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "hiccup",
+   "face": "tired",
+   "fx": [
+    "sweat"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gray",
+   "tmode": "stay",
+   "gif": "out/281_吃撑了.gif",
+   "cover": "out/_封面/281_吃撑了.png"
+  },
+  {
+   "id": 282,
+   "text": "生日快乐",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "sway",
+   "face": "happy",
+   "fx": [
+    "confetti"
+   ],
+   "hold": "cake",
+   "wear": [
+    "party"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/282_生日快乐.gif",
+   "cover": "out/_封面/282_生日快乐.png"
+  },
+  {
+   "id": 283,
+   "text": "新年快乐",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "jump",
+   "face": "joy",
+   "fx": [
+    "fireworks"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "red",
+   "tmode": "stay",
+   "gif": "out/283_新年快乐.gif",
+   "cover": "out/_封面/283_新年快乐.png"
+  },
+  {
+   "id": 284,
+   "text": "晒太阳",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "float",
+   "face": "happy",
+   "fx": [
+    "sun"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/284_晒太阳.gif",
+   "cover": "out/_封面/284_晒太阳.png"
+  },
+  {
+   "id": 285,
+   "text": "下雪了",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "lookup",
+   "face": "star",
+   "fx": [
+    "snow"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/285_下雪了.gif",
+   "cover": "out/_封面/285_下雪了.png"
+  },
+  {
+   "id": 286,
+   "text": "秋天到了",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "drift",
+   "face": "smile",
+   "fx": [
+    "leaves"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/286_秋天到了.gif",
+   "cover": "out/_封面/286_秋天到了.png"
+  },
+  {
+   "id": 287,
+   "text": "春天来了",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "sway",
+   "face": "happy",
+   "fx": [
+    "fall:flower"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "green",
+   "tmode": "stay",
+   "gif": "out/287_春天来了.gif",
+   "cover": "out/_封面/287_春天来了.png"
+  },
+  {
+   "id": 288,
+   "text": "吐泡泡",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "idle",
+   "face": "blep",
+   "fx": [
+    "bubbles"
+   ],
+   "hold": null,
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/288_吐泡泡.gif",
+   "cover": "out/_封面/288_吐泡泡.png"
+  },
+  {
+   "id": 289,
+   "text": "当厨师",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "sidehop",
+   "face": "happy",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": "cake",
+   "wear": [
+    "chef"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/289_当厨师.gif",
+   "cover": "out/_封面/289_当厨师.png"
+  },
+  {
+   "id": 290,
+   "text": "毕业了",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "circle",
+   "face": "star",
+   "fx": [
+    "confetti"
+   ],
+   "hold": null,
+   "wear": [
+    "grad"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/290_毕业了.gif",
+   "cover": "out/_封面/290_毕业了.png"
+  },
+  {
+   "id": 291,
+   "text": "听歌",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "headbang",
+   "face": "sleep",
+   "fx": [
+    "notes"
+   ],
+   "hold": null,
+   "wear": [
+    "phones"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/291_听歌.gif",
+   "cover": "out/_封面/291_听歌.png"
+  },
+  {
+   "id": 292,
+   "text": "天使",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "wag",
+   "face": "happy",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [
+    "halo"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/292_天使.gif",
+   "cover": "out/_封面/292_天使.png"
+  },
+  {
+   "id": 293,
+   "text": "戴花花",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "wobble",
+   "face": "happy",
+   "fx": [
+    "twinkle"
+   ],
+   "hold": null,
+   "wear": [
+    "flowers"
+   ],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/293_戴花花.gif",
+   "cover": "out/_封面/293_戴花花.png"
+  },
+  {
+   "id": 294,
+   "text": "国王驾到",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "rise",
+   "face": "smug",
+   "fx": [
+    "sparkles"
+   ],
+   "hold": null,
+   "wear": [
+    "crown"
+   ],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/294_国王驾到.gif",
+   "cover": "out/_封面/294_国王驾到.png"
+  },
+  {
+   "id": 295,
+   "text": "获胜",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "offer",
+   "face": "star",
+   "fx": [
+    "confetti"
+   ],
+   "hold": "trophy",
+   "wear": [],
+   "style": "gold",
+   "tmode": "stay",
+   "gif": "out/295_获胜.gif",
+   "cover": "out/_封面/295_获胜.png"
+  },
+  {
+   "id": 296,
+   "text": "出发",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "flagwave",
+   "face": "determined",
+   "fx": [
+    "speed"
+   ],
+   "hold": "flag",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/296_出发.gif",
+   "cover": "out/_封面/296_出发.png"
+  },
+  {
+   "id": 297,
+   "text": "打游戏",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "headbob",
+   "face": "focus",
+   "fx": [],
+   "hold": "controller",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/297_打游戏.gif",
+   "cover": "out/_封面/297_打游戏.png"
+  },
+  {
+   "id": 298,
+   "text": "刷手机",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "idle",
+   "face": "smile",
+   "fx": [],
+   "hold": "phone",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/298_刷手机.gif",
+   "cover": "out/_封面/298_刷手机.png"
+  },
+  {
+   "id": 299,
+   "text": "收到信",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "offer",
+   "face": "surprise",
+   "fx": [
+    "hearts"
+   ],
+   "hold": "mail",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/299_收到信.gif",
+   "cover": "out/_封面/299_收到信.png"
+  },
+  {
+   "id": 300,
+   "text": "浇花",
+   "category": "life",
+   "category_zh": "生活",
+   "motion": "sway",
+   "face": "happy",
+   "fx": [
+    "fall:drop"
+   ],
+   "hold": "bucket",
+   "wear": [],
+   "style": "pink",
+   "tmode": "stay",
+   "gif": "out/300_浇花.gif",
+   "cover": "out/_封面/300_浇花.png"
+  }
+ ],
+ "specials": [
+  {
+   "id": "tornado-无字",
+   "text": "",
+   "category": "special",
+   "category_zh": "特别篇",
+   "motion": "tornado",
+   "gif": "out/水龙卷_无字.gif"
+  },
+  {
+   "id": "tornado-我没事",
+   "text": "我没事",
+   "category": "special",
+   "category_zh": "特别篇",
+   "motion": "tornado",
+   "gif": "out/水龙卷_我没事.gif"
+  },
+  {
+   "id": "tornado-转晕了",
+   "text": "转晕了",
+   "category": "special",
+   "category_zh": "特别篇",
+   "motion": "tornado",
+   "gif": "out/水龙卷_转晕了.gif"
+  }
+ ]
+}
