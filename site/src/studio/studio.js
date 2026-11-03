@@ -303,8 +303,10 @@ function build(root) {
   S.runner.watch(() => { toast('沙盒没响应了，重开一次'); S.runner.start(); });
 
   store.on((why) => {
-    if (why === 'foreign') { setSaved(false); toast('这份草稿在另一个标签页里改过了：这边的改动不再自动保存（想接着用那边的就刷新页面；这边的可以「保存」成文件）'); return; }
-    if (why !== 'select') setSaved(!store.foreign);
+    if (why === 'foreign') { setSaved('foreign'); toast('这份草稿在另一个标签页里改过了：这边的改动不再自动保存（想接着用那边的就刷新页面；这边的可以「保存」成文件）'); return; }
+    if (why !== 'select') setSaved(store.foreign ? 'foreign' : store.saveFailed ? 'full' : 'ok');
+    if (why === 'load') { S.projectKey = null; S.projectDirty = false; }   // 换成了别的工程（文件、模板、分享…）：不再对应「我的工程」里那一份，存的话另存一份
+    else if (why === 'change' || why === 'history') S.projectDirty = true;
     if (why === 'select') { renderInspector(); renderTimeline(); loadCode(); updateStatus(); stageHint(); return; }
     if (document.activeElement !== name) name.value = store.p.name;
     sendProject(); renderTimeline(); updateHistory(); ensureModel(); ensureFonts(); updateStatus();
@@ -338,18 +340,23 @@ function stageHint() {
 }
 function stageInteract() {
   const box = S.stageBox, pts = new Map();
-  let drag = null, raf = 0, pending = null;
-  const flush = () => { raf = 0; const f = pending; pending = null; if (f) S.store.change(f, { coalesce: `stage:${drag?.t || 'model'}` }); };
-  const queue = (f) => { pending = f; raf ||= requestAnimationFrame(flush); };
+  let drag = null, raf = 0, pending = null, wheelS = null;     // wheelS：还没写进工程的滚轮缩放（一帧里来好几下滚轮要累积起来）
+  const flush = () => {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0; wheelS = null;
+    const p = pending; pending = null;
+    if (p) S.store.change(p.f, { coalesce: p.key });
+  };
+  const queue = (f, key) => { pending = { f, key }; raf ||= requestAnimationFrame(flush); };
   const textSel = () => { const l = S.store.layer(); return l?.type === 'text' ? l : null; };
   const begin = (e) => {
     const t = textSel(), M = S.store.p.model, k = 512 / box.getBoundingClientRect().width, [a, b] = [...pts.values()];
     drag = { k, t: t?.id || null, x0: e.clientX, y0: e.clientY, sx: t ? t.x : M.x, sy: t ? t.y : M.y, s0: t ? t.scale : M.scale, d0: b ? Math.hypot(a[0] - b[0], a[1] - b[1]) : 0, moved: false };
   };
-  const scaleTo = (t, s) => queue((p) => {
+  const scaleTo = (t, s, key) => queue((p) => {
     if (t) { const l = p.layers.find((x) => x.id === t); if (l) l.scale = clampN(+s.toFixed(3), 0.3, 2); }
     else p.model.scale = clampN(+s.toFixed(3), 0.3, 2.5);
-  });
+  }, key);
   box.addEventListener('pointerdown', (e) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     pts.set(e.pointerId, [e.clientX, e.clientY]);
@@ -359,7 +366,7 @@ function stageInteract() {
   box.addEventListener('pointermove', (e) => {
     if (!drag || !pts.has(e.pointerId)) return;
     pts.set(e.pointerId, [e.clientX, e.clientY]);
-    if (pts.size >= 2 && drag.d0) { const [a, b] = [...pts.values()]; scaleTo(drag.t, drag.s0 * Math.hypot(a[0] - b[0], a[1] - b[1]) / drag.d0); return; }
+    if (pts.size >= 2 && drag.d0) { const [a, b] = [...pts.values()]; drag.moved = true; scaleTo(drag.t, drag.s0 * Math.hypot(a[0] - b[0], a[1] - b[1]) / drag.d0, `stage:${drag.t || 'model'}`); return; }   // 捏合也算这次手势改过了
     const dx = (e.clientX - drag.x0) * drag.k, dy = (e.clientY - drag.y0) * drag.k;
     if (!drag.moved && Math.hypot(dx, dy) < 4) return;
     drag.moved = true; box.classList.add('dragging');
@@ -367,12 +374,13 @@ function stageInteract() {
     queue((p) => {
       if (t) { const l = p.layers.find((x) => x.id === t); if (l) { l.x = clampN(Math.round(sx + dx), -256, 256); l.y = clampN(Math.round(sy + dy), 0, 512); } }
       else { p.model.x = clampN(Math.round(sx + dx), -256, 256); p.model.y = clampN(Math.round(sy + dy), -256, 256); }
-    });
+    }, `stage:${t || 'model'}`);
   });
   const end = (e) => {
     pts.delete(e.pointerId);
+    flush();                                                   // 还排着的最后一下先写进去（用这次手势的撤销键），再收尾
+    if (drag?.moved) S.store.lastKey = null;                   // 下一次拖动 / 捏合另算一步撤销
     if (pts.size) { const [id, [x, y]] = [...pts][0]; begin({ pointerId: id, clientX: x, clientY: y }); return; }   // 双指松开一只：接着用剩下那只拖
-    if (drag?.moved) S.store.lastKey = null;                   // 下一次拖动另算一步撤销
     drag = null; box.classList.remove('dragging');
   };
   box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
@@ -380,7 +388,10 @@ function stageInteract() {
     if (S.zoom !== 'fit' && !e.ctrlKey && !e.altKey) return;   // 放大看的时候滚轮是滚动舞台
     e.preventDefault();
     const t = textSel(), cur = t ? t.scale : S.store.p.model.scale;
-    scaleTo(t?.id || null, cur * Math.exp(-e.deltaY * 0.0015));
+    wheelS = clampN((wheelS ?? cur) * Math.exp(-e.deltaY * 0.0015), 0.3, t ? 2 : 2.5);   // 同一帧里的几下滚轮叠起来
+    const s = wheelS;
+    scaleTo(t?.id || null, s, `wheel:${t?.id || 'model'}`);
+    wheelS = s;                                                 // scaleTo 排队时不会清掉它，flush 写进工程后才清
   }, { passive: false });
   stageHint();
 }
@@ -390,10 +401,14 @@ function bootLoader() {
   fill(S.bootMsg, el('div', { class: 'st-loader', 'aria-hidden': 'true' }, el('i'), el('i'), el('i')), el('span', { text: '正在启动预览…' }));
   S.bootMsg.hidden = false;
 }
-// 顶栏的「已自动保存」：每次改动闪一下；另一个标签页接手了草稿就变成提醒
-function setSaved(ok) {
+// 顶栏的「已自动保存」：每次改动闪一下；另一个标签页接手了草稿、或者浏览器存储满了存不上，就变成提醒
+function setSaved(state) {
+  const ok = state === 'ok';
   S.saved.classList.toggle('warn', !ok);
-  fill(S.saved, icon(ok ? 'check' : 'warn', 'tiny'), el('span', { text: ok ? '已自动保存' : '没在自动保存' }));
+  S.saved.title = ok ? '草稿一改就自动存在这台设备的浏览器里；想长期留着就「存到我的工程」或者「保存」成文件'
+    : state === 'full' ? '浏览器的存储空间满了，草稿没存上：赶紧「保存」成文件，或者在「工坊 · 我的组件库」里删掉用不到的模型、字体'
+      : '另一个标签页改过这份草稿，这边的改动不再自动保存：要留着就「保存」成文件';
+  fill(S.saved, icon(ok ? 'check' : 'warn', 'tiny'), el('span', { text: ok ? '已自动保存' : state === 'full' ? '没存上（存储满了）' : '没在自动保存' }));
   S.saved.classList.remove('pulse'); void S.saved.offsetWidth; S.saved.classList.add('pulse');
 }
 function sendVisibility() { S.runner?.post({ type: 'transport', visible: S.active && S.stageVisible }); }
@@ -801,7 +816,7 @@ async function chooseModel(id, b = null) {
   const ok = await busy(b, ensureModel(id));
   if (my !== modelPick || !ok) return false;
   const face = libModels().find((e) => e.id === id)?.face ?? S.repo?.find((c) => c.type === 'model' && c.id === id)?.face;
-  S.store.change((p) => { p.model = { component: id, face: typeof face === 'boolean' && id !== 'logo' ? face : null }; });
+  S.store.change((p) => { p.model = { ...p.model, component: id, face: typeof face === 'boolean' && id !== 'logo' ? face : null }; });   // 换模型不动它的大小和位置
   return true;
 }
 
@@ -897,7 +912,7 @@ async function deleteFromLibrary(origin, { confirmFirst = true } = {}) {
     const n = e.kind === 'model' ? Number(st.p.model.component === e.id) : st.p.layers.filter((l) => l.font === e.id).length;
     const what = e.kind === 'model' ? '模型' : '字体';
     if (confirmFirst && !await ask(`删除${what}「${e.name}」`, `会从这台设备浏览器的库里彻底删掉${n ? `，当前工程${e.kind === 'model' ? '会换回原版模型' : `里用到它的 ${n} 行字会换回默认字体`}` : ''}。${e.from === 'repo' ? '工坊里的原件不受影响，想要可以再添加。' : '想再用得重新载入文件。'}`, '删除', 'danger')) return false;
-    if (n) st.change((p) => { if (e.kind === 'model') p.model = { component: 'axolotl', face: null }; else for (const l of p.layers) if (l.font === e.id) delete l.font; });
+    if (n) st.change((p) => { if (e.kind === 'model') p.model = { ...p.model, component: 'axolotl', face: null }; else for (const l of p.layers) if (l.font === e.id) delete l.font; });
     if (e.kind === 'model') S.models.delete(e.id); else { S.fontsSent.delete(e.id); pickFaces.delete(e.id); }
     try { await lib.remove(origin); } catch (er) { toast(`没删掉：${er.message}`); return false; }
     toast(`删掉了${what}「${e.name}」`);
@@ -1394,14 +1409,33 @@ function newComponent(type) {
 
 // ---------------- 我的工程：存在这台设备浏览器里的工程（和组件库同一个 IndexedDB，kind: project），带一张小图 ----------------
 const libProjects = () => lib.list().filter((e) => e.kind === 'project');
+// 存一份：先把工程和要存到哪一条一起定下来（等小图的时候改了工程 / 换了工程都不影响这次存的内容），小图也按这份快照画。
+// 覆盖保存前从数据库读最新的：别的标签页改过或者删掉了这一条，就另存一份，不盖掉那边的
 async function saveToProjects(asNew = false) {
-  const p = S.store.p;
+  const snap = structuredClone(S.store.p), key = S.projectKey, seen = S.projectAt;
+  let origin = !asNew && key ? key : null, forked = false;
+  if (origin) {
+    const cur = await lib.fresh(origin);
+    if (!cur || cur.at !== seen) { origin = null; forked = true; }
+  }
+  origin ||= `project:${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
   let thumb = null;
-  try { thumb = (await S.runner.request({ type: 'export', format: 'png', size: 120 })).bytes; } catch { /* 没有小图也能存 */ }
-  const origin = !asNew && S.projectKey && lib.has(S.projectKey) ? S.projectKey : `project:${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-  await lib.put({ origin, kind: 'project', type: 'project', id: origin.slice(8), name: p.name || defaultTitle(p), project: structuredClone(p), thumb });
-  S.projectKey = origin;
+  try { thumb = (await S.runner.request({ type: 'export', format: 'png', size: 120, project: snap })).bytes; } catch { /* 没有小图也能存 */ }
+  const e = await lib.put({ origin, kind: 'project', type: 'project', id: origin.slice(8), name: snap.name || defaultTitle(snap), project: snap, thumb });
+  if (S.projectKey === key) {                                  // 等的时候没换工程：现在这份就对应刚存的这一条
+    S.projectKey = origin; S.projectAt = e.at;
+    if (JSON.stringify(S.store.p) === JSON.stringify(snap)) S.projectDirty = false;
+  }
+  if (forked) toast('这份工程在别的标签页里改过或者删掉了：这次另存成了新的一份，没有盖掉那边的');
   return origin;
+}
+// 打开「我的工程」里的一份
+async function openProject(origin) {
+  const e = await lib.fresh(origin);
+  if (e?.kind !== 'project') throw new Error(`没有存过的工程 ${origin}（可能在别的标签页里删掉了）`);
+  S.store.replace(e.project);
+  S.projectKey = origin; S.projectAt = e.at; S.projectDirty = false;
+  return e;
 }
 function showProjects() {
   const urls = [], list = el('div', { class: 'st-projgrid', 'data-ax': 'projects-list' });
@@ -1413,8 +1447,10 @@ function showProjects() {
       el('b', { text: e.name || '未命名' }), el('small', { text: new Date(e.at).toLocaleString() }),
       el('div', { class: 'st-row' },
         btn('打开', `打开「${e.name}」`, async () => {
-          if (e.origin !== S.projectKey && !await ask(`打开「${e.name}」`, '会替换掉当前的工程（当前这个可以先存进来）。', '打开')) return;
-          S.store.replace(e.project); S.projectKey = e.origin; d.close(); toast(`打开了「${e.name}」`);
+          const same = e.origin === S.projectKey;              // 当前就是这一份、也没改过：直接打开；不然先问（当前的改动会被替换掉）
+          if ((!same || S.projectDirty) && !await ask(`打开「${e.name}」`, same ? '当前这份有还没存进「我的工程」的改动，打开会回到上次存的样子。' : '会替换掉当前的工程（当前这个可以先存进来）。', '打开')) return;
+          try { await openProject(e.origin); } catch (er) { toast(er.message); draw(); return; }
+          d.close(); toast(`打开了「${e.name}」`);
         }, { cls: 'small primary', ico: 'open', ax: 'project-open' }),
         btn('删除', `删掉「${e.name}」`, async () => {
           if (!await ask(`删除「${e.name}」`, '会从这台设备的浏览器里彻底删掉。', '删除', 'danger')) return;
@@ -1458,7 +1494,7 @@ async function importFile(f) {
     S.models.set(id, { name: f.name, bytes, info });
     await lib.put({ origin: id, kind: 'model', type: 'model', id, name: f.name.replace(/\.(glb|gltf)$/i, ''), bytes, face: false, from: 'file', info, kb: Math.round(f.size / 1024) });   // 存进库：刷新页面也还在
     if (my !== modelPick) return;                                // 载入期间又选了别的模型：以后选的为准
-    S.store.change((p) => { p.model = { component: id, face: false }; });
+    S.store.change((p) => { p.model = { ...p.model, component: id, face: false }; });
     openDrawer('model');
     toast(`换上了 ${f.name}`);
     return;
@@ -1796,7 +1832,7 @@ function installApi() {
       'axo.layers.list() / add(类型, 组件, 属性) / update(id, 改动) / remove(id) / select(id) / move(id, ±1)', 'axo.text(文字, 图层id?) → 改字',
       'axo.workshop.list() / add(id 或文件名, { use }) / remove(origin) / library()', 'axo.favorites.list() / toggle(\'类型:id\', 开关?)',
       'axo.models.list() / use(id) → 模型（原版、工坊里下载的、载入的文件）；axo.models.transform({ x, y, scale, rot, flip }) → 模型整体的位置 / 大小 / 角度 / 镜像', 'axo.fonts.list() / use(字体id, { all, layer })',
-      'axo.projects.list() / save({ asNew }) / open(origin) / remove(origin) → 存在这台设备浏览器里的「我的工程」',
+      'await axo.projects.list() / save({ asNew }) / open(origin) / remove(origin) → 存在这台设备浏览器里的「我的工程」',
       'axo.play() / pause() / seek(帧)', 'axo.export({ format: \'gif\'|\'video\'|\'png-zip\'|\'png\', size, colors, maxKb, loops }) → { url, kb, mime, blob }（video 按真实时间录，loops 遍）',
       'axo.share({ short }) → { long, short?, expires? }（short: true 生成 1 分钟短链接）', 'axo.publishUrl({ title, description }) → { url, problems }（不打开，只给链接）',
       'axo.open(\'motion\'|\'workshop\'|…) 打开素材栏；axo.dock(\'timeline\'|\'code\')', '说明：llms.txt',
@@ -1880,10 +1916,10 @@ function installApi() {
     },
     favorites: { list: () => lib.favList(), toggle: (key, on) => lib.toggleFav(key, on) },
     projects: {
-      list: () => libProjects().map((e) => ({ origin: e.origin, name: e.name, at: new Date(e.at).toISOString(), current: e.origin === S.projectKey })),
-      save: async ({ asNew = false } = {}) => saveToProjects(asNew),
-      open: (origin) => { const e = lib.get(origin); if (e?.kind !== 'project') throw new Error(`没有存过的工程 ${origin}（axo.projects.list() 看有哪些）`); st.replace(e.project); S.projectKey = origin; return api.project.summary(); },
-      remove: async (origin) => { if (lib.get(origin)?.kind !== 'project') throw new Error(`没有存过的工程 ${origin}`); await lib.remove(origin); if (S.projectKey === origin) S.projectKey = null; return true; },
+      list: async () => { await lib.ready; return libProjects().map((e) => ({ origin: e.origin, name: e.name, at: new Date(e.at).toISOString(), current: e.origin === S.projectKey })); },   // 等数据库读完，不然刚打开页面时是空的
+      save: async ({ asNew = false } = {}) => { await lib.ready; return saveToProjects(asNew); },
+      open: async (origin) => { await lib.ready; await openProject(origin); return api.project.summary(); },
+      remove: async (origin) => { await lib.ready; if ((await lib.fresh(origin))?.kind !== 'project') throw new Error(`没有存过的工程 ${origin}`); await lib.remove(origin); if (S.projectKey === origin) S.projectKey = null; return true; },
     },
     play: () => { setPlaying(true); return true; }, pause: () => { setPlaying(false); return true; }, seek: (f) => { seek(f); return S.frame; },
     export: async ({ format = 'gif', size, colors, maxKb, loops } = {}) => {

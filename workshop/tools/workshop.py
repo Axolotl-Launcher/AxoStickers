@@ -185,7 +185,9 @@ def validate_project(p):
         v = model.get(k, d)
         if number(v, lo, hi): out['model'][k] = v
         else: errs.append(f'模型的 {k} 要在 {lo}～{hi} 之间：{show(v)}')
-    out['model']['flip'] = bool(model.get('flip', False))
+    flip = model.get('flip', False)
+    if not isinstance(flip, bool): errs.append(f'模型的 flip 要是 true 或 false：{show(flip)}'); flip = False
+    out['model']['flip'] = flip
 
     comps = p.get('components', [])
     if not isinstance(comps, list) or len(comps) > LIM['components']:

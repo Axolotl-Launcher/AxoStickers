@@ -36,7 +36,7 @@ export class Store {
   }
   on(f) { this.listeners.add(f); return () => this.listeners.delete(f); }
   tell(why) { for (const f of this.listeners) f(why); }
-  emit(why) { this.tell(why); if (!this.foreign) save(DRAFT, this.p); }
+  emit(why) { if (!this.foreign) this.saveFailed = !save(DRAFT, this.p); this.tell(why); }   // 先存再通知：界面上的「已自动保存」看的是这次存没存上（浏览器存储满了会失败）
 
   // 改工程：fn 直接改 draft；coalesce 用来把拖滑块这种连续操作合成一步撤销
   // fn 抛错时整个改动作废、工程回到改之前；带 userFacing 的错误（比如组件代码太多了）交给 onError 提示，不往外抛

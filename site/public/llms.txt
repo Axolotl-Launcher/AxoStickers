@@ -39,7 +39,7 @@ await axo.models.use('logo');              // 换模型（要先在库里：axo.
 axo.models.transform({ x: 40, y: -20, scale: 1.3, rot: 10, flip: true });   // 模型整体挪（像素，-256～256）、缩放（0.3～2.5）、转（度）、左右镜像
 axo.layers.update('w1', { params: { gy: 3, gs: 1.2 } });   // 帽子戴在哪：gx gy gz 挪、gs 缩放、rx ry rz 转
 axo.layers.update('t1', { style: '#33aa77' });             // 字色可以是内置的名字，也可以是 #rrggbb
-await axo.projects.save();                 // 「我的工程」：存在这台设备浏览器里；list() / open(origin) / remove(origin)
+await axo.projects.save();                 // 「我的工程」：存在这台设备浏览器里；await list() / open(origin) / remove(origin)（都是 Promise）。别的标签页改过同一份时会另存一份，不覆盖
 await axo.export({ format: 'video', size: 480, loops: 3 });   // 视频（浏览器能录 MP4 就是 MP4，不然 WebM），按真实时间录
 await axo.publishUrl({ title: '收到', description: '一句话' });   // → { url, problems }：填好的 GitHub 投稿链接（不打开；problems 不空就先改）
 ```

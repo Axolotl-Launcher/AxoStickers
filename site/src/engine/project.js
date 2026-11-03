@@ -23,7 +23,7 @@ export function normalizeProject(p = {}) {
     idle: { ...d.idle, ...(P.idle || {}) },
     skin: { ...d.skin, ...(P.skin || {}) },
     model: { component: String(P.model?.component || 'axolotl').slice(0, 80), face: typeof P.model?.face === 'boolean' ? P.model.face : null,
-      x: num(P.model?.x, 0, -256, 256), y: num(P.model?.y, 0, -256, 256), scale: num(P.model?.scale, 1, 0.3, 2.5), rot: num(P.model?.rot, 0, -180, 180), flip: !!P.model?.flip },   // 模型整体挪、缩放、转、左右镜像
+      x: num(P.model?.x, 0, -256, 256), y: num(P.model?.y, 0, -256, 256), scale: num(P.model?.scale, 1, 0.3, 2.5), rot: num(P.model?.rot, 0, -180, 180), flip: P.model?.flip === true },   // flip 只认 true（字符串 "false" 之类不算）   // 模型整体挪、缩放、转、左右镜像
     components: (Array.isArray(P.components) ? P.components : []).slice(0, 24)
       .filter((c) => c && typeof c.source === 'string' && c.source.length <= 60000)
       .map((c) => ({ origin: String(c.origin || 'project').slice(0, 80), source: c.source })),
