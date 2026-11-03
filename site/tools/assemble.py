@@ -1,13 +1,16 @@
 """把网站拼起来：python site/tools/assemble.py [--thumbs-only]
-_site/ = site/dist（vite build 的产物）+ out/（GIF、封面、清单）+ workshop/（投稿、index.json）+ thumbs/（缩略图 webp）。
-缩略图缓存在 site/.thumbs/（不进 git），源图没变就不重做。"""
-import os, sys, json, shutil
+_site/ = site/dist（vite build 的产物）+ out/（GIF、封面、清单）+ workshop/（投稿、index.json）
+       + thumbs/（240px 静态缩略图 webp）+ previews/（240px 小视频预览 mp4，悬停时播放，要 ffmpeg）。
+缩略图和预览缓存在 site/.thumbs/、site/.previews/（不进 git），源图没变就不重做。"""
+import os, re, sys, json, shutil, subprocess
+from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 OUT, WS = os.path.join(ROOT, 'out'), os.path.join(ROOT, 'workshop')
 THUMBS = os.path.join(ROOT, 'site', '.thumbs')
+PREVIEWS = os.path.join(ROOT, 'site', '.previews')
 SITE = os.path.join(ROOT, '_site')
 TS = 240
 
@@ -15,20 +18,58 @@ def thumb(src, name):
     dst = os.path.join(THUMBS, name + '.webp')
     if os.path.exists(dst) and os.path.getmtime(dst) >= os.path.getmtime(src): return 0
     im = Image.open(src); im.seek(0)                      # GIF 取第一帧（就是封面）
-    im = im.convert('RGB').resize((TS, TS), Image.LANCZOS)
+    im = im.convert('RGBA')
+    flat = Image.new('RGB', im.size, (255, 255, 255)); flat.paste(im, mask=im.getchannel('A'))   # 透明底的投稿：垫白底，别变成黑底
+    im = flat.resize((TS, TS), Image.LANCZOS)
     im.save(dst, 'WEBP', quality=82, method=6)
     return 1
 
-def make_thumbs():
-    os.makedirs(THUMBS, exist_ok=True)
+def preview(src, name):
+    """GIF -> 240px 无声循环 mp4（H.264，几十 KB）。"""
+    dst = os.path.join(PREVIEWS, name + '.mp4')
+    if os.path.exists(dst) and os.path.getmtime(dst) >= os.path.getmtime(src): return 0
+    # 先垫一层白底再转成不带透明的视频（透明底的投稿不然会变成黑底）；白底和 GIF 本身是同一路帧，时间对得上
+    vf = f'[0:v]scale={TS}:{TS}:flags=lanczos,format=rgba,split[a][b];[a]drawbox=c=white:t=fill[bg];[bg][b]overlay=format=auto,format=yuv420p'
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', src, '-filter_complex', vf,
+                    '-c:v', 'libx264', '-preset', 'slow', '-crf', '26', '-movflags', '+faststart', '-an', dst], check=True)
+    return 1
+
+def sources():
+    """[(源文件, 封面或首帧, 名字)]：300 张、特别篇、工坊投稿。"""
     data = json.load(open(os.path.join(OUT, 'stickers.json'), encoding='utf-8'))
-    n = 0
-    for s in data['stickers']: n += thumb(os.path.join(ROOT, s['cover']), '%03d' % s['id'])
-    for s in data['specials']: n += thumb(os.path.join(ROOT, s['gif']), s['id'])
+    out = [(os.path.join(ROOT, s['gif']), os.path.join(ROOT, s['cover']), '%03d' % s['id']) for s in data['stickers']]
+    out += [(os.path.join(ROOT, s['gif']), os.path.join(ROOT, s['gif']), s['id']) for s in data['specials']]
     idx = json.load(open(os.path.join(WS, 'index.json'), encoding='utf-8'))
-    for e in idx['entries']:
-        if os.path.exists(os.path.join(ROOT, e['cover'])): n += thumb(os.path.join(ROOT, e['cover']), 'w%d' % e['issue'])
+    out += [(os.path.join(ROOT, e['gif']), os.path.join(ROOT, e['cover']), 'w%d' % e['issue'])
+            for e in idx['entries'] if os.path.exists(os.path.join(ROOT, e['gif']))]
+    return out
+
+def make_thumbs(videos=True):
+    os.makedirs(THUMBS, exist_ok=True); os.makedirs(PREVIEWS, exist_ok=True)
+    src = sources()
+    n = sum(thumb(cover, name) for _, cover, name in src)
     print('thumbs:', n, 'new')
+    if videos:
+        with ThreadPoolExecutor(min(6, os.cpu_count() or 2)) as ex:
+            v = sum(ex.map(lambda s: preview(s[0], s[2]), src))
+        print('previews:', v, 'new')
+
+HEADER = re.compile(r'^\s*/\*\s*@axo\s*(\{.*?\})\s*\*/', re.S)
+
+def components(dst):
+    """组件库：workshop/components/*.axo.js -> components/，并从文件头的 /* @axo {...} */ 生成 index.json（不执行代码）。"""
+    src = os.path.join(WS, 'components'); os.makedirs(dst, exist_ok=True)
+    index = []
+    for name in sorted(os.listdir(src)) if os.path.isdir(src) else []:
+        if not name.endswith('.axo.js'): continue
+        text = open(os.path.join(src, name), encoding='utf-8').read()
+        m = HEADER.match(text)
+        if not m: print('skip (no @axo header):', name); continue
+        meta = json.loads(m.group(1))
+        index.append({k: str(meta.get(k, ''))[:300] for k in ('id', 'type', 'name', 'author', 'version', 'description')} | {'file': name})
+        shutil.copy2(os.path.join(src, name), os.path.join(dst, name))
+    json.dump(index, open(os.path.join(dst, 'index.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    print('components:', len(index))
 
 def copy(src, dst, exts=None):
     os.makedirs(dst, exist_ok=True)
@@ -48,8 +89,13 @@ def main():
     copy(OUT, os.path.join(SITE, 'out'), {'.gif', '.png', '.json'})
     copy(os.path.join(OUT, '_封面'), os.path.join(SITE, 'out', '_封面'), {'.png'})
     copy(WS, os.path.join(SITE, 'workshop'), {'.json'})
-    for d in ('gifs', 'covers'): copy(os.path.join(WS, d), os.path.join(SITE, 'workshop', d), {'.gif', '.png'})
+    for d in ('gifs', 'covers', 'projects'):          # projects/：投稿的工程，「在工坊里改一改」载进编辑器
+        if os.path.isdir(os.path.join(WS, d)): copy(os.path.join(WS, d), os.path.join(SITE, 'workshop', d), {'.gif', '.png', '.json'})
     copy(THUMBS, os.path.join(SITE, 'thumbs'), {'.webp'})
+    copy(PREVIEWS, os.path.join(SITE, 'previews'), {'.mp4'})
+    components(os.path.join(SITE, 'components'))
+    os.makedirs(os.path.join(SITE, 'models'), exist_ok=True)
+    shutil.copy2(os.path.join(ROOT, 'kit', 'model', 'axolotl_logo.glb'), os.path.join(SITE, 'models', 'axolotl_logo.glb'))
     open(os.path.join(SITE, '.nojekyll'), 'w').close()
     size = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(SITE) for f in fs)
     print('_site:', round(size / 1024 / 1024), 'MB')

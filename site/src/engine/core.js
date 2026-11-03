@@ -44,6 +44,16 @@ export function rng(seed) {                               // 可复现的随机�
 export function strHash(s) { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.codePointAt(0), 16777619); return h >>> 0; }
 
 export const hx = (s) => [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16)];
+// 画布：能用 OffscreenCanvas 就用（Worker 里也能跑），否则退回 DOM canvas
+export function makeCanvas(w, h) {
+  if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(Math.max(1, w), Math.max(1, h));
+  const c = document.createElement('canvas'); c.width = Math.max(1, w); c.height = Math.max(1, h); return c;
+}
+// 画布 -> 图片字节（OffscreenCanvas 用 convertToBlob，普通 canvas 用 toBlob）
+export async function canvasBytes(c, type = 'image/png') {
+  const blob = c.convertToBlob ? await c.convertToBlob({ type }) : await new Promise((r) => c.toBlob(r, type));
+  return new Uint8Array(await blob.arrayBuffer());
+}
 
 // ---------------- matrices (rig.py) ----------------
 export function rotEuler(rx = 0, ry = 0, rz = 0) {        // 度数，先 X 再 Y 再 Z
@@ -53,10 +63,18 @@ export function rotEuler(rx = 0, ry = 0, rz = 0) {        // 度数，先 X 再 
 const M4 = (R, t = [0, 0, 0]) => { const m = R ? R.clone() : new Matrix4(); m.setPosition(t[0], t[1], t[2]); return m; };
 export const camera = (yaw, pitch) => rotEuler(pitch, 0, 0).multiply(rotEuler(0, yaw, 0));
 
-const NODES = E.nodes;
-const PARENT = Object.fromEntries(Object.entries(E.parent).map(([k, v]) => [+k, v]));
-const BONE_IDX = new Set(Object.values(E.bones));
-const HEAD_CHILD = new Set(E.headChild);
+// 当前模型（默认是引擎导出的原版；换模型时 AxoRenderer.setModel 会换掉它）
+let MODEL = null, NODES, PARENT, BONE_IDX, HEAD_CHILD, BONES;
+export function useModel(m) {
+  MODEL = m; NODES = m.nodes; BONES = m.bones;
+  PARENT = Object.fromEntries(Object.entries(m.parent).map(([k, v]) => [+k, v]));
+  BONE_IDX = new Set(Object.values(m.bones)); HEAD_CHILD = new Set(m.headChild || []);
+}
+export const BUILTIN_MODEL = {
+  id: 'axolotl', nodes: E.nodes, parent: E.parent, bones: E.bones, headChild: E.headChild, headMesh: E.headMesh, meshName: E.meshName, face: true,
+  mesh: Object.fromEntries(Object.entries(E.mesh).map(([i, m]) => [i, m.c.map((c, k) => [m.p.slice(k * 12, k * 12 + 12), hx(c), m.n.slice(k * 3, k * 3 + 3)])])),
+};
+useModel(BUILTIN_MODEL);
 
 function nodeLocal(i, pose) {
   const n = NODES[i];
@@ -77,8 +95,8 @@ function world(i, pose) {
   const m = nodeLocal(i, pose);
   let j = i;
   while (j in PARENT) { j = PARENT[j]; m.premultiply(nodeLocal(j, pose)); }
-  if (HEAD_CHILD.has(NODES[j].name)) {                     // 鳃挂到头骨上（和 Minecraft 一样）
-    const hb = E.bones.head, T = NODES[hb].t;
+  if (HEAD_CHILD.has(NODES[j].name) && BONES.head !== undefined && j !== BONES.head) {   // 鳃挂到头骨上（和 Minecraft 一样）
+    const hb = BONES.head, T = NODES[hb].t;
     m.premultiply(new Matrix4().makeTranslation(-T[0], -T[1], -T[2])).premultiply(nodeLocal(hb, pose));
   }
   return m;
@@ -90,15 +108,19 @@ export function rootM(pose) {
   const mv = r.move || [0, 0, 0];
   return M4(rotEuler(...(r.rot || [0, 0, 0])), [mv[0] / 16, mv[1] / 16, mv[2] / 16]);
 }
-export const headWorld = (pose) => rootM(pose).multiply(world(E.headMesh, pose));
+export const headWorld = (pose) => rootM(pose).multiply(world(MODEL.headMesh, pose));
 
 export function itemXf(pose, it) {
   const at = it.at || 'head';
   const Wm = at === 'head' ? headWorld(pose) : at === 'root' ? rootM(pose) : new Matrix4();
   const R = rotEuler(it.rx || 0, it.ry || 0, it.rz || 0);
-  if (E.gear[it.kind] && it.x === undefined) return Wm.multiply(R);
+  if ((it.gear || E.gear[it.kind]) && it.x === undefined) return Wm.multiply(R);
   R.multiplyScalar(it.s ?? 1); R.elements[15] = 1;
   return Wm.multiply(M4(R, [(it.x || 0) * U, (it.y || 0) * U, (it.z ?? -13) * U]));
+}
+export function rotVec(v, rx = 0, ry = 0, rz = 0) {        // 向量绕 X→Y→Z 转（度）
+  const e = rotEuler(rx, ry, rz).elements;
+  return [e[0] * v[0] + e[4] * v[1] + e[8] * v[2], e[1] * v[0] + e[5] * v[1] + e[9] * v[2], e[2] * v[0] + e[6] * v[1] + e[10] * v[2]];
 }
 export function xfPoint(M, p) {                            // 模型像素 -> 世界坐标
   const e = M.elements, x = p[0] * U, y = p[1] * U, z = p[2] * U;
@@ -133,18 +155,21 @@ function bitmap(rows, pal, depth = 1, px = 1) {
 }
 const boxes = (lst) => { const q = []; for (const b of lst) box(b[0], b[1], b[2], b[3], b[4], b[5], hx(b[6]), q); return q; };
 
-export function itemQuads(kind) {
+// 道具 / 帽子的体素：def 是组件（sprite: [行, 调色板] 像素画挤成 1 格厚，或者 boxes: [[x0,y0,z0,x1,y1,z1,'颜色'],…]）
+export function itemQuads(kind, def) {
+  if (def?.sprite) return bitmap(def.sprite[0], def.sprite[1], def.depth || 1);
+  if (def?.boxes) return boxes(def.boxes);
   if (E.spr[kind]) return bitmap(...E.spr[kind]);
   if (E.blk[kind]) return boxes(E.blk[kind]);
   if (E.gear[kind]) return boxes(E.gear[kind]);
-  throw new Error('unknown item ' + kind);
+  return [];
 }
 
 function faceQuads(f) {
-  const cells = [];
-  for (const [c, r, col] of E.eyes[f.R || 'open']) cells.push([c, r, col]);
-  for (const [c, r, col] of E.eyes[f.L || 'open']) cells.push([15 - c, r, col]);
-  for (const cell of E.mouths[f.mouth || 'normal']) cells.push(cell);
+  const cells = [], eye = (k) => (Array.isArray(k) ? k : E.eyes[k || 'open'] || []), mouth = (k) => (Array.isArray(k) ? k : E.mouths[k || 'normal'] || []);
+  for (const [c, r, col] of eye(f.R)) cells.push([c, r, col]);
+  for (const [c, r, col] of eye(f.L)) cells.push([15 - c, r, col]);
+  for (const cell of mouth(f.mouth)) cells.push(cell);
   if (f.blush) for (const cell of E.blush) cells.push(cell);
   const d = new Map();
   for (const [c, r, col] of cells) d.set(c + ',' + r, [c, r, col]);   // 后写的盖住先写的
@@ -156,6 +181,9 @@ function faceQuads(f) {
   return q;
 }
 
+function tinted(quads, tint, part) {                       // 皮肤：每个面片的颜色过一遍 tint(rgb, 部位)
+  return tint ? quads.map(([p, col, n]) => [p, tint(col, part), n]) : quads;
+}
 function geometry(quads) {
   const n = quads.length, P = new Float32Array(n * 12), N = new Float32Array(n * 12), C = new Float32Array(n * 12);
   const I = new Uint32Array(n * 6);
@@ -204,8 +232,7 @@ const material = (top) => new ShaderMaterial({ vertexShader: VERT, fragmentShade
 export class AxoRenderer {
   constructor(ss = 2) {
     this.ss = ss;
-    this.canvas = document.createElement('canvas');
-    this.canvas.width = this.canvas.height = BOX * ss;
+    this.canvas = makeCanvas(BOX * ss, BOX * ss);
     this.gl = new WebGLRenderer({ canvas: this.canvas, antialias: false, alpha: true, preserveDrawingBuffer: true });
     this.gl.setPixelRatio(1);
     this.gl.setSize(BOX * ss, BOX * ss, false);
@@ -216,18 +243,44 @@ export class AxoRenderer {
     this.cam.matrixAutoUpdate = false; this.cam.matrixWorldAutoUpdate = false;
     this.matBody = material(0.32); this.matLeg = material(0.10);
     this.parts = [];
-    for (const [i, m] of Object.entries(E.mesh)) {
-      const quads = [];
-      for (let k = 0; k < m.c.length; k++) quads.push([m.p.slice(k * 12, k * 12 + 12), hx(m.c[k]), m.n.slice(k * 3, k * 3 + 3)]);
-      const name = E.meshName[i];
-      const mesh = new Mesh(geometry(quads), name.startsWith('leg') ? this.matLeg : this.matBody);
-      mesh.matrixAutoUpdate = false; mesh.frustumCulled = false;
-      this.scene.add(mesh); this.parts.push([+i, mesh]);
-    }
+    this.setModel(BUILTIN_MODEL);
+    this.tint = null; this.skinKey = '';
+    this.lookup = () => null;                               // kind -> 道具 / 帽子组件（场景设置）
     this.faceMesh = new Mesh(new BufferGeometry(), this.matBody);
     this.faceMesh.matrixAutoUpdate = false; this.faceMesh.frustumCulled = false; this.scene.add(this.faceMesh);
     this.faceKey = null; this.faceGeo = new Map();
     this.itemGeo = new Map(); this.itemMeshes = [];
+  }
+
+  // 换模型（model.js 读出来的，或者原版 BUILTIN_MODEL）
+  setModel(m) {
+    if (this.model === m) return;
+    for (const [, mesh] of this.parts) { this.scene.remove(mesh); mesh.geometry.dispose(); }
+    this.parts = [];
+    for (const [i, quads] of Object.entries(m.mesh)) {
+      const name = m.meshName[i] || '';
+      const mesh = new Mesh(geometry(quads), name.startsWith('leg') ? this.matLeg : this.matBody);
+      mesh.matrixAutoUpdate = false; mesh.frustumCulled = false;
+      mesh.userData = { quads, part: name };
+      this.scene.add(mesh); this.parts.push([+i, mesh]);
+    }
+    this.model = m; useModel(m);
+    this.skinKey = null;                                   // 下次 setSkin 会给新模型重新上色
+  }
+
+  // 皮肤：tint(rgb, 部位) -> rgb；key 变了才重新上色
+  setSkin(tint, key = '') {
+    if (key === this.skinKey) return;
+    this.tint = tint; this.skinKey = key;
+    for (const [, mesh] of this.parts) {
+      const { quads, part } = mesh.userData, attr = mesh.geometry.getAttribute('aColor');
+      quads.forEach(([, col], k) => {
+        const c = tint ? tint(col, part) : col;
+        for (let v = 0; v < 4; v++) for (let a = 0; a < 3; a++) attr.array[k * 12 + v * 3 + a] = c[a] / 255;
+      });
+      attr.needsUpdate = true;
+    }
+    this.faceGeo.clear(); this.faceKey = null; this.itemGeo.clear();
   }
 
   _face(f) {
@@ -235,7 +288,7 @@ export class AxoRenderer {
     if (key === this.faceKey) return;
     this.faceKey = key;
     if (!key) { this.faceMesh.visible = false; return; }
-    if (!this.faceGeo.has(key)) this.faceGeo.set(key, geometry(faceQuads(f)));
+    if (!this.faceGeo.has(key)) this.faceGeo.set(key, geometry(tinted(faceQuads(f), this.tint, 'face')));
     this.faceMesh.geometry = this.faceGeo.get(key); this.faceMesh.visible = true;
   }
 
@@ -249,25 +302,26 @@ export class AxoRenderer {
       const it = list[k];
       m.visible = !!it;
       if (!it) return;
-      if (!this.itemGeo.has(it.kind)) this.itemGeo.set(it.kind, geometry(itemQuads(it.kind)));
+      if (!this.itemGeo.has(it.kind)) this.itemGeo.set(it.kind, geometry(tinted(itemQuads(it.kind, this.lookup(it.kind)), this.tint, 'item')));
       m.geometry = this.itemGeo.get(it.kind);
       m.matrix.copy(itemXf(pose, it));
     });
   }
 
   // a: Ax 状态。返回 LAST = {C, center, scale}，和 rig2.LAST 一样用来把世界坐标投到盒子像素上
-  render(a) {
-    const C = camera(a.yaw, a.pitch);
-    const an = proj3(C, K.ANCHOR);
-    const center = [an[0] - K.ANCHOR_OFF[0] / a.zoom, an[1] - K.ANCHOR_OFF[1] / a.zoom];
-    const scale = K.SCL_BOX * a.zoom;
+  // opt.itemsOnly：只画道具（水龙卷里卷着飞的东西）；opt.center / opt.scale：自己定取景
+  render(a, cam = {}, opt = {}) {
+    const C = camera(a.yaw, a.pitch), persp = cam.persp ?? K.PERSP, zoom = a.zoom * (cam.zoom ?? 1);
+    const an = proj3(C, K.ANCHOR, persp);
+    const center = opt.center || [an[0] - K.ANCHOR_OFF[0] / zoom, an[1] - K.ANCHOR_OFF[1] / zoom];
+    const scale = opt.scale || K.SCL_BOX * zoom;
     const pose = a.pose, R = rootM(pose);
-    for (const [i, mesh] of this.parts) mesh.matrix.copy(R).multiply(world(i, pose));
+    for (const [i, mesh] of this.parts) { mesh.matrix.copy(R).multiply(world(i, pose)); mesh.visible = !opt.itemsOnly; }
     this.faceMesh.matrix.copy(headWorld(pose));
-    this._face(pose._face);
+    this._face(opt.itemsOnly || this.model.face === false ? null : pose._face);
     this._items(pose);
     // 投影 = rig2._proj：x' = x / (1 - z·P)，再减中心、乘比例；深度 z 越大越近
-    const P = K.PERSP, s = scale, zr = 4;
+    const P = persp, s = scale, zr = 4;
     this.cam.matrixWorldInverse.copy(C);
     this.cam.matrixWorld.copy(C).invert();
     this.cam.projectionMatrix.set(
@@ -277,17 +331,17 @@ export class AxoRenderer {
       0, 0, -P, 1);
     this.cam.projectionMatrixInverse.copy(this.cam.projectionMatrix).invert();
     this.gl.render(this.scene, this.cam);
-    return { C, center, scale };
+    return { C, center, scale, persp };
   }
 }
 
-export function proj3(C, p) {                              // 相机空间 + 透视，返回 (x, y) 模型单位
+export function proj3(C, p, persp = K.PERSP) {             // 相机空间 + 透视，返回 (x, y) 模型单位
   const e = C.elements;
   const x = e[0] * p[0] + e[4] * p[1] + e[8] * p[2], y = e[1] * p[0] + e[5] * p[1] + e[9] * p[2], z = e[2] * p[0] + e[6] * p[1] + e[10] * p[2];
-  const f = 1 / (1 - z * K.PERSP);
+  const f = 1 / (1 - z * persp);
   return [x * f, y * f];
 }
 export function projectBox(LAST, p) {                      // 世界坐标 -> 盒子像素（rig2.project）
-  const q = proj3(LAST.C, p);
+  const q = proj3(LAST.C, p, LAST.persp);
   return [(q[0] - LAST.center[0]) * LAST.scale * BOX + BOX / 2, BOX / 2 - (q[1] - LAST.center[1]) * LAST.scale * BOX];
 }

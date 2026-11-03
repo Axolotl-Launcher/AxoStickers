@@ -10,6 +10,7 @@ site/node_modules/
 site/dist/
 site/src/gen/
 site/.thumbs/
+site/.previews/
 site/.ref/
 _site/
 _tmp/
