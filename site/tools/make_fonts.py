@@ -32,7 +32,16 @@ def cut(job):
     s = subset.Subsetter(opt); s.populate(unicodes=cps); s.subset(f)
     path = os.path.join(OUT, f'{name}.woff2')
     f.flavor = 'woff2'; f.save(path)
-    return name, rs, len(cps), os.path.getsize(path)
+    return name, cps, len(cps), os.path.getsize(path)
+
+def runs(cps):
+    """[0x41, 0x42, 0x43, 0x50] -> 'U+0041-0043, U+0050'：unicode-range 写这一片里真有的字（不是整个区段），
+    编辑器据此知道哪些字 Axo 黑体里根本没有（比如 emoji），画出来会是系统字体，导出时拦下。"""
+    out, cps = [], sorted(cps)
+    for c in cps:
+        if out and c == out[-1][1] + 1: out[-1][1] = c
+        else: out.append([c, c])
+    return ', '.join('U+%04X' % lo if lo == hi else 'U+%04X-%04X' % (lo, hi) for lo, hi in out)
 
 def main():
     t0 = time.time()
@@ -47,8 +56,8 @@ def main():
     with ProcessPoolExecutor(min(6, os.cpu_count() or 2)) as ex:
         res = list(ex.map(cut, jobs))
     css = []
-    for name, rs, n, size in res:
-        ur = ', '.join('U+%04X-%04X' % (lo, hi) for lo, hi in rs)
+    for name, cps, n, size in res:
+        ur = runs(cps)
         css.append(f"@font-face {{ font-family: '{FAMILY}'; font-weight: 900; font-display: swap; "
                    f"src: url('./fonts/{name}.woff2') format('woff2'); unicode-range: {ur}; }}")
     open(CSS, 'w', encoding='utf-8').write('\n'.join(css) + '\n')

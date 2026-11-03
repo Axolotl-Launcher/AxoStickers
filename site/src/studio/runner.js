@@ -13,7 +13,7 @@ export class Runner {
 
   start() {
     this.frame?.remove();
-    this.ready = false;
+    this.ready = false; this.docGen = (this.docGen || 0) + 1;     // 沙盒代次：重开一次 +1，里面的文档重新报到（ready）也 +1
     // 旧沙盒没回完的请求（导出、缩略图…）不会再有回音了：直接算失败，别让调用的地方一直等；排队的消息也作废（ready 后会重发工程）
     for (const p of this.pending.values()) p.reject(new Error('预览重开了，再试一次'));
     this.pending.clear(); this.queue = [];
@@ -48,7 +48,7 @@ export class Runner {
     if (m.type === 'booting') { this.booting = true; this.armBoot(60000, '沙盒的脚本一直没加载完'); return; }
     if (m.type === 'boot-error') { if (!this.ready) { clearTimeout(this.bootTimer); this.emit('boot-failed', { reason: m.message }); } return; }
     if (m.type === 'ready') {
-      this.ready = true; clearTimeout(this.bootTimer);
+      this.ready = true; clearTimeout(this.bootTimer); this.docGen++;
       for (const q of this.queue.splice(0)) this.post(q.msg, q.transfer);
     }
     if (m.req !== undefined && this.pending.has(m.req)) {
@@ -64,15 +64,18 @@ export class Runner {
 
   // 沙盒的 Worker 自己下不了字体（不透明来源，CSP 的 'self' 对不上）：替它下本站的字体切片，把字节递回去。只下本站的 .woff2
   async fetchFont({ id, url }) {
+    const frame = this.frame, gen = this.docGen;               // 下的时候沙盒重开过 / 换过文档：这份回音只属于发请求的那个（新沙盒里的请求编号会重复）
     let bytes = null, error = null;
+    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 20000);   // 卡住的请求别让预览一直等
     try {
       const u = new URL(url, location.href);
       if (u.origin !== location.origin || !/\.woff2$/i.test(u.pathname)) throw new Error('只能下本站的字体文件');
-      const r = await fetch(u);
+      const r = await fetch(u, { signal: ctl.signal });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       bytes = await r.arrayBuffer();
-    } catch (e) { error = String(e?.message || e); }
-    this.frame?.contentWindow?.postMessage({ type: 'font-bytes', id, bytes, error }, '*', bytes ? [bytes] : []);
+    } catch (e) { error = ctl.signal.aborted ? '字体切片 20 秒没下下来' : String(e?.message || e); } finally { clearTimeout(timer); }
+    if (this.frame !== frame || this.docGen !== gen) return;
+    frame?.contentWindow?.postMessage({ type: 'font-bytes', id, bytes, error }, '*', bytes ? [bytes] : []);
   }
 
   post(msg, transfer) {
