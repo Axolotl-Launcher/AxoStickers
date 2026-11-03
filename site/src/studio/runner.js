@@ -21,6 +21,7 @@ export class Runner {
     if (this.sandboxed) f.setAttribute('sandbox', 'allow-scripts');     // 不给 allow-same-origin：碰不到本站的存储和页面
     f.src = this.src;
     f.title = '预览';
+    f.tabIndex = -1;                                                     // 预览里没有能操作的东西：别让焦点跑进去（不然空格、方向键这些快捷键就失灵了）
     f.className = 'stage-iframe';
     f.setAttribute('allow', '');
     let loads = 0;                                                       // 组件代码让预览框跳走了（本站 CSP 的 frame-src 会拦住别的网站）：重开
@@ -42,6 +43,7 @@ export class Runner {
     if (!this.frame || e.source !== this.frame.contentWindow) return;   // 只认自己的沙盒
     const m = e.data;
     if (!m || typeof m.type !== 'string') return;
+    this.lastPong = performance.now(); this.unanswered = 0;            // 沙盒发来的任何消息（导出进度、播放时间…）都说明它还活着
     if (m.type === 'booting') { this.booting = true; this.armBoot(60000, '沙盒的脚本一直没加载完'); return; }
     if (m.type === 'boot-error') { if (!this.ready) { clearTimeout(this.bootTimer); this.emit('boot-failed', { reason: m.message }); } return; }
     if (m.type === 'ready') {
@@ -71,13 +73,16 @@ export class Runner {
   on(type, f) { if (!this.handlers.has(type)) this.handlers.set(type, new Set()); this.handlers.get(type).add(f); return () => this.handlers.get(type).delete(f); }
   emit(type, m) { for (const f of this.handlers.get(type) || []) f(m); }
 
-  // 看门狗：沙盒卡死（组件里有什么奇怪的东西绕过了循环保险）就整个重开
+  // 看门狗：沙盒卡死（组件里有什么奇怪的东西绕过了循环保险）就整个重开。
+  // 只算页面看得见的时候发出去、连着 3 次都没回音的 ping：标签页切到后台时定时器会被浏览器压住，回来时不能当成卡死
   watch(onHang) {
     clearInterval(this.dog);
-    this.lastPong = performance.now();
+    this.lastPong = performance.now(); this.unanswered = 0;
+    if (!this.visHook) { this.visHook = true; document.addEventListener('visibilitychange', () => { this.lastPong = performance.now(); this.unanswered = 0; }); }
     this.dog = setInterval(() => {
-      if (document.hidden || !this.ready) return;
-      if (performance.now() - this.lastPong > 6000) { this.lastPong = performance.now(); onHang(); return; }
+      if (document.hidden || !this.ready) { this.lastPong = performance.now(); this.unanswered = 0; return; }
+      if (this.unanswered >= 3 && performance.now() - this.lastPong > 6000) { this.lastPong = performance.now(); this.unanswered = 0; onHang(); return; }
+      this.unanswered++;
       this.post({ type: 'ping', n: Date.now() });
     }, 2000);
   }

@@ -61,7 +61,7 @@ export class Store {
   }
   undo() { if (!this.past.length) return; this.future.push(JSON.stringify(this.p)); this.p = normalizeProject(JSON.parse(this.past.pop())); this.emit('history'); }
   redo() { if (!this.future.length) return; this.past.push(JSON.stringify(this.p)); this.p = normalizeProject(JSON.parse(this.future.pop())); this.emit('history'); }
-  select(id) { this.selected = id; for (const f of this.listeners) f('select'); }
+  select(id) { if (id === this.selected) return; this.selected = id; for (const f of this.listeners) f('select'); }   // 同一个不重画：拖时间轴时重画会把正在拖的条换掉
 
   layer(id = this.selected) { return this.p.layers.find((l) => l.id === id) || null; }
   first(type) { return this.p.layers.find((l) => l.type === type) || null; }

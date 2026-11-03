@@ -29,7 +29,7 @@ axo.text('早安/打工人');                    // 改第一行字（/ 换行�
 axo.layers.add('text', 'pop', { text: '收到', y: 300, style: 'gold' });
 axo.layers.update('l3', { start: 0.2, end: 0.8, strength: 0.6 });   // 时间段是 0～1 的比例
 axo.layers.remove('l3');
-const gif = await axo.export({ format: 'gif', size: 240, maxKb: 500 });   // → { url, kb, mime, blob }
+const gif = await axo.export({ format: 'gif', size: 240, maxKb: 500 });   // → { url, kb, mime, blob, errors }；url 用完了 URL.revokeObjectURL(gif.url)
 const link = await axo.share();            // → { long }：能打开这个工程的完整链接
 const both = await axo.share({ short: true });   // → { long, short, expires }：短链接 1 分钟后失效（工程加密后经 ntfy.sh 中转）
 axo.fonts.list();                          // 字体：axo（Axo 黑体，默认，唯一能发布的）、sys-sans / sys-serif / sys-kai / sys-round（系统字体）、font:文件名（导入的）
@@ -70,6 +70,7 @@ axo.favorites.toggle('motion:hop');        // 收藏：键是「类型:id」，�
   - 属性面板：`layer-up` `layer-down` `layer-duplicate` `layer-delete` `deselect`，参数输入框 `field:参数名`（数字框）和 `field:参数名:range`（滑块）
   - 弹窗：`[data-ax="dialog"]` 里的 `dialog-ok` `dialog-close`、输入框 `dialog-input:标签`
 - 不用浏览器原生的 confirm / prompt：所有确认都是页面里的弹窗，能正常点。
+- 接口参数不对（没有这个组件 / 图层、时间段倒过来、格式不支持）会直接抛错并说明原因，不会悄悄做错。
 
 ## 概念
 

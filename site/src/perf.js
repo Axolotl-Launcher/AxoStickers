@@ -6,12 +6,14 @@ let cached = null;
 function probeGpu() {
   let renderer = '', hw = false, any = false;
   try {
-    const mk = () => (typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(1, 1) : document.createElement('canvas'));
-    const strict = mk().getContext('webgl', { failIfMajorPerformanceCaveat: true });
-    const gl = strict || mk().getContext('webgl');
+    // OffscreenCanvas 有、但它上面拿不到 WebGL 的浏览器（老一点的 Safari）：退回普通画布，不然能加速的设备也会被当成没有显卡
+    const get = (opts) => { for (const mk of [() => new OffscreenCanvas(1, 1), () => document.createElement('canvas')]) { try { const g = mk().getContext('webgl', opts); if (g) return g; } catch { /* 换一种画布 */ } } return null; };
+    const strict = get({ failIfMajorPerformanceCaveat: true });
+    const gl = strict || get();
     if (gl) {
       any = true;
-      const ext = gl.getExtension('WEBGL_debug_renderer_info');
+      const ff = /firefox/i.test(navigator.userAgent);             // Firefox 的 RENDERER 本来就是真名，再要 WEBGL_debug_renderer_info 会报弃用警告
+      const ext = ff ? null : gl.getExtension('WEBGL_debug_renderer_info');
       renderer = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER) || '');
       hw = !!strict && !/swiftshader|llvmpipe|softpipe|software|basic render|microsoft basic/i.test(renderer);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
@@ -41,9 +43,12 @@ export function detectPerf() {
 //   thumb：素材库小图的边长
 export function quality(choice = 'auto', perf = detectPerf()) {
   const tier = choice === 'sharp' ? 'high' : choice === 'smooth' ? 'low' : perf.tier;
-  return {
+  const q = {
     high: { tier, ss: 2, cacheMB: 128, thumb: 96, power: 'high-performance' },
     mid: { tier, ss: 2, cacheMB: 48, thumb: 96, power: 'default' },
     low: { tier, ss: 1, cacheMB: 24, thumb: 72, power: 'low-power' },
   }[tier];
+  // 手机 / 平板就算选了「清晰」，缓存也别太大（iOS 内存紧了会直接把标签页关掉）
+  const cap = perf.device === 'phone' ? 32 : perf.device === 'tablet' || perf.mem <= 4 ? 64 : 128;
+  return { ...q, cacheMB: Math.min(q.cacheMB, cap) };
 }

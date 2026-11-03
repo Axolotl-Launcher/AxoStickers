@@ -35,6 +35,7 @@ const openStudioApi = async () => {
   if (!location.hash.startsWith('#/editor')) location.hash = '#/editor';
   await loadStudio();
   for (let i = 0; i < 400 && window.axo.studio === openStudioApi; i++) await new Promise((r) => setTimeout(r, 50));
+  if (window.axo.studio === openStudioApi) throw new Error('编辑器 20 秒内没打开（看页面上的提示，刷新再试）');
   return window.axo.studio();
 };
 window.axo = Object.assign(window.axo || {}, {

@@ -163,7 +163,7 @@
 .st-stage { position: relative; flex: 1; min-height: 220px; display: grid; place-items: center; overflow: auto; padding: 4px 10px 8px; }
 .st-stage-box { position: relative; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 2px var(--line), 0 6px 0 #cfe6fb; flex: none; contain: strict; }
 .st-stage-box.fit { width: min(100%, calc(100dvh - 430px), 560px); aspect-ratio: 1; min-width: 200px; }
-.st-stage-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+.st-stage-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; pointer-events: none; }   /* 预览只看不点：点上去焦点留在页面上，快捷键照常能用 */
 .bg-white { background: #fff; }
 .bg-checker { background: conic-gradient(#e6edf5 25%, #fff 0 50%, #e6edf5 0 75%, #fff 0) 0 0 / 24px 24px; }
 .bg-chat { background: #95ec69; padding: 0; box-shadow: 0 0 0 10px #ededed, 0 6px 0 10px #d5d5d5; }
@@ -368,6 +368,8 @@
   .tl-row { min-height: 38px; }
   .tl-bar .h { width: 16px; }
   .st-range { height: 28px; }
+  .chip.small { height: 36px; padding: 0 12px; }
+  .st-scrub { height: 32px; }
 }
 
 /* 平板竖屏 / 手机：舞台在上，四个页签切换素材 / 属性 / 时间轴 / 代码 */
@@ -389,7 +391,7 @@
   .st-railbtn[aria-pressed="true"]::before { left: 12px; right: 12px; top: auto; bottom: -6px; width: auto; height: 4px; border-radius: 4px 4px 0 0; }
   .st-main { order: 1; }
   .st-stage { min-height: 0; padding: 8px; }
-  .st-stage-box.fit { width: min(100%, 55dvh); }
+  .st-stage-box.fit { width: min(100%, 44dvh); }   /* 平板竖屏：舞台小一点，下面的面板也能露出来 */
   /* 底部页签（像手机 App 一样一直够得着） */
   .st-mtabs { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 2px solid var(--line); padding: 5px 6px calc(5px + env(safe-area-inset-bottom)); gap: 4px; }
   .st-mtabs .st-tab { flex: 1; flex-direction: column; justify-content: center; gap: 2px; font-size: 11px; padding: 6px 4px; border-radius: 12px; }
@@ -422,6 +424,6 @@
 .studio[data-perf="low"] .st-btn, .studio[data-perf="low"] .st-item-main { transition: none; }
 .studio[data-perf="low"] .st-stage-box { box-shadow: 0 0 0 2px var(--line); }
 .studio[data-perf="low"] .tl-track { background: #f6fafe; }
-.studio[data-perf="low"] .st-dialog { box-shadow: 0 0 0 2px var(--line); }
-.studio[data-perf="low"] .st-dialog::backdrop { background: rgba(120, 180, 230, .6); }
+html[data-perf="low"] .st-dialog { box-shadow: 0 0 0 2px var(--line); }   /* 弹窗挂在 body 上，不在 .studio 里 */
+html[data-perf="low"] .st-dialog::backdrop { background: rgba(120, 180, 230, .6); }
 @media (prefers-reduced-motion: reduce) { .studio * { transition: none !important; } }

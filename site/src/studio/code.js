@@ -48,6 +48,7 @@ function complete(ctx) {
 
 export function createEditor(parent, { doc = '', onChange, onRun }) {
   const editable = new Compartment();
+  let quiet = false;                                         // set() 换内容（切到别的组件）时为 true：不算用户改了代码
   const view = new EditorView({
     parent,
     state: EditorState.create({
@@ -58,7 +59,7 @@ export function createEditor(parent, { doc = '', onChange, onRun }) {
         autocompletion({ activateOnTyping: true }),
         keymap.of([{ key: 'Mod-Enter', run: () => { onRun?.(); return true; } }, { key: 'Mod-s', run: () => { onRun?.(); return true; } }]),
         editable.of(EditorView.editable.of(true)),
-        EditorView.updateListener.of((u) => { if (u.docChanged) onChange?.(u.state.doc.toString()); }),
+        EditorView.updateListener.of((u) => { if (u.docChanged && !quiet) onChange?.(u.state.doc.toString()); }),
         EditorView.theme({
           '&': { height: '100%', fontSize: '13px', background: '#fff' },
           '.cm-scroller': { fontFamily: 'ui-monospace, "Cascadia Code", Consolas, "Microsoft YaHei UI", monospace', lineHeight: '1.55' },
@@ -74,7 +75,8 @@ export function createEditor(parent, { doc = '', onChange, onRun }) {
     get value() { return view.state.doc.toString(); },
     set(text) {
       if (text === view.state.doc.toString()) return;
-      view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: text } });
+      quiet = true;
+      try { view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: text } }); } finally { quiet = false; }
     },
     errors(list) {                                           // [{ line, message }]
       const doc = view.state.doc;

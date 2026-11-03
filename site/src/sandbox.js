@@ -20,6 +20,10 @@ if (!OPAQUE && !LOCAL) {
   throw new Error('sandbox.html must run in an opaque-origin sandboxed iframe');
 }
 lockEval();                                                  // eval / Function 造出来的代码也要插循环保险
+// CSP 的 connect-src 管不到 WebRTC：组件代码能借 STUN 把数据带出去。用户代码跑之前把这些构造函数拿掉（WebSocket 之类 CSP 已经拦了，一起拿掉更干脆）
+for (const k of ['RTCPeerConnection', 'webkitRTCPeerConnection', 'RTCDataChannel', 'RTCSessionDescription', 'RTCIceCandidate', 'WebTransport', 'WebSocket', 'EventSource']) {
+  try { Object.defineProperty(self, k, { value: undefined, writable: false, configurable: false }); } catch { /* 拿不掉的就算了：CSP 还挡着大部分 */ }
+}
 
 const reg = builtinRegistry();
 const builtins = new Map(reg.items);                         // 改过的内置组件可以恢复原样
@@ -30,23 +34,27 @@ const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
 let scene = null, project = null, playing = true, speed = 1, t0 = performance.now(), tHold = 0, lastFrame = -1, onion = false;
 let visible = true, exporting = false;                       // 舞台看不见 / 正在导出：预览不画
 
-// 预览帧缓存：一圈的每一帧第一次画完就存成位图，之后循环播放只贴图（三维渲染 + 合成都省了）。工程一变就清空
-const cache = { gen: 0, map: new Map(), res: 0 };
+// 预览帧缓存：一圈的帧第一次画完就存成位图，之后循环播放只贴图（三维渲染 + 合成都省了）。工程一变就清空。
+// 总是存原尺寸（缩小了再放大会糊）；内存预算不够存一整圈时只存前面那些帧，剩下的照常画
+const cache = { gen: 0, map: new Map(), max: 0, pending: 0 };
 function resetCache() {
   for (const b of cache.map.values()) b.close?.();
-  cache.map.clear(); cache.gen++;
-  const r = scene ? Math.floor(Math.sqrt(Q.cacheMB * 1048576 / Math.max(1, scene.N) / 4)) : 0;
-  cache.res = typeof createImageBitmap !== 'function' ? 0 : r >= W ? W : r >= 192 ? r : 0;
+  cache.map.clear(); cache.gen++; cache.pending = 0;
+  cache.max = scene && typeof createImageBitmap === 'function' ? Math.min(scene.N, Math.floor(Q.cacheMB * 1048576 / (W * W * 4))) : 0;
 }
 function remember(f) {
-  if (!cache.res || cache.map.has(f)) return;
-  const gen = cache.gen, opts = cache.res < W ? { resizeWidth: cache.res, resizeHeight: cache.res, resizeQuality: 'medium' } : undefined;
-  createImageBitmap(canvas, opts).then((b) => { if (gen === cache.gen && !cache.map.has(f)) cache.map.set(f, b); else b.close(); }).catch(() => {});
+  if (cache.map.has(f) || cache.map.size + cache.pending >= cache.max) return;
+  const gen = cache.gen; cache.pending++;
+  createImageBitmap(canvas).then((b) => {
+    if (gen !== cache.gen) { b.close(); return; }
+    cache.pending--;
+    if (!cache.map.has(f)) cache.map.set(f, b); else b.close();
+  }).catch(() => { if (gen === cache.gen) cache.pending--; });
 }
 function drawCached(f) {
   const b = cache.map.get(f);
   if (!b) return false;
-  ctx.clearRect(0, 0, W, W); ctx.drawImage(b, 0, 0, W, W);
+  ctx.clearRect(0, 0, W, W); ctx.drawImage(b, 0, 0);
   return true;
 }
 let reported = 0;
@@ -113,19 +121,22 @@ function loop(now) {
 }
 
 let loaded = 0;                                               // 这次新编进来几段（用来决定要不要更新素材库）
+const compileErrors = new Map();                              // origin -> 编译错误：组件库和工程两边的报错都留着，发给编辑器的总是全部
+const allErrors = () => [...compileErrors].map(([origin, e]) => ({ origin, ...e }));
 function loadUser(items) {                                   // 用户 / 文件 / 工程自带的组件；没变的不重编
-  const errors = [];
   for (const { source, origin } of items) {
     if (userSources.get(origin) === source) continue;
     try {
       const defs = compile(source, origin, { guard: true });
+      for (const [key, e] of [...reg.items]) if (e.origin === origin && !defs.some((d) => reg.key(d.type, d.id) === key)) {   // 新版本里不再有的组件撤掉（顶掉的内置组件恢复）
+        reg.remove(e.def.type, e.def.id); const b = builtins.get(key); if (b) reg.put(b.def, b.source, b.origin);
+      }
       for (const d of defs) reg.put(d, source, origin);
-      userSources.set(origin, source); loaded++;
+      userSources.set(origin, source); compileErrors.delete(origin); loaded++;
     } catch (e) {
-      errors.push({ origin, message: e.message, line: e.line ?? null });     // 编译失败：保留上一个能用的版本
+      compileErrors.set(origin, { message: e.message, line: e.line ?? null });     // 编译失败：保留上一个能用的版本
     }
   }
-  return errors;
 }
 
 // 组件有两个来源：「我的组件」（components 消息）和工程自带的（project 消息）。
@@ -139,15 +150,19 @@ function dropOrigin(origin) {
     reg.remove(e.def.type, e.def.id); n++;
     const b = builtins.get(key); if (b) reg.put(b.def, b.source, b.origin);
   }
-  userSources.delete(origin);
+  userSources.delete(origin); compileErrors.delete(origin);
   return n;
 }
+const latest = { mine: [], project: [] };                     // 两边最近一次送来的组件
 function syncUser(kind, items) {
-  const errors = loadUser(items), now = new Set(items.map((i) => i.origin)), other = owned[kind === 'mine' ? 'project' : 'mine'];
+  latest[kind] = items;
+  const now = new Set(items.map((i) => i.origin)), other = owned[kind === 'mine' ? 'project' : 'mine'];
   let dropped = 0;
   for (const o of owned[kind]) if (!now.has(o) && !other.has(o)) dropped += dropOrigin(o);
   owned[kind] = now;
-  return { errors, dropped };
+  // 撤掉的组件可能顶掉过别处的同名组件（比如工程里改过的工坊组件「还原」了）：两边都重编一遍，组件库在前、工程在后（工程里的改动优先）
+  if (dropped) { userSources.clear(); loadUser([...latest.mine, ...latest.project]); } else loadUser(items);
+  return { errors: allErrors(), dropped };
 }
 
 const handlers = {
@@ -163,7 +178,8 @@ const handlers = {
   async remove({ ctype, id }) {
     reg.remove(ctype, id); userSources.clear();
     const b = builtins.get(reg.key(ctype, id)); if (b) reg.put(b.def, b.source, b.origin);
-    post({ type: 'catalog', errors: [], catalog: catalog() }); if (project) await build(); },
+    loadUser([...latest.mine, ...latest.project]);            // 别的来源里也有这个组件的话让它回来
+    post({ type: 'catalog', errors: allErrors(), catalog: catalog() }); if (project) await build(); },
   async project({ project: p }) {
     project = p;
     loaded = 0;
@@ -186,6 +202,7 @@ const handlers = {
   },
   async export({ req, format = 'gif', size, colors, maxKb }) {
     if (!scene) { post({ type: 'export-error', req, message: '预览还没准备好，等一下再导出' }); return; }
+    if (!['gif', 'png-zip', 'png'].includes(format)) { post({ type: 'export-error', req, message: `不支持的格式 ${format}（能用 gif / png-zip / png）` }); return; }
     exporting = true; R.setQuality(2);                        // 导出总是全画质；导出期间预览先不画，省出来给导出
     try {
       const progress = (p) => post({ type: 'progress', req, p });

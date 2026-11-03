@@ -47,8 +47,11 @@ export const ready = (async () => {
     for (const m of old) if (m?.origin && m.source && !items.has(m.origin)) await write({ ...describe(m.source), name: m.name, type: m.type || describe(m.source).type, origin: m.origin, source: m.source, from: 'mine' });
     if (db && old.length) localStorage.removeItem(LEGACY);       // 只有真的存进 IndexedDB 了才删旧的；数据库打不开就留着，下次再搬
   } catch { /* 没有 localStorage */ }
-  bc?.addEventListener('message', async () => { await reload(); emit('sync'); });
+  bc?.addEventListener('message', () => serial(reload).then(() => emit('sync')).catch(() => {}));
 })();
+// 读、写、删排成一队：别的标签页通知来的 reload 不会和这边刚写的东西交错（读到写之前的旧内容、把新加的盖掉）
+let queue = opened;
+const serial = (f) => { const run = queue.then(f, f); queue = run.catch(() => {}); return run; };
 
 export const list = () => [...items.values()].sort((a, b) => (b.at || 0) - (a.at || 0));
 let isLoaded = false; opened.then(() => { isLoaded = true; });
@@ -59,23 +62,20 @@ export const onChange = (f) => { listeners.add(f); return () => listeners.delete
 
 async function write(entry) {
   const e = { ...(typeof entry.source === 'string' ? describe(entry.source) : {}), ...entry, at: Date.now() };   // 模型 / 字体（kind: model / font）存的是 bytes
+  if (db) await req(store('readwrite').put(e));               // 先真的存进数据库（空间不够会在这里报错），界面上再显示「已添加」
   items.set(e.origin, e);
-  if (db) await req(store('readwrite').put(e));
   return e;
 }
 // 放进组件库（同一个 origin 覆盖）。from：repo（工坊）/ mine（自己写的）/ file（从文件载入）
 export async function put(entry) {
-  await opened;
-  const e = await write(entry);
+  const e = await serial(() => write(entry));
   emit('put'); bc?.postMessage('put');
   return e;
 }
 
 // 真的删掉：IndexedDB 里这一条没了
 export async function remove(origin) {
-  await opened;
-  items.delete(origin);
-  if (db) await req(store('readwrite').delete(origin));
+  await serial(async () => { if (db) await req(store('readwrite').delete(origin)); items.delete(origin); });   // 数据库里删掉了才算删掉
   emit('remove'); bc?.postMessage('remove');
 }
 
