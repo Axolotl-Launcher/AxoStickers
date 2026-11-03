@@ -38,14 +38,14 @@ export function detectPerf() {
 }
 
 // 按档位（或用户在舞台上选的画质）给出具体参数
-//   ss：三维部分的超采样（1 = 和画布一样大，2 = 两倍再缩下来，边缘更顺）
+//   ss：预览时三维部分的超采样（1 = 和画布一样大，2 = 两倍再缩下来，边缘更顺）。导出总是 2 倍，和这里无关
 //   cacheMB：预览缓存的帧最多占多少显存 / 内存
 //   thumb：素材库小图的边长
 export function quality(choice = 'auto', perf = detectPerf()) {
   const tier = choice === 'sharp' ? 'high' : choice === 'smooth' ? 'low' : perf.tier;
   const q = {
     high: { tier, ss: 2, cacheMB: 128, thumb: 96, power: 'high-performance' },
-    mid: { tier, ss: 2, cacheMB: 48, thumb: 96, power: 'default' },
+    mid: { tier, ss: 1, cacheMB: 48, thumb: 96, power: 'default' },   // 手机 / 平板：预览 1 倍（三维部分少画 3/4 的像素），导出照样 2 倍
     low: { tier, ss: 1, cacheMB: 24, thumb: 72, power: 'low-power' },
   }[tier];
   // 手机 / 平板就算选了「清晰」，缓存也别太大（iOS 内存紧了会直接把标签页关掉）

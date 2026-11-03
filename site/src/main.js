@@ -27,7 +27,10 @@ let view = null, studio = null;
 const loadStudio = () => (studio ||= import('./studio/studio.js'));
 const ready = { gallery: null, workshop: null };
 const retryable = (key, init) => (ready[key] ||= init().catch((e) => { ready[key] = null; console.error(e); }));
-const gallery = () => retryable('gallery', () => initGallery().then(() => { initHero(G.items, () => view === 'gallery').catch(console.error); }));
+// 首页头图（标题用表情字体画）只在真的看到图鉴时才开：直接打开编辑器时，后台预载图鉴数据不该顺手下标题那 6 个字体切片
+let heroStarted = false;
+const startHero = () => { if (heroStarted || view !== 'gallery' || !G.items?.length) return; heroStarted = true; initHero(G.items, () => view === 'gallery').catch(console.error); };
+const gallery = () => retryable('gallery', () => initGallery().then(startHero));
 const workshop = () => retryable('workshop', initWorkshop);
 
 // 给浏览器里的 AI 助手 / 自动化脚本：编辑器还没打开时，axo.studio() 会打开它并等预览准备好，然后返回完整接口（说明：llms.txt）
@@ -61,6 +64,7 @@ function show(v) {
     view = v;
   }
   if (studio) studio.then((m) => m.studioActive(v === 'editor'));
+  if (v === 'gallery') startHero();
   document.title = { gallery: '美西螈表情包 · AxoStickers', editor: '创意工坊 · 美西螈表情包', workshop: '工坊作品 · 美西螈表情包' }[v];
 }
 

@@ -87,7 +87,13 @@ S('摸鱼', 'flagwave', 'happy', [], hold='fish', s=0.7)
 
 **给 AI 助手和自动化工具用：** 能执行 JavaScript 的工具直接调 `window.axo`（`await axo.studio()` 打开编辑器，`axo.layers.add(...)`、`axo.workshop.add(...)`、`axo.export()` …），只能点按钮的工具每个控件都有中文名字和稳定的 `data-ax` 操作名，读不到画布就看 `[data-ax="status"]` 那一句描述。页面里不用浏览器原生的 confirm / prompt。完整说明在 [site/public/llms.txt](site/public/llms.txt)（网站根目录的 `llms.txt`）。
 
-**性能分档**（`site/src/perf.js`）：有显卡加速的电脑高画质；手机 / 平板标准；没有显卡加速（浏览器关了硬件加速、只有软件渲染）的省电预览——三维部分少画 3/4 的像素、首页不跑实时渲染、悬停视频少放几个。预览和 GIF 一样一帧一帧地换，每帧第一次画完就缓存成位图，看不见舞台或者正在导出时不画；导出总是全画质。舞台上的「画质」可以手动选流畅 / 清晰。
+**性能分档**（`site/src/perf.js`）：有显卡加速的电脑高画质；手机 / 平板和没有显卡加速（浏览器关了硬件加速、只有软件渲染）的设备预览时三维部分 1 倍（少画 3/4 的像素），导出总是 2 倍超采样；没有显卡加速时首页不跑实时渲染、悬停视频少放几个。预览和 GIF 一样一帧一帧地换，每帧第一次画完就缓存成位图，看不见舞台或者正在导出时不画。舞台上的「画质」可以手动选流畅 / 清晰。
+
+**引擎在 Worker 里跑**：沙盒页面（`sandbox.js`）把引擎（`sandbox-core.js`：组件代码、三维渲染、GIF 编码）放进它开的 Worker（`sandbox-worker.js`，OffscreenCanvas），编辑器界面所在的线程只管界面；Worker 跑不起来就在沙盒页面里跑同一份引擎（`#/editor?worker=0` 可以强制这样，对比用）。Worker 和沙盒页面一样是不透明来源、继承同样的 CSP，开完以后再封上 `worker-src 'none'`，组件代码开不了新的 Worker。
+
+**字体**：界面全用系统字体；表情同款的 Axo 黑体按字切成一百多个 woff2，只在画布上的表情字、首页标题和 Logo 字上用，用到哪些字才下哪些切片。画字、导出前都等这些字真的能用（切片没下下来就报错、不导出，不会悄悄换成系统字体）。
+
+**量一下**：`node site/tools/perf.mjs <拼好的网站目录> --base /AxoStickers/ --rate 6 [--sw] [--page]`：打开编辑器下了多少字体和脚本，手机视口 + CPU 降速 6 倍时预览帧率、主线程长任务（播放、拖滑块）、导出 400px GIF 的用时和界面卡顿。
 
 网页引擎（`site/src/engine/`）的模型面片、表情、道具和图标由 `site/tools/export_engine.py` 从 Python 引擎导出，动作、特效、文字动画逐行移植成了组件（`site/tools/split_motions.py`），和 Python 引擎逐帧对照（`dev.html`）。
 

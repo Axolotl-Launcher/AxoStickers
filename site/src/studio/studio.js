@@ -165,6 +165,7 @@ function btn(label, title, on, { cls = '', ico = null, ax = null, hideLabel = fa
 function build(root) {
   const store = new Store();
   store.onError = (e) => toast(e.message);
+  store.onSaved = (ok) => setSaved(store.foreign ? 'foreign' : ok ? 'ok' : 'full');   // 草稿真的存下来以后再更新顶栏的状态
   const perf = detectPerf();
   let quality = 'auto';
   try { quality = localStorage.getItem('axo-quality') || 'auto'; } catch { /* 没有 localStorage */ }
@@ -272,7 +273,7 @@ function build(root) {
   // 沙盒
   const params = new URLSearchParams(location.hash.split('?')[1] || '');
   const devNoSandbox = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && params.get('nosandbox') === '1';
-  S.runner = new Runner(S.stageBox, { sandboxed: !devNoSandbox, src: `sandbox.html?q=${encodeURIComponent(quality)}` });
+  S.runner = new Runner(S.stageBox, { sandboxed: !devNoSandbox, src: `sandbox.html?q=${encodeURIComponent(quality)}${params.get('worker') === '0' ? '&worker=0' : ''}` });   // #/editor?worker=0：引擎不进 Worker（对比、排查用）
   S.runner.on('ready', (m) => {
     S.sceneReady = false; bootTries = 0;
     S.bootMsg.hidden = true; S.root.dataset.state = 'ready'; setPerf(m.perf); setCatalog(m.catalog);
@@ -304,7 +305,7 @@ function build(root) {
 
   store.on((why) => {
     if (why === 'foreign') { setSaved('foreign'); toast('这份草稿在另一个标签页里改过了：这边的改动不再自动保存（想接着用那边的就刷新页面；这边的可以「保存」成文件）'); return; }
-    if (why !== 'select') setSaved(store.foreign ? 'foreign' : store.saveFailed ? 'full' : 'ok');
+    if (why !== 'select' && store.foreign) setSaved('foreign');
     if (why === 'load') { S.projectKey = null; S.projectDirty = false; }   // 换成了别的工程（文件、模板、分享…）：不再对应「我的工程」里那一份，存的话另存一份
     else if (why === 'change' || why === 'history') S.projectDirty = true;
     if (why === 'select') { renderInspector(); renderTimeline(); loadCode(); updateStatus(); stageHint(); return; }
@@ -409,7 +410,7 @@ function setSaved(state) {
     : state === 'full' ? '浏览器的存储空间满了，草稿没存上：赶紧「保存」成文件，或者在「工坊 · 我的组件库」里删掉用不到的模型、字体'
       : '另一个标签页改过这份草稿，这边的改动不再自动保存：要留着就「保存」成文件';
   fill(S.saved, icon(ok ? 'check' : 'warn', 'tiny'), el('span', { text: ok ? '已自动保存' : state === 'full' ? '没存上（存储满了）' : '没在自动保存' }));
-  S.saved.classList.remove('pulse'); void S.saved.offsetWidth; S.saved.classList.add('pulse');
+  S.saved.animate?.([{ opacity: 0.35 }, { opacity: 1 }], { duration: 400 });   // 闪一下（Web Animations：不用为了重播动画强制重排）
 }
 function sendVisibility() { S.runner?.post({ type: 'transport', visible: S.active && S.stageVisible }); }
 const libComponents = () => lib.list().filter((e) => typeof e.source === 'string');   // 组件库里除了组件代码，还有下载的模型、导入的字体（kind: model / font，存的是字节）
@@ -478,13 +479,14 @@ async function ensureFonts(p = S.store.p) {
 const pickFaces = new Map();
 function fontCssOf(id) {
   const f = FONT_LIST.find((x) => x.id === id);
+  if (id === 'axo') return 'var(--font-ui)';                   // Axo 黑体的按钮不用它自己写（为了按钮上几个字要多下好几个切片），画布上的预览就是它
   if (f) return f.css;
   if (!pickFaces.has(id)) {
     const e = libFonts().find((x) => x.id === id), fam = `AxoPick${pickFaces.size + 1}`;
     pickFaces.set(id, fam);
     if (e) new FontFace(fam, e.bytes.slice(0)).load().then((face) => document.fonts.add(face)).catch(() => {});
   }
-  return `"${pickFaces.get(id)}",AxoSans`;
+  return `"${pickFaces.get(id)}",var(--font-ui)`;
 }
 const fontName = (id) => FONT_LIST.find((f) => f.id === id)?.name || libFonts().find((e) => e.id === id)?.name || id.replace(/^font:/, '');
 function applyFont(id, all = false) {
@@ -572,14 +574,16 @@ function scheduleFilmstrip() {
   }, 700);
 }
 function drawFilmstrip() {
-  const strip = S.timeline.querySelector('.tl-film');
-  if (!strip || !S.filmBitmaps) return;
+  if (!S.filmBitmaps) return;
+  S.filmStrip ||= el('div', { class: 'tl-film' });
   S.filmCanvases = S.filmBitmaps.map((b, i) => {
     const c = el('canvas', { width: 56, height: 56, title: `第 ${i + 1} 帧`, onclick: () => seek(Math.floor(i * S.N / S.filmBitmaps.length)) });
     c.getContext('2d').drawImage(b, 0, 0);
+    b.close?.();
     return c;
   });
-  fill(strip, ...S.filmCanvases);
+  S.filmBitmaps = null;
+  fill(S.filmStrip, ...S.filmCanvases);
   updateCounter();
 }
 
@@ -1075,11 +1079,11 @@ function renderTimeline() {
     return el('div', { class: `tl-row ${sel ? 'sel' : ''} ${l.hidden ? 'off' : ''}`, 'data-ax': 'layer', 'data-layer': l.id, 'data-type': l.type, 'data-component': l.component }, eye, label, track);
   });
   fill(S.timeline,
-    el('div', { class: 'tl-row tl-head' }, el('span'), el('span', { class: 'tl-label static', text: `${S.N} 帧 · ${S.fps} fps` }), el('div', { class: 'tl-film' })),
+    el('div', { class: 'tl-row tl-head' }, el('span'), el('span', { class: 'tl-label static', text: `${S.N} 帧 · ${S.fps} fps` }), S.filmStrip ||= el('div', { class: 'tl-film' })),
     el('div', { class: 'tl-row tl-head' }, el('span'), el('span', { class: 'tl-label static', text: '' }), ruler),
     ...rows,
     rows.length ? null : el('p', { class: 'st-note', text: '还没有图层，从左边素材里点一个。' }));
-  drawFilmstrip(); updateCounter();
+  updateCounter();
 }
 function dragBar(bar, track, l) {
   bar.addEventListener('pointerdown', (e) => {

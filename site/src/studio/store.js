@@ -32,19 +32,33 @@ export class Store {
       window.addEventListener('storage', (e) => {
         if (e.key === DRAFT && e.newValue && !this.foreign) { this.foreign = true; this.tell('foreign'); }
       });
+      const now = () => { if (this.saveTimer) this.flush(); };
+      window.addEventListener('pagehide', now);
+      document.addEventListener('visibilitychange', () => { if (document.hidden) now(); });
     } catch { /* 没有 window（测试环境） */ }
   }
   on(f) { this.listeners.add(f); return () => this.listeners.delete(f); }
   tell(why) { for (const f of this.listeners) f(why); }
-  emit(why) { if (!this.foreign) this.saveFailed = !save(DRAFT, this.p); this.tell(why); }   // 先存再通知：界面上的「已自动保存」看的是这次存没存上（浏览器存储满了会失败）
+  // 草稿不是每改一下就存（拖滑块时一秒几十次，每次都要把整个工程转成 JSON）：停手 300 毫秒再存，关页面 / 切走时马上存
+  emit(why) {
+    if (!this.foreign) { clearTimeout(this.saveTimer); this.saveTimer = setTimeout(() => this.flush(), 300); }
+    this.tell(why);
+  }
+  flush() {
+    clearTimeout(this.saveTimer); this.saveTimer = null;
+    if (this.foreign) return;
+    this.saveFailed = !save(DRAFT, this.p);                  // 浏览器存储满了会失败：界面上的「已自动保存」跟着变
+    this.onSaved?.(!this.saveFailed);
+  }
 
   // 改工程：fn 直接改 draft；coalesce 用来把拖滑块这种连续操作合成一步撤销
   // fn 抛错时整个改动作废、工程回到改之前；带 userFacing 的错误（比如组件代码太多了）交给 onError 提示，不往外抛
   change(fn, { coalesce = null } = {}) {
-    const now = performance.now(), snap = JSON.stringify(this.p);
+    const now = performance.now();
     const pushed = !(coalesce && this.lastKey === coalesce && now - this.lastPush < 800);
+    const snap = pushed ? JSON.stringify(this.p) : null;     // 合进上一步撤销的连续改动（拖滑块）不用再拍快照
     try { fn(this.p); } catch (e) {
-      this.p = normalizeProject(JSON.parse(snap));
+      this.p = normalizeProject(snap ? JSON.parse(snap) : this.p);
       if (e.userFacing && this.onError) { this.onError(e); return false; }
       throw e;
     }

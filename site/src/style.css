@@ -17,7 +17,7 @@
   --radius: 14px;
   --block: 0 4px 0 #cfe6fb;
   --font-ui: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
-  --font-big: "AxoSans", var(--font-ui);
+  --font-big: "AxoSans", var(--font-ui);                 /* 表情同款字体：只给 Logo 字、首页大标题、分区标题用（每个字都要多下一个切片），界面别的地方用 --font-ui */
 }
 
 * { box-sizing: border-box; }
@@ -45,6 +45,7 @@ button, input, select { font: inherit; color: inherit; }
 }
 .topbar-inner { max-width: 1180px; margin: 0 auto; padding: 0 16px; height: 56px; display: flex; align-items: center; gap: 16px; }
 .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); font: 900 18px/1 var(--font-big); white-space: nowrap; }
+html.in-editor .brand, html[data-route="editor"] .brand { font-family: var(--font-ui); }   /* 编辑器里顶栏收着，Logo 字不值得为它下 6 个字体切片 */
 .brand-logo { height: 30px; width: auto; flex: none; }   /* 网页引擎渲染的 Logo 版美西螈（正面，public/logo.png） */
 @media (prefers-reduced-motion: no-preference) {
   html:not([data-perf="low"]) .brand:hover .brand-logo { animation: brand-wiggle .5s ease-in-out; }
@@ -173,7 +174,7 @@ html[data-route="editor"] #view-editor, html[data-route="workshop"] #view-worksh
   border-radius: 6px; padding: 0 6px; box-shadow: inset 0 -2px 0 var(--pink-deep);
 }
 .empty { text-align: center; padding: 48px 16px; color: var(--ink-soft); }
-.empty b { display: block; font: 900 22px/1.3 var(--font-big); color: var(--ink); margin-bottom: 6px; }
+.empty b { display: block; font: 800 22px/1.3 var(--font-ui); color: var(--ink); margin-bottom: 6px; }
 
 /* ---------------- detail dialog ---------------- */
 dialog.detail {
@@ -201,7 +202,7 @@ dialog.detail::backdrop { background: rgba(120, 180, 230, .55); backdrop-filter:
 .filmstrip .frame { flex: none; width: 52px; height: 52px; border-radius: 6px; cursor: pointer; background: #fff; box-shadow: inset 0 0 0 2px var(--line); }
 .filmstrip .frame[aria-selected="true"] { box-shadow: 0 0 0 3px var(--pink); }
 .keys { margin: 0; align-self: center; text-align: center; }
-.detail h2 { font: 900 30px/1.2 var(--font-big); margin: 4px 0 2px; word-break: break-all; }
+.detail h2 { font: 800 30px/1.2 var(--font-ui); margin: 4px 0 2px; word-break: break-all; }
 .detail .meta { color: var(--ink-soft); font-size: 14px; margin: 0 0 14px; }
 .recipe { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0 0 18px; font-size: 14px; }
 .recipe dt { color: var(--ink-soft); }
@@ -229,7 +230,7 @@ dialog.detail::backdrop { background: rgba(120, 180, 230, .55); backdrop-filter:
 .progress i { display: block; height: 100%; width: 0; background: var(--pink); transition: width .1s; }
 
 .panel { display: grid; gap: 22px; }
-.group h3 { font: 900 17px/1.3 var(--font-big); margin: 0 0 8px; display: flex; align-items: baseline; gap: 8px; }
+.group h3 { font: 800 17px/1.3 var(--font-ui); margin: 0 0 8px; display: flex; align-items: baseline; gap: 8px; }
 .group h3 small { font: 600 13px/1 var(--font-ui); color: var(--ink-soft); }
 .group h4 { font-size: 13px; color: var(--ink-soft); margin: 10px 0 6px; font-weight: 700; }
 .text-row { display: flex; gap: 10px; }
