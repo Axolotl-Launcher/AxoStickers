@@ -13,10 +13,17 @@ const ROOT = path.resolve(dir);
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.webp': 'image/webp', '.gif': 'image/gif', '.glb': 'model/gltf-binary', '.mp4': 'video/mp4' };
 
 // 静态服务器：和 GitHub Pages 一样发 Access-Control-Allow-Origin: *（沙盒 iframe 是不透明来源，要靠它取脚本和字体）
+// 只给 ROOT 里面的文件：按真实路径比（解开符号链接），只拒绝真的往上走的 ..（startsWith 会放过 site-old 这种同名前缀的兄弟目录）
+const REAL_ROOT = fs.realpathSync(ROOT);
+function insideRoot(file) {
+  if (!fs.existsSync(file)) return false;
+  const rel = path.relative(REAL_ROOT, fs.realpathSync(file));
+  return !!rel && rel !== '..' && !rel.startsWith('..' + path.sep) && !path.isAbsolute(rel);
+}
 const server = http.createServer((req, res) => {
   const url = decodeURIComponent(req.url.split('?')[0]);
   const file = path.resolve(ROOT, '.' + (url.endsWith('/') ? url + 'index.html' : url));
-  if (!file.startsWith(ROOT) || !fs.existsSync(file) || !fs.statSync(file).isFile()) { res.writeHead(404, { 'Access-Control-Allow-Origin': '*' }); res.end(); return; }
+  if (!insideRoot(file) || !fs.statSync(file).isFile()) { res.writeHead(404, { 'Access-Control-Allow-Origin': '*' }); res.end(); return; }
   res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream', 'Access-Control-Allow-Origin': '*' });
   fs.createReadStream(file).pipe(res);
 });

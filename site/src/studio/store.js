@@ -2,8 +2,6 @@
 import { normalizeProject, DEFAULTS } from '../engine/project.js';
 
 const DRAFT = 'axo-studio-draft-v2';
-const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
-const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
 
 let seq = 0;
 export const newId = (p = 'l') => `${p}${Date.now().toString(36)}${(seq++).toString(36)}`;
@@ -23,8 +21,12 @@ export class Store {
   constructor() {
     this.listeners = new Set();
     this.past = []; this.future = [];
-    const d = load(DRAFT, null);
+    let raw = null;
+    try { raw = localStorage.getItem(DRAFT); } catch { /* 没有 localStorage */ }
+    let d = null;
+    try { d = raw ? JSON.parse(raw) : null; } catch { d = null; }
     this.p = d ? normalizeProject(d) : STARTER();
+    this.lastRaw = raw;                                      // 和工程来自同一次读取：存之前比一比，别的标签页写过就不盖
     this.selected = null;                                    // 选中的图层 id；null = 工程设置
     this.lastPush = 0;
     this.beforeChange = null;                                // 改工程 / 撤销 / 重做 / 换工程之前叫一声：预览上还没写进工程的手势先写进当前这份
@@ -33,7 +35,7 @@ export class Store {
       window.addEventListener('storage', (e) => {
         if (e.key === DRAFT && e.newValue && !this.foreign) { this.foreign = true; this.tell('foreign'); }
       });
-      const now = () => { if (this.saveTimer) this.flush(); };
+      const now = () => { if (this.saveTimer) this.flush(true); };
       window.addEventListener('pagehide', now);
       document.addEventListener('visibilitychange', () => { if (document.hidden) now(); });
     } catch { /* 没有 window（测试环境） */ }
@@ -45,10 +47,22 @@ export class Store {
     if (!this.foreign) { clearTimeout(this.saveTimer); this.saveTimer = setTimeout(() => this.flush(), 300); }
     this.tell(why);
   }
-  flush() {
+  // 「看一眼有没有别的标签页写过 + 写进去」要一口气做完：有 Web Locks 就排队（同一个浏览器里的标签页轮流来），关页面时来不及排队就直接写
+  flush(now = false) {
     clearTimeout(this.saveTimer); this.saveTimer = null;
     if (this.foreign) return;
-    this.saveFailed = !save(DRAFT, this.p);                  // 浏览器存储满了会失败：界面上的「已自动保存」跟着变
+    if (!now && globalThis.navigator?.locks?.request) { navigator.locks.request('axo-draft', () => this.write()).catch(() => this.write()); return; }
+    this.write();
+  }
+  write() {
+    if (this.foreign) return;
+    let cur = null;
+    try { cur = localStorage.getItem(DRAFT); } catch { /* 没有 localStorage */ }
+    if (cur !== null && cur !== this.lastRaw) {                // 别的标签页刚写过（storage 事件还没轮到这边）：不盖掉它
+      this.foreign = true; this.tell('foreign'); return;
+    }
+    const raw = JSON.stringify(this.p);
+    try { localStorage.setItem(DRAFT, raw); this.lastRaw = raw; this.saveFailed = false; } catch { this.saveFailed = true; }   // 浏览器存储满了会失败：界面上的「已自动保存」跟着变
     this.onSaved?.(!this.saveFailed);
   }
 
@@ -58,9 +72,13 @@ export class Store {
     this.beforeChange?.();
     const now = performance.now();
     const pushed = !(coalesce && this.lastKey === coalesce && now - this.lastPush < 800);
-    const snap = pushed ? JSON.stringify(this.p) : null;     // 合进上一步撤销的连续改动（拖滑块）不用再拍快照
+    // 新的一步：拍下改之前的样子（进撤销栈，出错时也回到这里）。合进上一步的连续改动（拖滑块，一秒几十次）不再拍整份快照：
+    // 出错时回到这一串改动开始之前（撤销栈顶就是那时候的样子），这一步撤销也一起拿掉
+    const snap = pushed ? JSON.stringify(this.p) : null;
     try { fn(this.p); } catch (e) {
-      this.p = normalizeProject(snap ? JSON.parse(snap) : this.p);
+      const back = snap ?? this.past.pop();
+      if (!snap) this.lastKey = null;
+      this.p = normalizeProject(back ? JSON.parse(back) : this.p);
       if (e.userFacing && this.onError) { this.onError(e); return false; }
       throw e;
     }

@@ -10,7 +10,7 @@ const T = 3.2;
 export async function initHero(items, isActive) {
   const perf = detectPerf(), still = perf.tier === 'low' || perf.reduced || perf.save;
   const [ENG] = await Promise.all([import('./engine/index.js'), fontsCss]);
-  await ENG.loadFont(TITLE);
+  if (!await ENG.loadFont(TITLE)) return;                    // 标题的字体切片没下下来：不用系统字体画，页面上的文字标题留着
   const tc = document.getElementById('hero-title'), tg = tc.getContext('2d');
   const ch = 168, sprites = [...TITLE].map((c) => ENG.charSprite(c, ch, 'pink'));
   const adv = ch + 14, x0 = sprites[0].width / 2 - 40;            // 左对齐（字图四周有留白）
@@ -44,8 +44,9 @@ export async function initHero(items, isActive) {
   const reg = ENG.builtinRegistry();
   let stk = null, born = 0, onScreen = true, lastF = -1, lastTitle = 0;
   async function next(now) {
-    const it = pick();
-    await ENG.loadFont(it.text);
+    let it = pick();
+    for (let k = 0; k < 3 && !await ENG.loadFont(it.text); k++) it = pick();   // 这一张的字下不来：换一张（不用系统字体画）
+    if (!await ENG.loadFont(it.text)) return;                 // 还是不行：接着放现在这张
     stk = new ENG.Scene(ENG.fromRecipe(it), reg, ENG.renderer());
     born = now; lastF = -1; cap.textContent = `实时渲染 · #${it.key} ${it.text}`;
   }
