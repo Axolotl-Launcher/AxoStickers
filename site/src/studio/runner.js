@@ -24,16 +24,26 @@ export class Runner {
     f.className = 'stage-iframe';
     f.setAttribute('allow', '');
     let loads = 0;                                                       // 组件代码让预览框跳走了（本站 CSP 的 frame-src 会拦住别的网站）：重开
-    f.addEventListener('load', () => { if (++loads > 1 && this.frame === f) { this.emit('fatal', { message: '组件想让预览跳到别的网页，已经拦下并重开' }); this.start(); } });
+    f.addEventListener('load', () => { if (this.frame === f) this.frameLoaded = true; if (++loads > 1 && this.frame === f) { this.emit('fatal', { message: '组件想让预览跳到别的网页，已经拦下并重开' }); this.start(); } });
     this.mount.append(f);
+    this.booting = false; this.frameLoaded = false;
+    this.armBoot(12000);
+  }
+  // 启动看门狗：页面 12 秒内没报到 = 页面本身没打开；报到了（sandbox-boot.js）就多等一会儿脚本，开发时第一次编译可能很慢
+  armBoot(ms, reason = null) {
     clearTimeout(this.bootTimer);
-    this.bootTimer = setTimeout(() => { if (!this.ready) this.emit('boot-failed', {}); }, 12000);
+    this.bootTimer = setTimeout(() => {
+      if (this.ready) return;
+      this.emit('boot-failed', { reason: reason || (this.frameLoaded ? '沙盒页面打开了，但里面的脚本没能运行（多半是被拦下了）' : '沙盒页面没打开（可能被浏览器扩展或安全设置拦下了）') });
+    }, ms);
   }
 
   onMessage(e) {
     if (!this.frame || e.source !== this.frame.contentWindow) return;   // 只认自己的沙盒
     const m = e.data;
     if (!m || typeof m.type !== 'string') return;
+    if (m.type === 'booting') { this.booting = true; this.armBoot(60000, '沙盒的脚本一直没加载完'); return; }
+    if (m.type === 'boot-error') { if (!this.ready) { clearTimeout(this.bootTimer); this.emit('boot-failed', { reason: m.message }); } return; }
     if (m.type === 'ready') {
       this.ready = true; clearTimeout(this.bootTimer);
       for (const q of this.queue.splice(0)) this.post(q.msg, q.transfer);

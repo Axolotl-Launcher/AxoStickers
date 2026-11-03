@@ -2,8 +2,13 @@
 // 注意 Pillow 在 RGBA 画布上用 ImageDraw 画半透明色时是直接写像素、最后转 RGB 时 alpha 被丢掉，
 // 所以引擎里直接画在主画布上的东西（星星、方块、线）实际都是不透明的；这里照着画不透明色。
 import { E, W, hx, pyRound, makeCanvas } from './core.js';
+import { FONT_LIST } from './fonts.js';
 
 export const FONT = 'AxoSans';
+const FAMILIES = new Map(FONT_LIST.map((f) => [f.id, f.css]));   // 字体 id -> CSS 字体名（导入的字体另外注册）
+export const fontFamily = (id) => FAMILIES.get(id) || FONT;
+export const hasFont = (id) => !id || FAMILIES.has(id);
+export function registerFont(id, family) { FAMILIES.set(id, family); SPR.clear(); }
 const css = (c, a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 export const rgb = (c) => css(c);
 const canvas = makeCanvas;
@@ -91,35 +96,35 @@ export function polygon(ctx, pts, fill, alpha = 1) {
 
 // ---------------- 立体字 ----------------
 const MEASURE = canvas(8, 8).getContext('2d');
-const fontCss = (sz) => `900 ${sz}px ${FONT}`;
-export function textLength(c, sz) { MEASURE.font = fontCss(sz); return MEASURE.measureText(c).width; }
+const fontCss = (sz, font) => `900 ${sz}px ${fontFamily(font)}`;
+export function textLength(c, sz, font) { MEASURE.font = fontCss(sz, font); return MEASURE.measureText(c).width; }
 const isWide = (c) => c.codePointAt(0) > 0x2e80;
-const units = (line) => [...line].reduce((s, c) => s + (isWide(c) ? 1 : (textLength(c, 100) + 14) / 100), 0);
+const units = (line, font) => [...line].reduce((s, c) => s + (isWide(c) ? 1 : (textLength(c, 100, font) + 14) / 100), 0);
 function size(u) {
   const xs = [1, 2, 3, 4, 5, 6], ys = [190, 160, 138, 112, 92, 80];
   u = Math.max(1, Math.min(6, u));
   for (let i = 0; i < 5; i++) if (u <= xs[i + 1]) return ys[i] + (ys[i + 1] - ys[i]) * (u - xs[i]);
   return ys[5];
 }
-// 返回 [[字, x, y, 字号], ...]，一行或两行；scale 整体放大缩小，dx 整体左右挪
-export function layout(text, y0 = 118, scale = 1, dx = 0) {
+// 返回 [[字, x, y, 字号], ...]，一行或两行；scale 整体放大缩小，dx 整体左右挪，font 字体 id
+export function layout(text, y0 = 118, scale = 1, dx = 0, font = 'axo') {
   let lines = text.includes('/') ? text.split('/') : [text];
-  if (lines.length === 1 && units(text) > 5.3) {
+  if (lines.length === 1 && units(text, font) > 5.3) {
     const cs = [...text];
     let best = 1, bv = Infinity;
     for (let k = 1; k < cs.length; k++) {
-      const v = Math.abs(units(cs.slice(0, k).join('')) - units(cs.slice(k).join(''))) + (cs[k - 1] < '\x80' && cs[k] < '\x80' ? 9 : 0);
+      const v = Math.abs(units(cs.slice(0, k).join(''), font) - units(cs.slice(k).join(''), font)) + (cs[k - 1] < '\x80' && cs[k] < '\x80' ? 9 : 0);
       if (v < bv) { bv = v; best = k; }
     }
     lines = [cs.slice(0, best).join(''), cs.slice(best).join('')];
   }
-  let ch = size(Math.max(...lines.map(units)));
+  let ch = size(Math.max(...lines.map((ln) => units(ln, font))));
   if (lines.length === 2) ch = Math.min(ch, 104);
   ch *= scale;
   const out = [];
   lines.forEach((line, li) => {
     const cs = [...line];
-    const adv = cs.map((c) => (isWide(c) ? ch + 2 : textLength(c, Math.floor(ch)) + ch * 0.14));
+    const adv = cs.map((c) => (isWide(c) ? ch + 2 : textLength(c, Math.floor(ch), font) + ch * 0.14));
     let x = W / 2 + dx - adv.reduce((a, b) => a + b, 0) / 2;
     const y = lines.length === 1 ? y0 : y0 - 52 * scale + li * (ch + 18 * scale);
     cs.forEach((c, k) => { out.push([c, x + adv[k] / 2, y, Math.floor(ch)]); x += adv[k]; });
@@ -128,14 +133,14 @@ export function layout(text, y0 = 118, scale = 1, dx = 0) {
 }
 
 const SPR = new Map();
-export function charSprite(c, ch, style = 'pink') {
-  const key = `${c}|${ch}|${style}`;
+export function charSprite(c, ch, style = 'pink', font = 'axo') {
+  const key = `${c}|${ch}|${style}|${font}`;
   if (SPR.has(key)) return SPR.get(key);
   const [HOT, DEEP, PLUM, TINT] = E.styles[style].map(hx);
   const s1 = Math.max(6, pyRound(ch * 0.134)), s2 = Math.max(4, pyRound(ch * 0.09)), dep = Math.max(4, pyRound(ch * 0.08));
   const pad = Math.floor(ch * 0.36), sz = ch + 2 * pad;
   const cv = canvas(sz, sz + 20), g = cv.getContext('2d');
-  g.font = fontCss(ch); g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
+  g.font = fontCss(ch, font); g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
   const m = g.measureText(c);
   const base = (m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2;   // Pillow anchor 'mm'：上下沿的正中
   const cx = sz / 2, cy = sz / 2 + base;
@@ -159,8 +164,8 @@ export function charSprite(c, ch, style = 'pink') {
   return cv;
 }
 
-export async function loadFont(text) {
+export async function loadFont(text, font = 'axo') {
   const fonts = globalThis.document?.fonts || globalThis.fonts;
   if (!fonts) return;
-  try { await fonts.load(fontCss(100), text || '美西螈'); } catch { /* 字体没加载上就用系统字体 */ }
+  try { await fonts.load(fontCss(100, font), text || '美西螈'); } catch { /* 字体没加载上就用系统字体 */ }
 }

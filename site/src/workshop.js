@@ -22,7 +22,7 @@ export function sorted() {
 }
 
 function card(e) {
-  const img = el('img', { class: 'pic', loading: 'lazy', decoding: 'async', width: 400, height: 400, alt: e.text, src: e.still, 'data-still': e.still, 'data-gif': e.gifUrl, 'data-preview': e.preview });
+  const img = el('img', { class: 'pic', loading: 'lazy', decoding: 'async', width: 400, height: 400, alt: '', src: e.still, 'data-still': e.still, 'data-gif': e.gifUrl, 'data-preview': e.preview });
   img.addEventListener('error', () => { if (img.src.includes('/thumbs/')) { img.dataset.still = e.coverUrl; img.src = e.coverUrl; } }, { once: true });
   return animated(el('button', { class: 'card ws-card', type: 'button', onclick: () => { location.hash = `#/w/${e.issue}`; } }, img,
     el('span', { class: 'cap' }, el('b', { text: e.text }), el('span', { class: 'likes', text: `👍 ${e.likes || 0}` }),

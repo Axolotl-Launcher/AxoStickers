@@ -1,6 +1,6 @@
 // 沙盒里的那一半：编译组件、拼场景、播放、导出。和外面只通过 postMessage 说话（协议见 studio/runner.js）。
-import './gen/fonts.css';
 import { W, Scene, builtinRegistry, renderer, loadFont, exportGif } from './engine/index.js';
+import { registerFont, hasFont } from './engine/draw.js';
 import { eachFrame } from './engine/gif.js';
 import { compile, sourceFor } from './engine/components.js';
 import { makeCanvas, canvasBytes } from './engine/core.js';
@@ -80,7 +80,8 @@ function errorsOf(s) { return s ? [...s.errors].map(([key, e]) => ({ key, messag
 
 async function build() {
   if (!project) return;
-  await loadFont(project.layers.filter((l) => l.type === 'text').map((l) => l.text).join('') || '美西螈');
+  const texts = project.layers.filter((l) => l.type === 'text');
+  for (const f of new Set(texts.map((l) => l.font || 'axo'))) await loadFont(texts.filter((l) => (l.font || 'axo') === f).map((l) => l.text).join('') || '美西螈', hasFont(f) ? f : 'axo');
   useModel();
   scene = new Scene(project, reg, R);
   lastFrame = -1; resetCache();
@@ -255,6 +256,17 @@ const handlers = {
       if (project?.model?.component === id) await build();
     } catch (e) { post({ type: 'model-done', req, ok: false, id, message: e.message }); }
   },
+  // 导入的字体文件：FontFace 直接吃字节（不走网络，沙盒的 CSP 拦不着），注册成这个 id 的字体
+  async font({ req, id, bytes }) {
+    try {
+      const family = `AxoUser${++fontSeq}`;
+      const face = new FontFace(family, bytes, { weight: '100 900' });   // 当成可变粗细：用 900 画的时候不额外加粗
+      await face.load(); document.fonts.add(face);
+      registerFont(id, `"${family}"`);
+      post({ type: 'font-done', req, ok: true, id });
+      if (project?.layers?.some((l) => l.font === id)) await build();
+    } catch (e) { post({ type: 'font-done', req, ok: false, id, message: e?.message || '字体文件读不出来' }); }
+  },
   ping({ n }) { post({ type: 'pong', n }); },
 };
 
@@ -269,7 +281,8 @@ window.addEventListener('unhandledrejection', (e) => asyncFail(e.reason));
 
 // 导出要好几秒：期间改工程 / 换组件 / 换模型的消息先排队，等导出完再处理，免得一张 GIF 里混着两个版本
 let busy = Promise.resolve();
-const CHANGES = new Set(['project', 'components', 'remove', 'model', 'quality']);
+const CHANGES = new Set(['project', 'components', 'remove', 'model', 'font', 'quality']);
+let fontSeq = 0;
 window.addEventListener('message', async (e) => {
   if (e.source !== parent || !e.data || typeof e.data.type !== 'string' || !handlers[e.data.type]) return;
   if (e.origin !== HOME) return;                                       // 别的网站嵌了这个页面也指挥不动它
@@ -280,4 +293,5 @@ window.addEventListener('message', async (e) => {
 });
 
 requestAnimationFrame(loop);
+window.__axoReady = true;                                     // sandbox-boot.js 之后不再把运行时错误当成启动失败
 post({ type: 'ready', catalog: catalog(), perf: { ...detectPerf(), quality: Q } });

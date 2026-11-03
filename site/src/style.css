@@ -3,6 +3,7 @@
   color-scheme: light;
   --pink: #fe3e8c;
   --pink-deep: #c41660;
+  --pink-strong: #e0206b;                            /* 白字底色用：和白字的对比度 4.6:1（--pink 只有 3.3:1，只用来装饰） */
   --plum: #6e1446;
   --pink-soft: #ffe3f0;
   --water: #aadeff;
@@ -52,7 +53,7 @@ button, input, select { font: inherit; color: inherit; }
   text-decoration: none; color: var(--ink-soft); font-weight: 700; padding: 8px 12px; border-radius: 10px; white-space: nowrap;
 }
 .nav a:hover { color: var(--ink); background: var(--bg); }
-.nav a[aria-current="page"] { color: #fff; background: var(--pink); box-shadow: inset 0 -3px 0 var(--pink-deep); }
+.nav a[aria-current="page"] { color: #fff; background: var(--pink-strong); box-shadow: inset 0 -3px 0 var(--pink-deep); }
 .gh-link { display: flex; color: var(--ink-soft); }
 .gh-link:hover { color: var(--ink); }
 
@@ -91,20 +92,23 @@ button, input, select { font: inherit; color: inherit; }
 }
 .btn:hover { transform: translateY(-1px); }
 .btn:active { transform: translateY(2px); box-shadow: inset 0 0 0 2px var(--line), 0 1px 0 var(--line); }
-.btn.primary { background: var(--pink); color: #fff; box-shadow: inset 0 -3px 0 var(--pink-deep), 0 3px 0 var(--plum); }
+.btn.primary { background: var(--pink-strong); color: #fff; box-shadow: inset 0 -3px 0 var(--pink-deep), 0 3px 0 var(--plum); }
 .btn.primary:active { box-shadow: inset 0 -2px 0 var(--pink-deep), 0 1px 0 var(--plum); }
 .btn.water { background: var(--water); color: #134a73; box-shadow: inset 0 -3px 0 var(--water-deep), 0 3px 0 #3d8fc9; }
 .btn[disabled] { opacity: .5; cursor: not-allowed; transform: none; }
-.btn small { font-weight: 600; opacity: .8; }
+.btn small { font-weight: 600; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+#cat-chips:empty { min-height: 32px; }                 /* 分类按钮等图鉴数据来了才有：先占一行（手机上两行），下面的搜索栏不会被挤下去 */
+@media (max-width: 520px) { #cat-chips:empty { min-height: 71px; } }
 .chip {
   border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; background: #fff; font-weight: 700; font-size: 14px;
   box-shadow: inset 0 0 0 2px var(--line); color: var(--ink); white-space: nowrap;
 }
 .chip:hover { box-shadow: inset 0 0 0 2px #a9d6f7; }
-.chip[aria-pressed="true"] { background: var(--pink); color: #fff; box-shadow: inset 0 -2px 0 var(--pink-deep); }
+.chip[aria-pressed="true"] { background: var(--pink-strong); color: #fff; box-shadow: inset 0 -2px 0 var(--pink-deep); }
 .chip .n { font-weight: 600; opacity: .7; margin-left: 2px; font-size: 12px; }
+.chip[aria-pressed="true"] .n { opacity: 1; }
 .chip[disabled] { opacity: .35; cursor: not-allowed; }
 
 .field { display: flex; flex-direction: column; gap: 4px; }
@@ -117,6 +121,12 @@ button, input, select { font: inherit; color: inherit; }
 main { min-height: 60vh; }
 .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
 .view[hidden] { display: none !important; }
+/* main.js 还没跑的时候按地址先显示对的那一页（index.html 里的小脚本挂 data-route）；跑起来以后 hidden 说了算 */
+html[data-route="editor"] #view-gallery, html[data-route="workshop"] #view-gallery { display: none; }
+html[data-route="editor"] #view-editor, html[data-route="workshop"] #view-workshop { display: block !important; }
+#studio-root { min-height: calc(100dvh - 56px); }      /* 编辑器还没载入：先把位置占住，页脚不会跳 */
+.boot-empty { display: grid; justify-items: center; gap: 12px; padding-top: 22vh; }
+.spin { width: 28px; height: 28px; border-radius: 50%; border: 3.5px solid var(--pink); border-right-color: transparent; animation: spin .8s linear infinite; }
 .section-title { font: 900 26px/1.2 var(--font-big); margin: 0 0 4px; letter-spacing: .02em; }
 .section-sub { margin: 0 0 18px; color: var(--ink-soft); }
 
@@ -135,6 +145,7 @@ main { min-height: 60vh; }
 .result-count { color: var(--ink-soft); font-size: 14px; margin-left: auto; }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.grid:empty { min-height: 100vh; }                     /* 图鉴还没载入：先占住位置，页脚不会等卡片出来时往下跳 */
 .card {
   position: relative; background: var(--card); border-radius: var(--radius); box-shadow: inset 0 0 0 2px var(--line), var(--block);
   cursor: pointer; text-align: left; border: 0; padding: 0; overflow: hidden; transition: transform .12s, box-shadow .12s;
@@ -156,7 +167,7 @@ main { min-height: 60vh; }
 .card .cap b { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .card .cap span { color: var(--ink-soft); margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .card .badge {
-  position: absolute; top: 8px; left: 8px; font-size: 11px; font-weight: 800; background: var(--pink); color: #fff;
+  position: absolute; top: 8px; left: 8px; font-size: 11px; font-weight: 800; background: var(--pink-strong); color: #fff;
   border-radius: 6px; padding: 0 6px; box-shadow: inset 0 -2px 0 var(--pink-deep);
 }
 .empty { text-align: center; padding: 48px 16px; color: var(--ink-soft); }
@@ -292,6 +303,23 @@ footer a { color: #0d3f66; font-weight: 700; }
   .bubbles i { animation: none; display: none; }
   html { scroll-behavior: auto; }
 }
+
+/* ---------------- 动效：换页淡入、卡片出场、按钮和导航的反馈、弹窗弹出、提示条滑入（减少动画 / 低档设备不放） ---------------- */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-perf="low"]) .view-enter { animation: view-in .28s ease-out; }
+  html:not([data-perf="low"]) .grid .card { animation: card-in .32s ease-out backwards; }
+  html:not([data-perf="low"]) .nav a { transition: background .15s, color .15s, transform .1s; }
+  html:not([data-perf="low"]) .nav a:active { transform: scale(.95); }
+  html:not([data-perf="low"]) .chip { transition: background .15s, box-shadow .15s, transform .08s; }
+  html:not([data-perf="low"]) .chip:active:not([disabled]) { transform: scale(.95); }
+  dialog.detail[open] { animation: dlg-in .24s cubic-bezier(.2, .9, .3, 1.15); }
+  dialog.detail[open]::backdrop { animation: fade-in .24s ease-out; }
+  .toast { transition: opacity .2s, transform .25s cubic-bezier(.2, .9, .3, 1.3); }
+}
+@keyframes view-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes card-in { from { opacity: 0; transform: translateY(10px) scale(.98); } }
+@keyframes dlg-in { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+@keyframes fade-in { from { opacity: 0; } }
 
 /* ---------------- 设备档位（main.js 挂在 <html data-perf>）：没有显卡加速时，毛玻璃、常驻动画、悬停位移都在 CPU 上画，关掉 ---------------- */
 html[data-perf="low"] .topbar { backdrop-filter: none; background: #fff; }

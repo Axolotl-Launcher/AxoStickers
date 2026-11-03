@@ -35,7 +35,7 @@ export function loadOk(box) { box.parentElement.querySelector('.load-error')?.re
 
 function card(it) {
   const img = el('img', {
-    class: 'pic', loading: 'lazy', decoding: 'async', width: 400, height: 400, alt: it.text || '水龙卷（无字）',
+    class: 'pic', loading: 'lazy', decoding: 'async', width: 400, height: 400, alt: '',   // 文字就在下面的说明里（按钮的名字），图片再念一遍是重复
     src: it.still, 'data-still': it.still, 'data-gif': it.gif, 'data-preview': it.preview,
   });
   img.addEventListener('error', () => { if (img.src.includes('/thumbs/')) { img.dataset.still = it.cover; img.src = it.cover; } }, { once: true });

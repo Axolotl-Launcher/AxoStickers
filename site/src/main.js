@@ -1,7 +1,6 @@
 // 入口：路由（#/ 图鉴、#/s/编号 大图、#/editor 创意工坊、#/workshop 工坊作品、#/w/issue 号）。
-import './gen/fonts.css';
 import './style.css';
-import { RELEASE, $, encodePath, toast } from './util.js';
+import { RELEASE, $, encodePath, toast } from './util.js';   // util.js 一载入就开始异步拿字体样式（fontsCss）
 import { G, initGallery } from './gallery.js';
 import { WS, initWorkshop, sorted } from './workshop.js';
 import { openDetail, closeDetail } from './detail.js';
@@ -47,8 +46,12 @@ window.axo = Object.assign(window.axo || {}, {
 });
 
 function show(v) {
+  delete document.documentElement.dataset.route;                // 换成按 hidden 显示（index.html 里按地址先显示的那一层不要了）
   if (v !== view) {
-    for (const s of document.querySelectorAll('.view')) s.hidden = s.dataset.view !== v;
+    for (const s of document.querySelectorAll('.view')) {
+      s.hidden = s.dataset.view !== v;
+      if (!s.hidden && view !== null) { s.classList.remove('view-enter'); void s.offsetWidth; s.classList.add('view-enter'); }   // 换页淡入（CSS 里按设备档位、减少动画开关）
+    }
     for (const a of document.querySelectorAll('.nav a')) {
       if (a.dataset.view === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     }
@@ -64,6 +67,7 @@ async function route() {
   const seq = ++routeSeq, hash = location.hash;
   const [path, query] = location.hash.replace(/^#\/?/, '').split('?');   // 先拆再解码：配方里的 + 不能被当成空格
   const [head, arg] = path.split('/').map((x) => { try { return decodeURIComponent(x); } catch { return x; } });
+  if (head === 'e' && arg) { history.replaceState(null, '', `#/editor?k=${encodeURIComponent(arg)}`); return route(); }   // 1 分钟短链接
   if (head === 'editor') {
     closeDetail(true);
     show('editor');
@@ -79,8 +83,8 @@ async function route() {
       } else if (e) recipe = e.recipe;
     }
     if (seq !== routeSeq || location.hash !== hash) return;
-    await m.openStudio($('#studio-root'), { recipe, project, shared: q.get('s') });
-    if ((q.get('r') || q.get('w') || q.get('s')) && location.hash === hash) history.replaceState(null, '', '#/editor');
+    await m.openStudio($('#studio-root'), { recipe, project, shared: q.get('s'), short: q.get('k') });
+    if ((q.get('r') || q.get('w') || q.get('s') || q.get('k')) && location.hash === hash) history.replaceState(null, '', '#/editor');
     return;
   }
   if (head === 'workshop' || head === 'w') {

@@ -2,13 +2,14 @@
 // 按设备档位来：没有显卡加速 / 省流量 / 想少看动画的，标题画一次、右边放一张静态封面，不跑三维；
 // 其他的实时渲染也只在换帧的时候画（15 fps，和 GIF 一样），标题在弱一点的设备上 30 fps。
 import { detectPerf } from './perf.js';
+import { fontsCss } from './util.js';
 
 const TITLE = '美西螈表情包';
 const T = 3.2;
 
 export async function initHero(items, isActive) {
   const perf = detectPerf(), still = perf.tier === 'low' || perf.reduced || perf.save;
-  const ENG = await import('./engine/index.js');
+  const [ENG] = await Promise.all([import('./engine/index.js'), fontsCss]);
   await ENG.loadFont(TITLE);
   const tc = document.getElementById('hero-title'), tg = tc.getContext('2d');
   const ch = 168, sprites = [...TITLE].map((c) => ENG.charSprite(c, ch, 'pink'));

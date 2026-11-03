@@ -54,6 +54,18 @@ component({
 
 参数（`params`）会自动出现在右边的属性面板：`type` 可以是 `int` `number` `bool` `select`（加 `options`）`color` `icon` `text`，都要写 `default`。
 
+## 模型
+
+`workshop/models/` 放模型：一个说明卡 `<id>.json` 加一个 `.glb` 文件，出现在工坊的「模型」分类里，添加后在编辑器「模型」里能换上，也能发布到工坊。
+
+```json
+{"id": "my-model", "type": "model", "name": "我的模型", "author": "你的 GitHub 名字", "version": "1.0.0", "description": "一句话说明", "file": "my-model.glb", "face": false}
+```
+
+- 用 Blockbench 做方块模型，导出成 `.glb`（贴图内嵌），最多 4 MB。节点名叫 `head`、`body`、`tail`、`leg1`～`leg4`、`top_gills`、`left_gills`、`right_gills` 的会跟着动作动。
+- `face`：要不要在头的正面画表情（脸不在那儿的模型写 `false`）。
+- 先在编辑器里「载入模型文件」试一下能不能读出来、动作对不对，再开 PR。
+
 ## 规矩
 
 - 组件只在浏览器沙盒里跑（`<iframe sandbox="allow-scripts">`，不能联网、碰不到网站的页面和存储），循环跑太久会被掐掉。别想着在里面发请求。

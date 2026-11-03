@@ -68,8 +68,23 @@ def components(dst):
         meta = json.loads(m.group(1))
         index.append({k: str(meta.get(k, ''))[:300] for k in ('id', 'type', 'name', 'author', 'version', 'description')} | {'file': name})
         shutil.copy2(os.path.join(src, name), os.path.join(dst, name))
+    index += models(os.path.join(os.path.dirname(dst), 'models'))
     json.dump(index, open(os.path.join(dst, 'index.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    print('components:', len(index))
+    print('components + models:', len(index))
+
+def models(dst):
+    """工坊里的模型：workshop/models/<id>.json（说明卡）+ 模型文件（.glb，在 workshop/models/ 或 kit/model/）-> models/。"""
+    src, kit, out = os.path.join(WS, 'models'), os.path.join(ROOT, 'kit', 'model'), []
+    os.makedirs(dst, exist_ok=True)
+    for name in sorted(os.listdir(src)) if os.path.isdir(src) else []:
+        if not name.endswith('.json'): continue
+        meta = json.load(open(os.path.join(src, name), encoding='utf-8'))
+        f = str(meta.get('file', ''))
+        glb = next((p for p in (os.path.join(src, f), os.path.join(kit, f)) if re.fullmatch(r'[\w.-]+\.glb', f) and os.path.isfile(p)), None)
+        if not glb: print('skip model (no file):', name); continue
+        shutil.copy2(glb, os.path.join(dst, f)); shutil.copy2(os.path.join(src, name), os.path.join(dst, name))
+        out.append({k: str(meta.get(k, ''))[:300] for k in ('id', 'name', 'author', 'version', 'description')} | {'type': 'model', 'file': f, 'face': bool(meta.get('face')), 'kb': round(os.path.getsize(glb) / 1024)})
+    return out
 
 def copy(src, dst, exts=None):
     os.makedirs(dst, exist_ok=True)

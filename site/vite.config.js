@@ -37,12 +37,20 @@ function repoFiles() {
             const m = /^\s*\/\*\s*@axo\s*(\{[\s\S]*?\})\s*\*\//.exec(fs.readFileSync(path.join(dir, f), 'utf8'));
             if (m) list.push({ ...JSON.parse(m[1]), file: f });
           }
+          const md = path.join(ROOT, 'workshop', 'models');            // 工坊里的模型：说明卡 <id>.json，文件在 workshop/models/ 或 kit/model/
+          for (const f of fs.existsSync(md) ? fs.readdirSync(md) : []) {
+            if (!f.endsWith('.json')) continue;
+            const meta = JSON.parse(fs.readFileSync(path.join(md, f), 'utf8')), file = [path.join(md, meta.file), path.join(dirs.models, meta.file)].find((p) => fs.existsSync(p));
+            if (file) list.push({ ...meta, type: 'model', face: !!meta.face, kb: Math.round(fs.statSync(file).size / 1024) });
+          }
           res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(list)); return;
         }
         const m = url.match(/^\/(out|workshop|thumbs|previews|components|models|_ref)\/(.+)$/);
         if (!m) return next();
-        const file = path.resolve(dirs[m[1]], m[2]);
-        if (!file.startsWith(dirs[m[1]] + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) return next();
+        let file = path.resolve(dirs[m[1]], m[2]);
+        const wsModels = path.join(ROOT, 'workshop', 'models');
+        if (m[1] === 'models' && !fs.existsSync(file)) file = path.resolve(wsModels, m[2]);   // 工坊里的模型
+        if (!(file.startsWith(dirs[m[1]] + path.sep) || (m[1] === 'models' && file.startsWith(wsModels + path.sep))) || !fs.existsSync(file) || !fs.statSync(file).isFile()) return next();
         res.setHeader('Content-Type', TYPES[path.extname(file)] || 'application/octet-stream');
         fs.createReadStream(file).pipe(res);
       });
@@ -50,9 +58,18 @@ function repoFiles() {
   };
 }
 
+// 开发时沙盒页面不要 Vite 的热更新客户端：沙盒的 CSP 是 connect-src 'none'，客户端连 WebSocket 一定被拦、在控制台报错。
+// 沙盒的模块图里没有用到 import.meta.hot 的（字体样式是 <link> 引进来的），去掉它不影响加载；改了代码刷新编辑器就会重开沙盒。
+function sandboxNoHmr() {
+  return {
+    name: 'sandbox-no-hmr', apply: 'serve',
+    transformIndexHtml: { order: 'post', handler: (html, ctx) => (/sandbox\.html$/.test(ctx.path) ? html.replace(/<script type="module" src="[^"]*\/@vite\/client"><\/script>\s*/g, '') : html) },
+  };
+}
+
 export default defineConfig({
   base: './',
-  plugins: [repoFiles()],
+  plugins: [repoFiles(), sandboxNoHmr()],
   // 沙盒 iframe 取资源的 CORS 见上面 repoFiles 里的中间件；GitHub Pages 本来就发 ACAO: *
   server: { port: 5173, strictPort: true, fs: { allow: [ROOT] }, cors: { origin: [/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/] } },
   build: {

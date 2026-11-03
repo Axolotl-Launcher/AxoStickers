@@ -7,6 +7,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'none'; worker-src 'none'; form-action 'none'; base-uri 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>沙盒</title>
+<link rel="stylesheet" href="./src/gen/fonts.css">
 <style>
   html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
   canvas { display: block; width: 100%; height: 100%; image-rendering: auto; }
@@ -14,6 +15,7 @@
 </head>
 <body>
 <canvas id="c" width="512" height="512"></canvas>
+<script src="./sandbox-boot.js"></script>
 <script type="module" src="./src/sandbox.js"></script>
 </body>
 </html>

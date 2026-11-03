@@ -51,12 +51,14 @@ export const ready = (async () => {
 })();
 
 export const list = () => [...items.values()].sort((a, b) => (b.at || 0) - (a.at || 0));
+let isLoaded = false; opened.then(() => { isLoaded = true; });
+export const loaded = () => isLoaded;                          // 数据库读完了没有（没读完时「库里没有」不算数）
 export const get = (origin) => items.get(origin) || null;
 export const has = (origin) => items.has(origin);
 export const onChange = (f) => { listeners.add(f); return () => listeners.delete(f); };
 
 async function write(entry) {
-  const e = { ...describe(entry.source), ...entry, at: Date.now() };
+  const e = { ...(typeof entry.source === 'string' ? describe(entry.source) : {}), ...entry, at: Date.now() };   // 模型 / 字体（kind: model / font）存的是 bytes
   items.set(e.origin, e);
   if (db) await req(store('readwrite').put(e));
   return e;

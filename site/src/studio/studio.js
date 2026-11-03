@@ -9,6 +9,8 @@ import { loadGallery, G } from '../gallery.js';
 import { icon, TYPE_ICON } from './icons.js';
 import * as lib from './library.js';
 import { detectPerf } from '../perf.js';
+import { FONT_LIST } from '../engine/fonts.js';
+import { createShort, openShort, dropShort, TTL as SHORT_TTL } from './share.js';
 import './studio.css';
 
 const ZH = { motion: '动作', face: '表情', prop: '道具', wear: '帽子', fx: '特效', text: '文字', textanim: '文字动画', skin: '皮肤', scene: '场景' };
@@ -19,7 +21,7 @@ const RAIL = [
   ['prop', '道具', 'prop'], ['wear', '帽子', 'wear'], ['skin', '皮肤', 'skin'], ['model', '模型', 'model'], ['workshop', '工坊', 'bag'],
 ];
 // 工坊里的分类：多种效果拼起来、代码很多的整帧场景（比如水龙卷）才叫「组件」，别的按它是什么归到对应的一类
-const KIND = { scene: '组件', motion: '动作', face: '表情', fx: '特效', textanim: '文字', prop: '道具', wear: '帽子', skin: '皮肤' };
+const KIND = { scene: '组件', motion: '动作', face: '表情', fx: '特效', textanim: '文字', prop: '道具', wear: '帽子', skin: '皮肤', model: '模型' };
 const LINES = ['收到', '已阅', '在摸了', '下次一定', '你说得对', '啊对对对', '也不是不行', '先这样吧', '关我啥事', '好家伙', '绷不住了', '急了', '已老实', '睡了', '开摆', '稳住', '收工', '就这'];
 const TEMPLATES = {
   motion: `// 我的动作。a 是美西螈这一帧的状态：a.dx / a.dy 平移（像素），a.sx / a.sy 缩放，a.roll 整体歪（度），
@@ -109,8 +111,12 @@ export function studioActive(on) {
   S.mini.hidden = !on || S.stageVisible;
 }
 
-export async function openStudio(root, { recipe = null, project = null, shared = null } = {}) {
+export async function openStudio(root, { recipe = null, project = null, shared = null, short = null } = {}) {
   if (!S) build(root);
+  if (short) {                                                 // 1 分钟短链接：从中转站取回加密的工程，在这里解开
+    const d = dialog('正在打开短链接', [el('div', { class: 'st-loading' }, spinner(), el('span', { text: '从中转站取工程…' }))], [], { closeLabel: '取消' });
+    try { shared = await openShort(short); } catch (e) { toast(e.message); shared = null; } finally { d.close(); }
+  }
   if (shared) { try { S.store.replace(await decodeShare(shared)); toast('打开了分享的工程'); } catch { toast('分享链接坏了'); } }
   else if (project) S.store.replace(project);
   else if (recipe) S.store.replace(fromRecipe(recipe));
@@ -120,6 +126,18 @@ export async function openStudio(root, { recipe = null, project = null, shared =
 
 // ---------------- 构建界面 ----------------
 // 每个能点的东西都有：看得见的文字或 aria-label（读屏 / 浏览器里的 AI 助手靠它认按钮）、data-ax（稳定的操作名，见 public/llms.txt）
+// 要等一会儿的按钮：图标换成转圈、不能连点，做完了打个勾（失败就恢复原样）。job 是 Promise，原样返回
+const spinner = (cls = '') => el('i', { class: `st-spin ${cls}`.trim(), 'aria-hidden': 'true' });
+async function busy(b, job) {
+  if (!(b instanceof HTMLElement) || b.classList.contains('is-busy')) return job;
+  const sp = spinner();
+  b.classList.add('is-busy'); b.setAttribute('aria-busy', 'true'); b.disabled = true; b.prepend(sp);
+  let ok = false;
+  try { const v = await job; ok = true; return v; } finally {
+    sp.remove(); b.classList.remove('is-busy'); b.removeAttribute('aria-busy'); b.disabled = false;
+    if (ok && b.isConnected) { b.classList.add('is-done'); setTimeout(() => b.classList.remove('is-done'), 900); }
+  }
+}
 function btn(label, title, on, { cls = '', ico = null, ax = null, hideLabel = false } = {}) {
   return el('button', { class: `st-btn ${cls} ${ico ? 'has-ico' : ''} ${hideLabel ? 'ico-only' : ''}`.trim(), type: 'button', title, 'aria-label': label, 'data-ax': ax, onclick: on },
     ico ? icon(ico) : null, hideLabel ? null : el('span', { class: 'st-btn-label', text: label }));
@@ -133,7 +151,7 @@ function build(root) {
   try { quality = localStorage.getItem('axo-quality') || 'auto'; } catch { /* 没有 localStorage */ }
   S = { store, catalog: new Map(), errors: [], compileErrors: [], playing: true, speed: 1, frame: 0, N: 48, fps: 15, T: 3.2, onion: false,
     drawer: 'motion', dock: 'timeline', zoom: 'fit', bg: 'white', active: true, stageVisible: true, thumbCache: new Map(),
-    models: new Map(), perf, quality, favOnly: false, wsTab: 'browse', wsFilter: 'all', repo: null };   // models：载入过的模型 id -> { name, bytes }
+    models: new Map(), fontsSent: new Set(), perf, quality, favOnly: false, wsTab: 'browse', wsFilter: 'all', repo: null };   // models：送进沙盒的模型 id -> { name, bytes }；fontsSent：送进沙盒的导入字体
 
   // 顶栏：左边工程名和撤销，中间文件操作，右边发布 / 导出
   const name = el('input', { class: 'st-name', value: store.p.name, placeholder: '给它起个名', maxlength: 40, 'aria-label': '工程名', 'data-ax': 'project-name' });
@@ -148,7 +166,7 @@ function build(root) {
       btn('新建', '新建一个空工程', async () => { if (await ask('新建工程', '新建会丢掉当前没保存的改动（可以先「保存」成文件），接着？', '新建')) store.replace(STARTER()); }, { ico: 'file', ax: 'new' }),
       btn('打开', '打开 .axo.json 工程文件，或者 .axo.js 组件', () => pickFile(), { ico: 'open', ax: 'open' }),
       btn('保存', '把工程存成文件（Ctrl+S）', () => saveProjectFile(), { ico: 'save', ax: 'save' }),
-      btn('分享', '复制一个能打开这个工程的链接', () => shareLink(), { ico: 'share', ax: 'share' }),
+      btn('分享', '分享链接：完整链接，或者 1 分钟就失效的短链接', () => shareLink(), { ico: 'share', ax: 'share' }),
       btn('随机', '随便来一张', () => randomize(), { ico: 'dice', ax: 'random' })),
     el('span', { class: 'st-grow' }),
     btn('帮助', '快捷键和给 AI 助手的说明', () => showKeys(), { ico: 'help', ax: 'help', hideLabel: true }),
@@ -170,7 +188,7 @@ function build(root) {
   // 中：舞台
   S.stageBox = el('div', { class: 'st-stage-box bg-white', role: 'img', 'aria-label': '预览' });
   S.errBadge = el('button', { class: 'st-errbadge', type: 'button', hidden: true, 'data-ax': 'errors', onclick: () => setDock('code') });
-  S.bootMsg = el('div', { class: 'st-boot', text: '正在启动沙盒…' });
+  S.bootMsg = el('div', { class: 'st-boot', role: 'status' });
   const stage = el('div', { class: 'st-stage' }, S.stageBox, S.errBadge, S.bootMsg);
   const sel = (title, ax, opts, value, on) => el('select', { class: 'st-mini-select', title, 'aria-label': title, 'data-ax': ax, onchange: (e) => on(e.target.value) },
     ...opts.map(([v, t]) => el('option', { value: v, text: t, selected: v === value ? true : null })));
@@ -202,8 +220,8 @@ function build(root) {
 
   // 底部停靠：时间轴 / 代码
   const tab = (d, label, ico) => el('button', { class: 'st-tab', type: 'button', role: 'tab', 'data-d': d, 'data-ax': `dock:${d}`, onclick: () => setDock(d) }, icon(ico), el('span', { text: label }));
-  S.dockTabs = el('div', { class: 'st-docktabs', role: 'tablist', 'aria-label': '时间轴和代码' },
-    tab('timeline', '时间轴', 'layers'), tab('code', '代码', 'code'),
+  S.dockTabs = el('div', { class: 'st-docktabs' },
+    el('div', { class: 'st-tablist', role: 'tablist', 'aria-label': '时间轴和代码' }, tab('timeline', '时间轴', 'layers'), tab('code', '代码', 'code')),
     el('span', { class: 'st-grow' }),
     btn('加图层', '加一层', (e) => addMenu(e.currentTarget), { cls: 'small', ico: 'plus', ax: 'add-layer-menu' }));
   S.timeline = el('div', { class: 'st-timeline', role: 'region', 'aria-label': '时间轴' });
@@ -227,9 +245,10 @@ function build(root) {
   const devNoSandbox = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && params.get('nosandbox') === '1';
   S.runner = new Runner(S.stageBox, { sandboxed: !devNoSandbox, src: `sandbox.html?q=${encodeURIComponent(quality)}` });
   S.runner.on('ready', (m) => {
-    S.sceneReady = false;
+    S.sceneReady = false; bootTries = 0;
     S.bootMsg.hidden = true; S.root.dataset.state = 'ready'; setPerf(m.perf); setCatalog(m.catalog);
-    for (const [id, x] of S.models) S.runner.request({ type: 'model', id, bytes: x.bytes.slice(0) });   // 沙盒重开过：模型再送一遍
+    for (const [id, x] of S.models) S.runner.request({ type: 'model', id, bytes: x.bytes.slice(0) }).catch(() => {});   // 沙盒重开过：模型、字体再送一遍
+    S.fontsSent = new Set(); ensureFonts();
     sendLibrary(); sendProject(); sendVisibility();
   });
   S.runner.on('perf', (m) => setPerf(m.perf));
@@ -238,11 +257,18 @@ function build(root) {
   S.runner.on('errors', (m) => { S.errors = m.errors || []; showErrors(); });
   S.runner.on('time', (m) => { if (S.playing) { S.frame = m.frame; updateCounter(); } });
   S.runner.on('fatal', (m) => toast('沙盒出错：' + m.message));
-  S.runner.on('boot-failed', () => {
-    S.bootMsg.hidden = false; S.root.dataset.state = 'error';
+  let bootTries = 0;
+  S.runner.on('boot-failed', (m) => {
+    if (++bootTries <= 1) { S.runner.start(); return; }        // 第一次失败悄悄再试一次（开发时依赖刚重新打包完、第一次请求会失败）
+    S.root.dataset.state = 'error';
     const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);      // 不加沙盒只给本机开发用：网站上 sandbox.html 会拒绝在本站身份下运行
-    fill(S.bootMsg, el('b', { text: '预览沙盒没能启动' }), el('p', { text: local ? '可能被浏览器扩展拦下了（沙盒的请求来源是 null）。本机开发可以不用沙盒直接跑。' : '可能被浏览器扩展拦下了（沙盒的请求来源是 null）。换个浏览器，或者给这个网站关掉拦截类扩展再试试。' }),
-      local ? el('button', { class: 'btn', type: 'button', text: '不用沙盒直接运行', onclick: () => { S.runner.sandboxed = false; S.runner.start(); S.bootMsg.textContent = '正在启动…'; } }) : null);
+    const restart = (sandboxed) => { bootTries = 1; S.runner.sandboxed = sandboxed; S.root.dataset.state = 'booting'; bootLoader(); S.runner.start(); };
+    fill(S.bootMsg, icon('warn', 'big'), el('b', { text: '预览沙盒没能启动' }),
+      el('p', { text: `${m?.reason || '没有回应'}。` }),
+      el('p', { class: 'st-note', text: '组件代码只在一个不透明来源的沙盒框里跑，拦截类浏览器扩展（广告 / 隐私拦截）有时会把它的请求当成可疑的拦下来：给这个网站关掉它们再重试，或者换个浏览器。' }),
+      el('div', { class: 'st-row' }, el('button', { class: 'btn primary', type: 'button', 'data-ax': 'boot-retry', onclick: () => restart(S.runner.sandboxed) }, icon('undo'), '重试'),
+        local ? el('button', { class: 'btn', type: 'button', 'data-ax': 'boot-nosandbox', onclick: () => restart(false) }, '不用沙盒直接运行（只在本机）') : null));
+    S.bootMsg.hidden = false;
   });
   S.runner.watch(() => { toast('沙盒没响应了，重开一次'); S.runner.start(); });
 
@@ -250,12 +276,12 @@ function build(root) {
     if (why === 'foreign') { toast('这份草稿在另一个标签页里改过了：这边的改动不再自动保存（想接着用那边的就刷新页面；这边的可以「保存」成文件）'); return; }
     if (why === 'select') { renderInspector(); renderTimeline(); loadCode(); updateStatus(); return; }
     if (document.activeElement !== name) name.value = store.p.name;
-    sendProject(); renderTimeline(); updateHistory(); ensureModel(); updateStatus();
+    sendProject(); renderTimeline(); updateHistory(); ensureModel(); ensureFonts(); updateStatus();
     if (S.quiet !== 'inspector') renderInspector();              // 正在打字 / 拖滑块的那个面板不重建，不然输入框会被换掉、失去焦点
     if (why !== 'change') loadCode();
     if (S.quiet !== 'drawer' && ['text', 'skin', 'workshop', 'model'].includes(S.drawer)) renderDrawer();
   });
-  lib.ready.then(() => { sendLibrary(); renderDrawer(); });
+  lib.ready.then(() => { sendLibrary(); renderDrawer(); ensureModel(); ensureFonts(); });
   lib.onChange((why) => { if (why !== 'fav') sendLibrary(); renderDrawer(); });
 
   // 舞台看不见的时候（手机上往下翻）：挂一个小提示，预览也先不画（省电）
@@ -266,13 +292,22 @@ function build(root) {
   root.addEventListener('dragleave', (e) => { if (e.target === root || !root.contains(e.relatedTarget)) S.root.classList.remove('dropping'); });
   root.addEventListener('drop', (e) => { e.preventDefault(); S.root.classList.remove('dropping'); for (const f of e.dataTransfer.files) importFile(f); });
 
+  bootLoader();
   openDrawer(S.drawer); setDock('timeline'); setMobile('drawer');
   renderInspector(); renderTimeline(); updateHistory(); layoutStage(); setPerf(null); updateStatus();
   installApi();
 }
 
+// 启动中的动画：一只在水里上下浮的小美西螈 + 三个点
+function bootLoader() {
+  fill(S.bootMsg, el('div', { class: 'st-loader', 'aria-hidden': 'true' }, el('i'), el('i'), el('i')), el('span', { text: '正在启动预览…' }));
+  S.bootMsg.hidden = false;
+}
 function sendVisibility() { S.runner?.post({ type: 'transport', visible: S.active && S.stageVisible }); }
-function sendLibrary() { S.runner?.post({ type: 'components', items: lib.list().map((e) => ({ origin: e.origin, source: e.source })) }); }
+const libComponents = () => lib.list().filter((e) => typeof e.source === 'string');   // 组件库里除了组件代码，还有下载的模型、导入的字体（kind: model / font，存的是字节）
+const libModels = () => lib.list().filter((e) => e.kind === 'model');
+const libFonts = () => lib.list().filter((e) => e.kind === 'font');
+function sendLibrary() { S.runner?.post({ type: 'components', items: libComponents().map((e) => ({ origin: e.origin, source: e.source })) }); }
 function setPerf(p) {
   if (p) S.perfInfo = p;
   const x = S.perfInfo || S.perf, q = x.quality?.tier || x.tier;
@@ -292,18 +327,81 @@ function updateStatus() {
 // 面板里的输入框改工程时用：这次改动不重建这个面板（输入框本身已经是新值了）
 function quietly(panel, fn) { S.quiet = panel; try { fn(); } finally { S.quiet = null; } }
 
-// 工程用到了网站自带的 Logo 模型、但这个页面还没载入过（打开分享 / 工坊作品 / 草稿时）：载入并送进沙盒
-let modelLoading = null;
+// 工程用的模型还没送进沙盒：组件库里有就用库里的；没有但工坊里有（打开分享 / 工坊作品时），临时下一份（不存进库）
+async function modelBytes(id) {
+  const e = libModels().find((x) => x.id === id);
+  if (e) return { name: e.name, bytes: e.bytes };
+  const c = (await loadRepo().catch(() => [])).find((x) => x.type === 'model' && x.id === id);
+  if (!c) return null;
+  const r = await fetch(`models/${encodeURIComponent(c.file)}`);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return { name: c.name, bytes: await r.arrayBuffer() };
+}
+const modelLoads = new Map();
 function ensureModel(id = S.store.p.model.component) {
-  if (id !== 'logo' || S.models.has('logo')) return Promise.resolve();
-  return modelLoading ||= (async () => {
+  if (id === 'axolotl' || S.models.has(id)) return Promise.resolve(true);
+  if (!modelLoads.has(id)) modelLoads.set(id, (async () => {
     try {
-      const bytes = await (await fetch('models/axolotl_logo.glb')).arrayBuffer();
-      S.models.set('logo', { name: 'Logo 版', bytes });
-      const r = await S.runner.request({ type: 'model', id: 'logo', bytes: bytes.slice(0) });
-      if (!r.ok) toast('模型没读出来：' + r.message);
-    } catch { toast('Logo 模型没下载下来'); } finally { modelLoading = null; }
-  })();
+      const m = await modelBytes(id);
+      if (!m) { toast(`这台设备上没有模型「${id.replace(/^file:/, '')}」：先用原版显示（去「工坊」添加，或者重新载入模型文件）`); return false; }
+      const r = await S.runner.request({ type: 'model', id, bytes: m.bytes.slice(0) });
+      if (!r.ok) { toast('模型没读出来：' + r.message); return false; }
+      S.models.set(id, { name: m.name, bytes: m.bytes, info: `${r.quads} 个面片 · 骨骼 ${r.bones.join(' ') || '无'}` });
+      return true;
+    } catch (e) { toast(`模型没载进来：${e.message}`); return false; } finally { modelLoads.delete(id); }
+  })());
+  return modelLoads.get(id);
+}
+
+// ---------------- 字体 ----------------
+// 工程里文字用到的导入字体送进沙盒（FontFace 吃字节）；这台设备上没有这个字体文件的就先用默认字体画，提示一次
+const fontMissing = new Set();
+async function ensureFonts(p = S.store.p) {
+  for (const id of new Set(p.layers.filter((l) => l.type === 'text' && l.font?.startsWith('font:')).map((l) => l.font))) {
+    if (S.fontsSent.has(id)) continue;
+    const e = libFonts().find((x) => x.id === id);
+    if (!e) { if (lib.loaded() && !fontMissing.has(id)) { fontMissing.add(id); toast(`这台设备上没有字体「${id.slice(5)}」：先用默认字体显示（在「文字」里导入同一个字体文件就好）`); } continue; }
+    S.fontsSent.add(id);
+    const r = await S.runner.request({ type: 'font', id, bytes: e.bytes.slice(0) }).catch((er) => ({ ok: false, message: er.message }));
+    if (!r.ok) { S.fontsSent.delete(id); toast(`字体「${e.name}」没读出来：${r.message}`); }
+  }
+}
+// 字体按钮上用它自己的字体写名字：导入的字体在主页面也注册一份（只用来显示按钮）
+const pickFaces = new Map();
+function fontCssOf(id) {
+  const f = FONT_LIST.find((x) => x.id === id);
+  if (f) return f.css;
+  if (!pickFaces.has(id)) {
+    const e = libFonts().find((x) => x.id === id), fam = `AxoPick${pickFaces.size + 1}`;
+    pickFaces.set(id, fam);
+    if (e) new FontFace(fam, e.bytes.slice(0)).load().then((face) => document.fonts.add(face)).catch(() => {});
+  }
+  return `"${pickFaces.get(id)}",AxoSans`;
+}
+const fontName = (id) => FONT_LIST.find((f) => f.id === id)?.name || libFonts().find((e) => e.id === id)?.name || id.replace(/^font:/, '');
+function applyFont(id, all = false) {
+  if (all) S.store.change((p) => { for (const l of p.layers) if (l.type === 'text') l.font = id; });
+  else applyToText((l) => { l.font = id; });
+}
+function fontRow() {
+  const l = S.store.layer(), cur = (l?.type === 'text' ? l.font : S.store.first('text')?.font) || 'axo';
+  const chip = (id, name, desc) => el('button', { class: 'chip st-fontchip', type: 'button', 'aria-pressed': String(cur === id), title: desc, 'aria-label': `字体：${name}`, 'data-ax': `font:${id}`, style: `font-family:${fontCssOf(id)}`, onclick: () => applyFont(id) }, name);
+  return el('div', { class: 'st-fonts' },
+    el('div', { class: 'chips', role: 'group', 'aria-label': '字体' }, ...FONT_LIST.map((f) => chip(f.id, f.name, f.desc)), ...libFonts().map((e) => chip(e.id, e.name, `导入的字体 · ${e.kb || '?'} KB（只在这台设备上）`))),
+    el('div', { class: 'st-row' },
+      btn('导入字体', '导入 .ttf / .otf / .woff / .woff2 字体文件（存在这台设备上）', () => pickFile('.ttf,.otf,.woff,.woff2'), { cls: 'small', ico: 'open', ax: 'import-font' }),
+      btn('所有文字都用它', '把所有文字图层换成这个字体', () => applyFont(cur, true), { cls: 'small', ax: 'font-all' })),
+    cur !== 'axo' ? el('p', { class: 'st-note', text: '工坊出图只认「Axo 黑体」：换了字体导出 GIF 没问题，发布到工坊前要换回来。系统字体在别的设备上可能长得不一样。' }) : null);
+}
+async function importFont(f) {
+  if (f.size > 40 << 20) { toast(`${f.name} 太大了（字体最多 40 MB）`); return; }
+  const bytes = await f.arrayBuffer();
+  try { await new FontFace('AxoProbe', bytes.slice(0)).load(); } catch { toast(`${f.name} 不是能用的字体文件`); return; }
+  const id = `font:${f.name}`.slice(0, 80), name = f.name.replace(/\.(ttf|otf|woff2?)$/i, '');
+  await lib.put({ origin: id, kind: 'font', type: 'font', id, name, bytes, from: 'file', kb: Math.round(f.size / 1024) });
+  S.fontsSent.delete(id); pickFaces.delete(id);
+  applyFont(id);
+  toast(`导入了字体「${name}」，用在了选中的文字上（存在这台设备的库里）`);
 }
 
 // ---------------- 沙盒通信 ----------------
@@ -401,6 +499,7 @@ function openDrawer(k) {
   S.search.value = '';
   S.search.parentElement.hidden = k === 'skin' || k === 'model';
   renderDrawer();
+  S.drawerBody.classList.remove('enter'); void S.drawerBody.offsetWidth; S.drawerBody.classList.add('enter');   // 换分类时内容淡入
   if (matchMedia('(max-width: 900px)').matches) setMobile('drawer');
 }
 
@@ -460,12 +559,12 @@ function star(key, label) {
 // 一个素材：主按钮（点了用上）+ 收藏 + 「再叠一层」。thumb：表情 / 道具 / 帽子 / 皮肤画一张小图
 function entry(type, meta, { active, onUse, onAdd, thumb, error }) {
   const tag = originTag(meta);
-  const c = thumb ? el('canvas', { width: 96, height: 96, class: 'st-thumb', 'aria-hidden': 'true' }) : null;
+  const c = thumb ? el('canvas', { width: 96, height: 96, class: 'st-thumb loading', 'aria-hidden': 'true' }) : null;
   const main = el('button', { class: 'st-item-main', type: 'button', 'aria-pressed': String(!!active), title: `${meta.name}（${meta.id}）${meta.description ? '：' + meta.description : ''}`, 'data-ax': 'use', onclick: onUse },
     c,
     el('span', { class: 'st-item-name', text: meta.name }),
     tag ? el('em', { class: 'st-tag', text: tag }) : null, error ? el('em', { class: 'st-tag err', text: '出错' }) : null);
-  if (c) thumbs(thumb, [meta.id]).then(([b]) => { if (b) c.getContext('2d').drawImage(b, 0, 0, 96, 96); }).catch(() => {});
+  if (c) thumbs(thumb, [meta.id]).then(([b]) => { if (b) c.getContext('2d').drawImage(b, 0, 0, 96, 96); c.classList.remove('loading'); }).catch(() => c.classList.remove('loading'));
   return el('div', { class: `st-item ${c ? 'thumb' : ''} ${active ? 'on' : ''}`, 'data-ax': 'item', 'data-type': type, 'data-id': meta.id, 'data-origin': meta.origin },
     main, star(favKey(type, meta.id), meta.name),
     onAdd ? el('button', { class: 'st-plus', type: 'button', 'aria-label': `再叠一层：${meta.name}`, title: '再加一层（叠加）', 'data-ax': 'add-layer', onclick: onAdd }, icon('plus')) : null);
@@ -521,6 +620,7 @@ async function renderDrawer() {
       btn('再加一行字', '再加一行字', () => { const nid = newId('t'); st.change((p) => p.layers.push({ id: nid, type: 'text', component: 'stay', text: '再来一行', y: 200 + 60 * texts.length, scale: 0.7 })); st.select(nid); }, { cls: 'small', ico: 'plus', ax: 'add-text' }),
       el('p', { class: 'st-note', text: '「/」可以手动换行。选中一行字后，下面的颜色和动画会用在它身上。' }),
       el('h4', { text: '字色' }), styleRow(),
+      el('h4', { text: '字体' }), fontRow(),
       el('h4', { text: `文字动画（${anims.length}）` }),
       ...withFavs('textanim', anims, (l) => grid(l.map(animEntry)), () => {
         const own = anims.filter((m) => m.origin !== 'builtin'), base = anims.filter((m) => m.origin === 'builtin');
@@ -537,17 +637,23 @@ async function renderDrawer() {
   }
   if (k === 'workshop') { renderWorkshop(body, q); return; }
   if (k === 'model') {
-    const cur = st.p.model.component;
-    const mtile = (id, name, desc) => el('button', { class: 'st-model', type: 'button', 'aria-pressed': String(cur === id), 'data-ax': `model:${id}`, onclick: () => chooseModel(id) }, el('b', { text: name }), el('small', { text: desc }));
+    const cur = st.p.model.component, mine = libModels();
+    const tile = (id, name, desc, extra = null) => el('div', { class: `st-model ${cur === id ? 'on' : ''}`, 'data-ax': 'model-item', 'data-id': id },
+      el('button', { class: 'st-model-main', type: 'button', 'aria-pressed': String(cur === id), 'data-ax': `model:${id}`, onclick: (e) => chooseModel(id, e.currentTarget) },
+        el('i', { class: 'st-wsico t-model' }, icon('model')), el('span', { class: 'st-model-text' }, el('b', { text: name }), el('small', { text: desc }))), extra);
     const face = el('input', { type: 'checkbox', checked: (st.p.model.face ?? (cur === 'axolotl' || cur === 'logo')) ? true : null, 'data-ax': 'model-face' });
     face.addEventListener('change', () => st.change((p) => { p.model.face = face.checked; }));
+    S.drawerCount.textContent = `${mine.length + 1} 个`;
     fill(body,
-      mtile('axolotl', '原版体素', '表情包用的那只：逐像素的方块，鳃和尾巴是 1 像素的薄片'),
-      mtile('logo', 'Logo 版', 'Axolotl Launcher 图标同款，加厚过的鳃和尾巴'),
-      ...[...S.models].filter(([id]) => id.startsWith('file:')).map(([id, x]) => mtile(id, x.name, `载入的模型 · ${x.info || ''}`)),
-      btn('载入模型文件（.glb / .gltf）', '载入模型文件', () => pickFile('.glb,.gltf'), { cls: 'small', ico: 'open', ax: 'load-model' }),
+      tile('axolotl', '原版体素', '内置 · 表情包用的那只：逐像素的方块，鳃和尾巴是 1 像素的薄片'),
+      ...mine.map((e) => tile(e.id, e.name, `${e.from === 'repo' ? '工坊 · 能发布' : '载入的文件 · 只在这台设备上'}${e.kb ? ` · ${e.kb} KB` : ''}`,
+        btn('删除', `从这台设备上删掉模型「${e.name}」`, () => deleteFromLibrary(e.origin), { cls: 'small danger', ico: 'trash', ax: 'model-remove', hideLabel: true }))),
+      cur !== 'axolotl' && !mine.some((e) => e.id === cur) ? tile(cur, S.models.get(cur)?.name || cur.replace(/^file:/, ''), '这个工程用的（不在你的库里）') : null,
+      el('div', { class: 'st-row' },
+        btn('去工坊找模型', '工坊里的全部模型', () => { S.wsTab = 'browse'; S.wsFilter = 'model'; openDrawer('workshop'); }, { cls: 'small primary', ico: 'bag', ax: 'models-workshop' }),
+        btn('载入模型文件', '载入 .glb / .gltf 模型文件（存在这台设备上）', () => pickFile('.glb,.gltf'), { cls: 'small', ico: 'open', ax: 'load-model' })),
       el('label', { class: 'st-field check' }, face, el('span', { text: '在头的正面画表情（别的模型脸不在那儿的话关掉）' })),
-      el('p', { class: 'st-note', text: '能用 Blockbench 做的方块模型：节点名叫 head、body、tail、leg1～leg4、top_gills、left_gills、right_gills 的会跟着动作动，其他的跟着身体走。只支持贴图和数据都内嵌在文件里的 .glb / .gltf（带单独 .bin 或贴图文件的 .gltf 载不进来，导出时选 .glb 或勾上内嵌），模型会自动缩放到和原版差不多大。载入的模型只在你这台电脑上用，发布到工坊只支持上面两个内置模型。' }));
+      el('p', { class: 'st-note', text: '工坊里的模型「添加」后存在这台设备的库里，用了也能发布到工坊；自己载入的模型文件也存在库里，但只在这台设备上能用。能用 Blockbench 做的方块模型：节点名叫 head、body、tail、leg1～leg4、top_gills、left_gills、right_gills 的会跟着动作动，其他的跟着身体走。只支持贴图和数据都内嵌在文件里的 .glb / .gltf，模型会自动缩放到和原版差不多大。' }));
     return;
   }
   const list = (S.catalog.get(k) || []).filter((m) => match(m, q));
@@ -577,11 +683,13 @@ function applyNew(type, id) {
 }
 
 let modelPick = 0;                                             // 选模型要等载入：只认最后一次选的
-async function chooseModel(id) {
+async function chooseModel(id, b = null) {
   const my = ++modelPick;
-  await ensureModel(id);
-  if (my !== modelPick || (id === 'logo' && !S.models.has('logo'))) return;
-  S.store.change((p) => { p.model = { component: id, face: null }; });
+  const ok = await busy(b, ensureModel(id));
+  if (my !== modelPick || !ok) return false;
+  const face = libModels().find((e) => e.id === id)?.face ?? S.repo?.find((c) => c.type === 'model' && c.id === id)?.face;
+  S.store.change((p) => { p.model = { component: id, face: typeof face === 'boolean' && id !== 'logo' ? face : null }; });
+  return true;
 }
 
 function styleRow() {
@@ -615,20 +723,51 @@ async function loadRepo() {
 const repoOrigin = (c) => `repo:${c.file}`;
 
 async function addFromRepo(c, use = false) {
+  if (c.type === 'model') return addModelFromRepo(c, use);
   try {
     const r = await fetch(`components/${encodeURIComponent(c.file)}`, { cache: 'no-store' });     // 不进浏览器的 HTTP 缓存：组件库里那份就是唯一的一份
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const source = await r.text();
     const compiled = nextCatalog();
+    markJustAdded(repoOrigin(c));
     await lib.put({ origin: repoOrigin(c), source, from: 'repo', file: c.file, id: c.id, type: c.type, name: c.name, author: c.author, version: c.version, description: c.description });
     toast(`「${c.name}」已经下载到组件库${c.type === 'scene' ? '：在「工坊 · 我的组件库」里点「用上」' : `：在「${KIND[c.type] || c.type}」里就能找到`}`);
     if (use) { await compiled; applyNew(c.type, c.id); }      // 等沙盒编完再用
   } catch (e) { toast(`没下载下来：${e.message}`); throw e; }   // 按钮那边吞掉，axo.workshop.add() 能拿到失败
 }
 
+// 工坊里的模型：下载 .glb、先让沙盒读一遍（读不出来就不存），再存进库
+async function addModelFromRepo(c, use = false) {
+  try {
+    if (!/^[\w.-]+\.glb$/.test(c.file || '')) throw new Error('模型文件名不对');
+    const r = await fetch(`models/${encodeURIComponent(c.file)}`, { cache: 'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const bytes = await r.arrayBuffer();
+    const m = await S.runner.request({ type: 'model', id: c.id, bytes: bytes.slice(0) });
+    if (!m.ok) throw new Error(`模型读不出来：${m.message}`);
+    S.models.set(c.id, { name: c.name, bytes, info: `${m.quads} 个面片` });
+    markJustAdded(repoOrigin(c));
+    await lib.put({ origin: repoOrigin(c), kind: 'model', type: 'model', id: c.id, name: c.name, bytes, face: !!c.face, from: 'repo', file: c.file, author: c.author, version: c.version, description: c.description, kb: Math.round(bytes.byteLength / 1024) });
+    toast(`模型「${c.name}」已经下载到库里：在「模型」里就能换上`);
+    if (use) await chooseModel(c.id);
+  } catch (e) { toast(`没下载下来：${e.message}`); throw e; }
+}
+// 刚添加的那张卡片闪一下（列表会重画，按钮上的转圈跟着没了，靠这个让人看到加上了）
+function markJustAdded(origin) { S.justAdded = origin; clearTimeout(S.justTimer); S.justTimer = setTimeout(() => { S.justAdded = null; }, 1500); }
+
 // 真的删掉：组件库（IndexedDB）里删掉这一条；当前工程里用到它的图层一起拿掉（文字只换回默认动画，字留着）
 async function deleteFromLibrary(origin, { confirmFirst = true } = {}) {
   const e = lib.get(origin), st = S.store;
+  if (e?.kind === 'model' || e?.kind === 'font') {                // 模型 / 字体：用到它的地方换回默认的
+    const n = e.kind === 'model' ? Number(st.p.model.component === e.id) : st.p.layers.filter((l) => l.font === e.id).length;
+    const what = e.kind === 'model' ? '模型' : '字体';
+    if (confirmFirst && !await ask(`删除${what}「${e.name}」`, `会从这台设备浏览器的库里彻底删掉${n ? `，当前工程${e.kind === 'model' ? '会换回原版模型' : `里用到它的 ${n} 行字会换回默认字体`}` : ''}。${e.from === 'repo' ? '工坊里的原件不受影响，想要可以再添加。' : '想再用得重新载入文件。'}`, '删除', 'danger')) return false;
+    if (n) st.change((p) => { if (e.kind === 'model') p.model = { component: 'axolotl', face: null }; else for (const l of p.layers) if (l.font === e.id) delete l.font; });
+    if (e.kind === 'model') S.models.delete(e.id); else { S.fontsSent.delete(e.id); pickFaces.delete(e.id); }
+    await lib.remove(origin);
+    toast(`删掉了${what}「${e.name}」`);
+    return true;
+  }
   let defs = [...S.catalog.values()].flat().filter((m) => m.origin === origin);
   if (!defs.length && e) { const d = lib.describe(e.source); defs = [{ type: e.type || d.type, id: e.id || d.id }]; }   // 编译失败的组件不在素材库里：按组件库里记的类型和 id 找
   const hits = (l) => defs.some((m) => (m.type === l.type || (m.type === 'textanim' && l.type === 'text')) && m.id === l.component);
@@ -660,11 +799,11 @@ function renderWorkshop(body, q) {
   const tabs = el('div', { class: 'st-seg', role: 'tablist', 'aria-label': '工坊' }, ...[['browse', '工坊里的全部'], ['mine', '我的组件库']].map(([k, t]) =>
     el('button', { type: 'button', role: 'tab', 'aria-selected': String(S.wsTab === k), 'data-ax': `workshop-tab:${k}`, onclick: () => { S.wsTab = k; renderDrawer(); } }, t)));
   if (S.wsTab === 'mine') { fill(body, tabs, ...renderLibrary(q)); return; }
-  const kinds = ['all', 'fav', 'added', 'scene', 'motion', 'fx', 'textanim', 'face', 'prop', 'wear', 'skin'];
+  const kinds = ['all', 'fav', 'added', 'scene', 'model', 'motion', 'fx', 'textanim', 'face', 'prop', 'wear', 'skin'];
   const label = { all: '全部', fav: '收藏', added: '已添加', ...KIND };
   const filters = el('div', { class: 'chips st-filters', role: 'group', 'aria-label': '分类' }, ...kinds.map((k) =>
     el('button', { class: 'chip small', type: 'button', 'aria-pressed': String(S.wsFilter === k), 'data-ax': `workshop-filter:${k}`, onclick: () => { S.wsFilter = k; renderDrawer(); } }, k === 'fav' ? icon('star', 'tiny') : null, label[k])));
-  const listBox = el('div', { class: 'st-wslist', role: 'list' }, el('p', { class: 'st-note', text: '加载中…' }));
+  const listBox = el('div', { class: 'st-wslist', 'aria-busy': 'true' }, ...Array.from({ length: 4 }, () => el('div', { class: 'st-wscard skeleton', 'aria-hidden': 'true' }, el('i'), el('b'), el('span'))));
   fill(body, tabs, filters, listBox);
   loadRepo().then((repo) => {
     if (S.drawer !== 'workshop' || S.wsTab !== 'browse') return;
@@ -673,30 +812,41 @@ function renderWorkshop(body, q) {
       && (f === 'all' || (f === 'fav' ? lib.isFav(favKey(c.type, c.id)) : f === 'added' ? lib.has(repoOrigin(c)) : c.type === f))
       && (!S.favOnly || lib.isFav(favKey(c.type, c.id))));
     S.drawerCount.textContent = `${items.length} / ${repo.length} 个`;
-    fill(listBox, ...items.map(wsCard), items.length ? null : el('p', { class: 'st-empty', text: repo.length ? '没有符合条件的。' : '工坊里还没有组件。' }),
-      el('p', { class: 'st-note' }, '工坊就是仓库里的 workshop/components 文件夹，大家用 PR 往里加。自己写的组件在代码面板里「提交到工坊」就能开 PR。'));
-  }).catch(() => fill(listBox, el('p', { class: 'st-empty', text: '工坊没加载出来，过会儿再试。' }), btn('重试', '重新加载', () => { S.repo = null; renderDrawer(); }, { cls: 'small', ax: 'retry' })));
+    listBox.removeAttribute('aria-busy');
+    fill(listBox, items.length ? el('div', { class: 'st-wslist', role: 'list', 'aria-label': '工坊里的组件和模型' }, ...items.map(wsCard)) : el('p', { class: 'st-empty', text: repo.length ? '没有符合条件的。' : '工坊里还没有组件。' }),
+      el('p', { class: 'st-note' }, '工坊就是仓库里的 workshop/components（组件）和 workshop/models（模型）文件夹，大家用 PR 往里加。自己写的组件在代码面板里「提交到工坊」就能开 PR。'));
+  }).catch(() => { listBox.removeAttribute('aria-busy'); fill(listBox, el('p', { class: 'st-empty', text: '工坊没加载出来，过会儿再试。' }), btn('重试', '重新加载', () => { S.repo = null; renderDrawer(); }, { cls: 'small', ax: 'retry' })); });
 }
 
 function wsCard(c) {
-  const added = lib.has(repoOrigin(c)), kind = KIND[c.type] || c.type;
-  return el('article', { class: `st-wscard ${added ? 'added' : ''}`, role: 'listitem', 'data-ax': 'workshop-item', 'data-type': c.type, 'data-id': c.id, 'data-file': c.file, 'aria-label': `${kind}：${c.name}` },
+  const added = lib.has(repoOrigin(c)), kind = KIND[c.type] || c.type, model = c.type === 'model';
+  const use = model ? (e) => chooseModel(c.id, e.currentTarget) : () => useFromLibrary(lib.get(repoOrigin(c)));
+  return el('article', { class: `st-wscard ${added ? 'added' : ''} ${added && S.justAdded === repoOrigin(c) ? 'just' : ''}`, role: 'listitem', 'data-ax': 'workshop-item', 'data-type': c.type, 'data-id': c.id, 'data-file': c.file, 'aria-label': `${kind}：${c.name}` },
     el('div', { class: 'st-wshead' },
       el('i', { class: `st-wsico t-${c.type}` }, icon(TYPE_ICON[c.type] || 'fx')),
-      el('div', { class: 'st-wstitle' }, el('b', { text: c.name }), el('small', { text: [kind, c.author && `by ${c.author}`, c.version && `v${c.version}`].filter(Boolean).join(' · ') })),
+      el('div', { class: 'st-wstitle' }, el('b', { text: c.name }), el('small', { text: [kind, c.author && `by ${c.author}`, c.version && `v${c.version}`, c.kb && `${c.kb} KB`].filter(Boolean).join(' · ') })),
       star(favKey(c.type, c.id), c.name)),
     c.description ? el('p', { class: 'st-wsdesc', text: c.description }) : null,
     el('div', { class: 'st-row' }, added
-      ? [btn('用上', '用到当前工程里', () => useFromLibrary(lib.get(repoOrigin(c))), { cls: 'small primary', ico: 'check', ax: 'workshop-use' }),
-        btn('删除', '从这台设备的组件库里删掉', () => deleteFromLibrary(repoOrigin(c)), { cls: 'small danger', ico: 'trash', ax: 'workshop-remove' })]
-      : [btn('添加', '下载到这台设备的组件库', () => addFromRepo(c).catch(() => {}), { cls: 'small primary', ico: 'download', ax: 'workshop-add' }),
-        btn('添加并用上', '下载并马上用到当前工程', () => addFromRepo(c, true).catch(() => {}), { cls: 'small', ico: 'plus', ax: 'workshop-add-use' })]));
+      ? [btn(model ? '换上' : '用上', model ? '换成这个模型' : '用到当前工程里', use, { cls: 'small primary', ico: 'check', ax: 'workshop-use' }),
+        btn('删除', '从这台设备的库里删掉', (e) => busy(e.currentTarget, deleteFromLibrary(repoOrigin(c))), { cls: 'small danger', ico: 'trash', ax: 'workshop-remove' })]
+      : [btn('添加', '下载到这台设备的库', (e) => busy(e.currentTarget, addFromRepo(c)).catch(() => {}), { cls: 'small primary', ico: 'download', ax: 'workshop-add' }),
+        btn(model ? '添加并换上' : '添加并用上', '下载并马上用到当前工程', (e) => busy(e.currentTarget, addFromRepo(c, true)).catch(() => {}), { cls: 'small', ico: 'plus', ax: 'workshop-add-use' })]));
 }
 
 function renderLibrary(q) {
   const st = S.store;
-  const items = lib.list().filter((e) => !q || `${e.name} ${e.id} ${e.origin}`.toLowerCase().includes(q)).filter((e) => !S.favOnly || lib.isFav(favKey(e.type, e.id)));
-  S.drawerCount.textContent = `${items.length} 个`;
+  const items = libComponents().filter((e) => !q || `${e.name} ${e.id} ${e.origin}`.toLowerCase().includes(q)).filter((e) => !S.favOnly || lib.isFav(favKey(e.type, e.id)));
+  const assets = [...libModels(), ...libFonts()].filter((e) => !q || `${e.name} ${e.id}`.toLowerCase().includes(q));
+  S.drawerCount.textContent = `${items.length + assets.length} 个`;
+  const assetRow = (e) => el('div', { class: 'st-libitem', 'data-ax': 'library-item', 'data-origin': e.origin, 'data-type': e.kind, 'data-id': e.id },
+    el('div', { class: 'st-wshead' },
+      el('i', { class: `st-wsico t-${e.kind}` }, icon(e.kind === 'model' ? 'model' : 'text')),
+      el('div', { class: 'st-wstitle' }, el('b', { text: e.name || e.id, style: e.kind === 'font' ? `font-family:${fontCssOf(e.id)}` : null }), el('small', { text: [e.kind === 'model' ? '模型' : '字体', e.from === 'repo' ? '工坊下载' : '从文件载入', e.kb && `${e.kb} KB`].filter(Boolean).join(' · ') }))),
+    el('div', { class: 'st-row' },
+      e.kind === 'model' ? btn('换上', '换成这个模型', (ev) => chooseModel(e.id, ev.currentTarget), { cls: 'small primary', ico: 'check', ax: 'library-use' })
+        : btn('用上', '用到选中的文字', () => applyFont(e.id), { cls: 'small primary', ico: 'check', ax: 'library-use' }),
+      btn('删除', '从这台设备上彻底删掉', () => deleteFromLibrary(e.origin), { cls: 'small danger', ico: 'trash', ax: 'library-remove', hideLabel: true })));
   const newSel = el('select', { class: 'select', 'aria-label': '新建组件', 'data-ax': 'new-component', onchange: (e) => { if (e.target.value) newComponent(e.target.value); e.target.value = ''; } },
     el('option', { value: '', text: '＋ 新建组件…' }), ...Object.keys(TEMPLATES).map((t) => el('option', { value: t, text: `新建${ZH[t]}` })));
   const byKind = new Map();
@@ -720,6 +870,7 @@ function renderLibrary(q) {
     el('p', { class: 'st-note', text: '这里是存在这台设备浏览器里的组件：从工坊下载的、自己写的、从文件载入的。下载的动作 / 特效 / 文字动画会出现在对应的那一类里；整帧的场景组件（比如水龙卷）在这里点「用上」。' }),
     ...[...byKind.keys()].sort((a, b) => order.indexOf(a) - order.indexOf(b)).flatMap((k) => [el('h4', { text: `${KIND[k] || '其他'}（${byKind.get(k).length}）` }), el('div', { class: 'st-wslist' }, ...byKind.get(k).map(row))]),
     items.length ? null : el('p', { class: 'st-empty', text: S.favOnly ? '组件库里没有收藏的。' : '组件库是空的：去「工坊里的全部」添加，或者新建一个。' }),
+    assets.length && !S.favOnly ? [el('h4', { text: `模型和字体（${assets.length}）` }), el('div', { class: 'st-wslist' }, ...assets.map(assetRow))] : null,
     inProject.length ? [el('h4', { text: '这个工程自带、但不在组件库里的代码' }), el('ul', { class: 'st-list' }, ...inProject)] : null,
   ];
 }
@@ -858,6 +1009,7 @@ function renderInspector() {
     const inp = el('input', { class: 'input st-textinput', value: l.text, maxlength: 24 });
     inp.addEventListener('input', () => set((x) => { x.text = inp.value; }, 'text'));
     kids.push(group('文字', inp, el('p', { class: 'st-note', text: '「/」手动换行。' }), styleRow(),
+      el('div', { class: 'st-field' }, el('span', { text: '字体' }), fontRow()),
       el('label', { class: 'st-field' }, el('span', { text: '动画' }), comp),
       control({ label: '上下位置', min: 0, max: 512, type: 'int' }, l.y, (v) => set((x) => { x.y = v; }, 'y'), 'y'),
       control({ label: '左右位置', min: -256, max: 256, type: 'int' }, l.x, (v) => set((x) => { x.x = v; }, 'x'), 'x'),
@@ -1048,18 +1200,21 @@ function saveProjectFile() {
   const p = S.store.p;
   download(new Blob([JSON.stringify(p, null, 1)], { type: 'application/json' }), `${p.name || '美西螈'}.axo.json`);
 }
-function pickFile(accept = '.js,.json,.axo,.glb,.gltf,application/json,text/javascript') {
+function pickFile(accept = '.js,.json,.axo,.glb,.gltf,.ttf,.otf,.woff,.woff2,application/json,text/javascript') {
   const i = el('input', { type: 'file', accept, multiple: true });
   i.addEventListener('change', () => { for (const f of i.files) importFile(f); });
   i.click();
 }
 async function importFile(f) {
+  if (/\.(ttf|otf|woff2?)$/i.test(f.name)) { await importFont(f); return; }
   if (/\.(glb|gltf)$/i.test(f.name)) {
     if (f.size > 4 << 20) { toast(`${f.name} 太大了（模型上限 4 MB）`); return; }
-    const id = `file:${f.name}`, bytes = await f.arrayBuffer(), my = ++modelPick;
+    const id = `file:${f.name}`.slice(0, 80), bytes = await f.arrayBuffer(), my = ++modelPick;
     const r = await S.runner.request({ type: 'model', id, bytes: bytes.slice(0) }).catch((e) => ({ ok: false, message: e.message }));
     if (!r.ok) { toast(`模型没读出来：${r.message}`); return; }
-    S.models.set(id, { name: f.name, bytes, info: `${r.quads} 个面片 · 骨骼 ${r.bones.join(' ') || '无'}` });
+    const info = `${r.quads} 个面片 · 骨骼 ${r.bones.join(' ') || '无'}`;
+    S.models.set(id, { name: f.name, bytes, info });
+    await lib.put({ origin: id, kind: 'model', type: 'model', id, name: f.name.replace(/\.(glb|gltf)$/i, ''), bytes, face: false, from: 'file', info, kb: Math.round(f.size / 1024) });   // 存进库：刷新页面也还在
     if (my !== modelPick) return;                                // 载入期间又选了别的模型：以后选的为准
     S.store.change((p) => { p.model = { component: id, face: false }; });
     openDrawer('model');
@@ -1082,7 +1237,7 @@ async function importFile(f) {
     toast(`载入并用上了「${n ? n[1] : f.name}」（也存进了「我的组件」）`);
     return;
   }
-  toast(`不认识 ${f.name}：能拖进来的是 .axo.json 工程、.axo.js 组件、.glb / .gltf 模型`);
+  toast(`不认识 ${f.name}：能拖进来的是 .axo.json 工程、.axo.js 组件、.glb / .gltf 模型、.ttf / .otf / .woff2 字体`);
 }
 
 async function encodeShare(p) {
@@ -1111,10 +1266,51 @@ async function decodeShare(code) {
   }
   return normalizeProject(JSON.parse(new TextDecoder().decode(out)));
 }
+const siteUrl = () => `${location.origin}${location.pathname}`;
+// 只在这台设备上的东西（导入的字体、载入的模型文件）：别人打开链接时会换成默认的
+function localOnly(p) {
+  const out = [];
+  if (p.model.component.startsWith('file:')) out.push(`模型「${p.model.component.slice(5)}」`);
+  for (const id of new Set(p.layers.filter((l) => l.type === 'text' && l.font?.startsWith('font:')).map((l) => l.font))) out.push(`字体「${fontName(id)}」`);
+  return out;
+}
+async function copyText(text, input) {
+  try { await navigator.clipboard.writeText(text); return true; } catch { input?.select(); return false; }   // 复制不了（没权限）：选中输入框，自己按 Ctrl+C
+}
 async function shareLink() {
-  const code = await encodeShare(S.store.p);
-  const url = `${location.origin}${location.pathname}#/editor?s=${code}`;
-  try { await navigator.clipboard.writeText(url); toast(url.length > 6000 ? '链接复制好了（有点长，有的聊天软件会截断）' : '链接复制好了'); } catch { dialog('分享链接', [el('p', { text: '复制下面这个链接：' }), el('input', { class: 'input', value: url, readonly: true, 'aria-label': '分享链接', 'data-ax': 'share-url' })], []); }
+  const p = S.store.p, code = await encodeShare(p), long = `${siteUrl()}#/editor?s=${code}`;
+  const field = (value, ax, label) => el('input', { class: 'input st-linkin', value, readonly: true, 'aria-label': label, 'data-ax': ax, onfocus: (e) => e.target.select() });
+  const longIn = field(long, 'share-url', '完整链接');
+  const copyBtn = (input, what) => btn('复制', `复制${what}`, async (e) => { const ok = await copyText(input.value, input); const b = e.currentTarget; b.classList.add('is-done'); setTimeout(() => b.classList.remove('is-done'), 900); toast(ok ? `${what}复制好了` : '没能自动复制：已经选中了，按 Ctrl+C'); }, { cls: 'small', ico: 'copy', ax: `copy-${input.dataset.ax}` });
+  const shortBox = el('div', { class: 'st-shortbox', 'data-ax': 'share-short' });
+  const makeShort = async (b) => {
+    let made;
+    try { made = await busy(b, createShort(code)); } catch (e) { toast(`短链接没生成：${e.message}`); return; }
+    const url = `${siteUrl()}#/e/${made.key}`, shortIn = field(url, 'share-short-url', '1 分钟短链接');
+    const left = el('b', { class: 'st-countdown', 'data-ax': 'share-short-left' }), bar = el('i');
+    fill(shortBox, el('div', { class: 'st-linkrow' }, shortIn, copyBtn(shortIn, '短链接')),
+      el('div', { class: 'st-ttl' }, el('span', { class: 'st-ttlbar' }, bar), left));
+    copyText(url, shortIn).then((ok) => ok && toast('短链接复制好了：1 分钟内发给对方'));
+    const tick = () => {
+      const s = Math.max(0, Math.ceil((made.expires - Date.now()) / 1000));
+      left.textContent = s ? `还剩 ${s} 秒` : '已经失效了';
+      bar.style.transform = `scaleX(${s / SHORT_TTL})`;
+      if (s) return;
+      clearInterval(timer); shortIn.disabled = true; shortBox.classList.add('expired'); dropShort(made);
+      shortBox.append(btn('再生成一个', '再生成一个 1 分钟短链接', (e) => makeShort(e.currentTarget), { cls: 'small', ico: 'share', ax: 'share-short-again' }));
+    };
+    const timer = setInterval(tick, 250); tick();
+  };
+  fill(shortBox, btn('生成 1 分钟短链接', '短链接 1 分钟后失效', (e) => makeShort(e.currentTarget), { cls: 'small primary', ico: 'share', ax: 'share-make-short' }));
+  const local = localOnly(p);
+  dialog('分享工程', [
+    el('h4', { text: '完整链接（一直有效）' }),
+    el('div', { class: 'st-linkrow' }, longIn, copyBtn(longIn, '完整链接')),
+    el('p', { class: 'st-note', text: `${long.length.toLocaleString()} 个字符：工程整个装在链接里，不经过任何服务器。${long.length > 6000 ? '有点长，有的聊天软件会截断，那就用短链接。' : ''}` }),
+    el('h4', { text: '短链接（1 分钟内有效）' }), shortBox,
+    el('p', { class: 'st-note', text: '工程先在你的浏览器里加密，再交给公开的中转站 ntfy.sh 存一下（它只看得到乱码，密钥只在链接里）。1 分钟后链接就打不开了，到时间这个页面还开着的话也会请中转站删掉。' }),
+    local.length ? el('p', { class: 'st-warn', text: `${local.join('、')} 只在你这台设备上：别人打开时会换成默认的。` }) : null,
+  ], []);
 }
 
 // 发布前先按工坊机器人的规矩查一遍（和 workshop/tools/workshop.py 的 validate_project 一致），免得提交了才被打回来
@@ -1132,7 +1328,8 @@ function preflight(p, json) {
   }
   if (p.layers.length > PUB.layers) out.push(`图层最多 ${PUB.layers} 个`);
   if (p.frames > PUB.frames) out.push(`工坊最多 ${PUB.frames} 帧，现在是 ${p.frames} 帧（右边「工程设置」里改）`);
-  if (!['axolotl', 'logo'].includes(p.model.component)) out.push('自己载入的模型只在你的浏览器里，发不上去：先在「模型」里换回网站自带的');
+  if (p.model.component !== 'axolotl' && !(S.repo || []).some((c) => c.type === 'model' && c.id === p.model.component) && p.model.component !== 'logo') out.push('自己载入的模型只在你的浏览器里，发不上去：先在「模型」里换成原版或工坊里的模型');
+  for (const l of texts) if (l.font && l.font !== 'axo') { out.push(`「${l.text}」用的字体是「${fontName(l.font)}」：工坊出图只认「Axo 黑体」（在「文字 · 字体」里换回来）`); break; }
   if (p.components.length > PUB.components) out.push(`工程最多带 ${PUB.components} 段组件代码，现在有 ${p.components.length} 段`);
   for (const c of p.components) if (size(c.source) > PUB.component) out.push(`组件代码「${c.origin}」超过 ${PUB.component / 1000} KB`);
   if (size(json) > PUB.bytes) out.push(`工程太大了（${Math.round(size(json) / 1000)} KB，最多 ${PUB.bytes / 1000} KB）`);
@@ -1140,23 +1337,70 @@ function preflight(p, json) {
   return out;
 }
 
-function publish() {
-  const p = S.store.p, json = JSON.stringify(p), problems = preflight(p, json);
-  if (problems.length) {
-    dialog('还不能发布', [el('p', { text: '工坊机器人会按这些规矩检查，先改一下：' }), el('ul', {}, ...problems.map((t) => el('li', { text: t })))], []);
-    return;
-  }
-  const title = `[工坊] ${p.layers.find((l) => l.type === 'text')?.text || p.name || '美西螈'}`;
-  const base = `https://github.com/${REPO}/issues/new?template=workshop.yml&title=${encodeURIComponent(title)}`;
-  const url = `${base}&project=${encodeURIComponent(json)}`;
-  dialog('发布到工坊', [
-    el('p', { text: '会打开 GitHub 的发布表单（要登录 GitHub）。提交之后，GitHub Actions 在隔离的环境里用同一个引擎重新出图，几分钟后出现在「工坊作品」。别人给 issue 点 👍 就是点赞。' }),
-    p.components.length ? el('p', { class: 'st-note', text: `这个工程带了 ${p.components.length} 段组件代码，会一起发上去（出图时在沙盒里跑，维护者也会看）。` }) : null,
-    url.length > 6000 ? el('p', { class: 'st-warn', text: '工程有点大，放不进链接：点下面的按钮会先把工程复制到剪贴板，打开表单后粘贴到「工程」那一栏。' }) : null,
-  ], [['打开 GitHub 发布表单', async () => {
-    if (url.length > 6000) { try { await navigator.clipboard.writeText(json); toast('工程已复制，粘贴到表单的「工程」栏'); } catch { /* 用户自己复制 */ } window.open(base, '_blank', 'noopener'); }
-    else window.open(url, '_blank', 'noopener');
-  }, 'primary']]);
+// 投稿链接：GitHub 的 issue 表单能用网址参数预先填好（标题、说明、工程）；授权的复选框填不了，要在 GitHub 上勾
+const ISSUE_URL_MAX = 7500;
+function publishUrl(p, { title, description = '' }) {
+  const json = JSON.stringify(p);
+  const base = `https://github.com/${REPO}/issues/new?template=workshop.yml&title=${encodeURIComponent(`[工坊] ${title}`)}${description ? `&description=${encodeURIComponent(description)}` : ''}`;
+  const full = `${base}&project=${encodeURIComponent(json)}`;
+  return { url: full.length <= ISSUE_URL_MAX ? full : base, fits: full.length <= ISSUE_URL_MAX, json, problems: preflight(p, json) };
+}
+const defaultTitle = (p) => (p.layers.find((l) => l.type === 'text' && l.text && !l.hidden)?.text || p.name || '美西螈').replace(/\//g, ' ').trim();
+
+// 发布到工坊：在这个页面里写好标题、说明，看一眼预览和检查结果；「确定投稿」打开已经填好的 GitHub 表单
+async function publish() {
+  const p = S.store.p;
+  await loadRepo().catch(() => {});                            // 检查模型能不能发布要用工坊清单
+  const titleIn = el('input', { class: 'input', value: defaultTitle(p), maxlength: 40, 'aria-label': '标题', 'data-ax': 'publish-title' });
+  const descIn = el('textarea', { class: 'input', rows: 2, maxlength: 140, placeholder: '可选：一句话介绍这张表情（显示在作品详情里）', 'aria-label': '说明', 'data-ax': 'publish-desc' });
+  const agree = el('input', { type: 'checkbox', 'data-ax': 'publish-agree' });
+  const checks = el('ul', { class: 'st-checks', 'data-ax': 'publish-checks', 'aria-live': 'polite' });
+  const prev = el('figure', { class: 'st-pubprev', 'aria-busy': 'true' }, el('div', { class: 'st-loading' }, spinner(), el('span', { text: '出一张预览…' })));
+  const count = el('small', { class: 'st-count' });
+  let previewOk = null, d;
+  const refresh = () => {
+    const title = titleIn.value.trim(), info = publishUrl(p, { title: title || defaultTitle(p), description: descIn.value.trim() });
+    const items = [
+      ...info.problems.map((t) => [false, t]),
+      ...(info.problems.length ? [] : [[true, `工程 ${Math.round(new Blob([info.json]).size / 1000)} KB · ${p.frames} 帧 · ${p.layers.length} 个图层${p.components.length ? ` · 带 ${p.components.length} 段组件代码（出图时在沙盒里跑，维护者也会看）` : ''}`]]),
+      previewOk === false ? [false, '预览出图时组件报错了：工坊出图有报错就不会发布'] : null,
+      agree.checked ? null : [false, '还没勾下面的「同意按 GPL-3.0-only 发布」（到 GitHub 上还要再勾一次）'],
+    ].filter(Boolean);
+    fill(checks, ...items.map(([ok, t]) => el('li', { class: ok ? 'ok' : 'bad' }, icon(ok ? 'check' : 'warn', 'tiny'), el('span', { text: t }))));
+    count.textContent = `${[...titleIn.value].length} / 40`;
+    const go = d?.querySelector('[data-ax="publish-go"]');
+    if (go) go.disabled = !!info.problems.length || previewOk === false || !agree.checked || !title;
+    return info;
+  };
+  for (const x of [titleIn, descIn]) x.addEventListener('input', refresh);
+  agree.addEventListener('change', refresh);
+  d = dialog('发布到工坊', [
+    el('div', { class: 'st-pub' }, prev,
+      el('div', { class: 'st-pubform' },
+        el('label', { class: 'st-field' }, el('span', {}, '标题 ', count), titleIn),
+        el('label', { class: 'st-field' }, el('span', { text: '说明' }), descIn),
+        el('h4', { text: '检查' }), checks,
+        el('label', { class: 'st-field check' }, agree, el('span', { text: '我同意这张表情（包括工程里带的组件代码）按 GPL-3.0-only 发布' })))),
+    el('p', { class: 'st-note', text: '「确定投稿」会打开填好的 GitHub 发布表单（要登录 GitHub），在那边勾上「授权」点 Create 就行。提交后 GitHub Actions 在断网的容器里用同一个引擎重新出图，几分钟后出现在「工坊作品」，别人给 issue 点 👍 就是点赞。' }),
+  ], [
+    ['确定投稿', async () => {
+      const info = refresh();
+      if (!info.fits) { await copyText(info.json); toast('工程太大放不进链接：已经复制好了，粘贴到表单的「工程」那一栏'); }
+      window.open(info.url, '_blank', 'noopener');
+      return true;
+    }, 'primary', 'publish-go'],
+    ['复制工程', async () => { toast(await copyText(JSON.stringify(p)) ? '工程 JSON 复制好了' : '没能复制'); return true; }, '', 'publish-copy'],
+  ], { closeLabel: '取消' });
+  refresh();
+  try {                                                         // 预览：和工坊出图一样从第一帧开始，小一点、快一点
+    const r = await S.runner.request({ type: 'export', format: 'gif', size: 200, colors: 64, maxKb: 400 });
+    previewOk = !(r.errors || []).length;
+    const url = URL.createObjectURL(new Blob([r.bytes], { type: r.mime }));
+    fill(prev, el('img', { src: url, alt: '投稿预览', width: 200, height: 200 }), el('figcaption', { text: previewOk ? '预览（工坊会按 400px 重新出图）' : '预览里组件报错了' }));
+    d.addEventListener('close', () => URL.revokeObjectURL(url));
+  } catch (e) { fill(prev, el('p', { class: 'st-warn', text: `预览没出来：${e.message}` })); }
+  prev.removeAttribute('aria-busy');
+  refresh();
 }
 
 function proposeComponent(src, id) {
@@ -1256,16 +1500,16 @@ function showKeys() {
 const LAYER_TYPES = ['motion', 'face', 'prop', 'wear', 'fx', 'text', 'scene'];
 function installApi() {
   const st = S.store;
-  const layerInfo = (l) => ({ id: l.id, type: l.type, component: l.component, ...(l.type === 'text' ? { text: l.text, style: l.style } : {}), start: l.start, end: l.end, strength: l.strength, hidden: !!l.hidden, params: l.params || {} });
+  const layerInfo = (l) => ({ id: l.id, type: l.type, component: l.component, ...(l.type === 'text' ? { text: l.text, style: l.style, font: l.font || 'axo' } : {}), start: l.start, end: l.end, strength: l.strength, hidden: !!l.hidden, params: l.params || {} });
   const metaInfo = (m) => ({ type: m.type, id: m.id, name: m.name, origin: m.origin, favorite: lib.isFav(favKey(m.type, m.id)), params: m.params || {}, description: m.description || '' });
   // 预览沙盒启动、并且第一个工程建好（收到 scene）才算好；沙盒没起来 / 工程建失败就报错，别让调用的一直等
   const ready = () => new Promise((res, rej) => {
     if (S.sceneReady) { res(api); return; }
-    if (S.root.dataset.state === 'error') { rej(new Error('预览沙盒没能启动（可能被浏览器扩展拦下了）')); return; }
+    if (S.root.dataset.state === 'error') { rej(new Error('预览沙盒没能启动（看预览区的说明，可以点「重试」）')); return; }
     const offs = [];
     const done = () => offs.forEach((f) => f());
     offs.push(S.runner.on('scene', () => { done(); res(api); }));
-    offs.push(S.runner.on('boot-failed', () => { done(); rej(new Error('预览沙盒没能启动（可能被浏览器扩展拦下了）')); }));
+    offs.push(S.runner.on('boot-failed', (m) => setTimeout(() => { if (S.root.dataset.state === 'error') { done(); rej(new Error(`预览沙盒没能启动：${m?.reason || '没有回应'}`)); } })));   // 第一次失败编辑器会自己重试，真放弃了才算
     offs.push(S.runner.on('fatal', (m) => { if (!S.sceneReady) { done(); rej(new Error(`工程没建起来：${m.message}`)); } }));
   });
   const findRepo = async (key) => (await loadRepo()).find((c) => c.file === key || c.id === key || repoOrigin(c) === key);
@@ -1276,7 +1520,9 @@ function installApi() {
       'axo.catalog(类型?) → 能用的组件（motion face fx textanim prop wear skin scene）', 'axo.use(类型, id, { add }) → 换上 / 叠一层',
       'axo.layers.list() / add(类型, 组件, 属性) / update(id, 改动) / remove(id) / select(id) / move(id, ±1)', 'axo.text(文字, 图层id?) → 改字',
       'axo.workshop.list() / add(id 或文件名, { use }) / remove(origin) / library()', 'axo.favorites.list() / toggle(\'类型:id\', 开关?)',
-      'axo.play() / pause() / seek(帧)', 'axo.export({ format: \'gif\'|\'png-zip\'|\'png\', size, colors, maxKb }) → { url, kb, mime, blob }', 'axo.share() → 分享链接',
+      'axo.models.list() / use(id) → 模型（原版、工坊里下载的、载入的文件）', 'axo.fonts.list() / use(字体id, { all, layer })',
+      'axo.play() / pause() / seek(帧)', 'axo.export({ format: \'gif\'|\'png-zip\'|\'png\', size, colors, maxKb }) → { url, kb, mime, blob }',
+      'axo.share({ short }) → { long, short?, expires? }（short: true 生成 1 分钟短链接）', 'axo.publishUrl({ title, description }) → { url, problems }（不打开，只给链接）',
       'axo.open(\'motion\'|\'workshop\'|…) 打开素材栏；axo.dock(\'timeline\'|\'code\')', '说明：llms.txt',
     ].join('\n'),
     ready,
@@ -1315,7 +1561,19 @@ function installApi() {
       list: async () => (await loadRepo()).map((c) => ({ ...c, kind: KIND[c.type] || c.type, added: lib.has(repoOrigin(c)), origin: repoOrigin(c), favorite: lib.isFav(favKey(c.type, c.id)) })),
       add: async (key, { use = false } = {}) => { const c = await findRepo(key); if (!c) throw new Error(`工坊里没有 ${key}`); await addFromRepo(c, use); return repoOrigin(c); },
       remove: async (key) => { const c = lib.has(key) ? null : await findRepo(key); return deleteFromLibrary(c ? repoOrigin(c) : key, { confirmFirst: false }); },
-      library: () => lib.list().map(({ source, ...e }) => ({ ...e, bytes: source.length })),
+      library: () => lib.list().map(({ source, bytes, ...e }) => ({ ...e, kind: e.kind || 'component', bytes: source ? source.length : bytes?.byteLength || 0 })),
+    },
+    models: {
+      list: () => [{ id: 'axolotl', name: '原版体素', from: 'builtin' }, ...libModels().map((e) => ({ id: e.id, name: e.name, from: e.from }))].map((m) => ({ ...m, current: st.p.model.component === m.id })),
+      use: async (id) => { if (!await chooseModel(id)) throw new Error(`模型 ${id} 没换上（库里没有？先 axo.workshop.add('${id}')）`); return api.project.summary(); },
+    },
+    fonts: {
+      list: () => [...FONT_LIST.map((f) => ({ id: f.id, name: f.name, note: f.desc })), ...libFonts().map((e) => ({ id: e.id, name: e.name, note: '导入的' }))],
+      use: (id, { all = false, layer = null } = {}) => {
+        if (!FONT_LIST.some((f) => f.id === id) && !libFonts().some((e) => e.id === id)) throw new Error(`没有字体 ${id}（axo.fonts.list() 看能用的）`);
+        if (layer) { if (!st.change((p) => { const l = p.layers.find((x) => x.id === layer && x.type === 'text'); if (!l) throw Object.assign(new Error(`没有文字图层 ${layer}`), { userFacing: true }); l.font = id; })) throw new Error(`没有文字图层 ${layer}`); } else applyFont(id, all);
+        return api.layers.list().filter((l) => l.type === 'text');
+      },
     },
     favorites: { list: () => lib.favList(), toggle: (key, on) => lib.toggleFav(key, on) },
     play: () => { setPlaying(true); return true; }, pause: () => { setPlaying(false); return true; }, seek: (f) => { seek(f); return S.frame; },
@@ -1324,7 +1582,12 @@ function installApi() {
       const blob = new Blob([r.bytes], { type: r.mime });
       return { blob, url: URL.createObjectURL(blob), kb: Math.round(blob.size / 1024), mime: r.mime };
     },
-    share: async () => `${location.origin}${location.pathname}#/editor?s=${await encodeShare(st.p)}`,
+    share: async ({ short = false } = {}) => {
+      const code = await encodeShare(st.p), out = { long: `${siteUrl()}#/editor?s=${code}` };
+      if (short) { const m = await createShort(code); Object.assign(out, { short: `${siteUrl()}#/e/${m.key}`, expires: new Date(m.expires).toISOString() }); setTimeout(() => dropShort(m), m.expires - Date.now()); }
+      return out;
+    },
+    publishUrl: async ({ title, description = '' } = {}) => { await loadRepo().catch(() => {}); const { url, fits, problems } = publishUrl(st.p, { title: title || defaultTitle(st.p), description }); return { url, fits, problems, note: fits ? '打开这个链接，在 GitHub 上勾「授权」再提交' : '工程放不进链接：打开后把 axo.project.get() 的 JSON 粘贴到「工程」栏' }; },
     open: (k) => { openDrawer(k); return k; }, dock: (d) => { setDock(d); return d; },
   };
   window.axo = Object.assign(window.axo || {}, api, { studio: ready });

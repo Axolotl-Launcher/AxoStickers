@@ -54,6 +54,13 @@ def extract(body):
     r = parse(body, PROJECT_MAX, '工程')         # 没有小标题：整段就是 JSON
     return ('project' if 'layers' in r else 'recipe'), r
 
+def description(body):
+    """「### 说明」那一段（可选）：一两句话，只当纯文本显示。GitHub 表单没填时写的是 _No response_。"""
+    t = section(body or '', '说明')
+    t = re.sub(r'\s+', ' ', unicodedata.normalize('NFC', t or '')).strip()
+    t = ''.join(c for c in t if unicodedata.category(c)[0] != 'C')
+    return '' if t in ('', '_No response_') else t[:140]
+
 def consented(body):
     """「### 授权」那一段里的复选框勾上了没有（表单里是必填，但 API 建的 / 改过正文的 issue 绕得过去）。"""
     m = re.search(r'###\s*授权\s*\n(.*?)(?=\n###\s|\Z)', body or '', re.S)
@@ -121,8 +128,18 @@ PROJECT_MAX = 60000              # 整个工程 JSON 的字节数
 LIM = dict(components=8, component=40000, layers=40, texts=4, text=16, frames=96)
 TOP = {'v', 'name', 'size', 'fps', 'frames', 'seed', 'background', 'camera', 'water', 'idle', 'skin', 'model', 'components', 'layers'}
 LAYER_TYPES = {'motion', 'face', 'prop', 'wear', 'fx', 'text', 'scene'}
-LAYER_KEYS = {'id', 'type', 'component', 'params', 'start', 'end', 'strength', 'hidden', 'text', 'style', 'x', 'y', 'scale', 'face', 'blink'}
-MODELS = {'axolotl': '美西螈', 'logo': 'Logo 版'}
+LAYER_KEYS = {'id', 'type', 'component', 'params', 'start', 'end', 'strength', 'hidden', 'text', 'style', 'font', 'x', 'y', 'scale', 'face', 'blink'}
+
+def models():
+    """能发布的模型：内置的美西螈 + workshop/models/*.json（工坊里的模型，出图时从 dist/models/ 递进沙盒）。"""
+    out, d = {'axolotl': '美西螈'}, os.path.join(WS, 'models')
+    for name in sorted(os.listdir(d)) if os.path.isdir(d) else []:
+        if not name.endswith('.json'): continue
+        try: m = json.load(open(os.path.join(d, name), encoding='utf-8'))
+        except (OSError, ValueError): continue
+        if isinstance(m, dict) and isinstance(m.get('id'), str) and re.fullmatch(r'[a-z0-9][a-z0-9_-]{0,47}', m['id']): out[m['id']] = str(m.get('name') or m['id'])[:40]
+    return out
+MODELS = models()
 ID_RE = re.compile(r'[A-Za-z0-9_.:\-]{1,80}')
 LAYER_TEXT_RE = re.compile('[%s/ ]*' % CATALOG['text']['chars'])
 SIZE = 400                       # 工坊统一按 400px 出图
@@ -201,6 +218,8 @@ def validate_project(p):
         for k in ('hidden', 'blink'):
             if k in l: q[k] = bool(l[k])
         if t == 'text':
+            if l.get('font') not in (None, 'axo'):
+                errs.append(f'{where}的字体是 {show(l.get("font"))}：工坊出图只认默认的「Axo 黑体」（系统字体每台设备不一样，导入的字体只在你的浏览器里），在「字体」里换回来')
             text = unicodedata.normalize('NFC', str(l.get('text', ''))).strip()
             n = len(text.replace('/', '').replace(' ', ''))
             if n > LIM['text']: errs.append(f"{where}的文字太长了（最多 {LIM['text']} 个字）")
@@ -542,6 +561,7 @@ def cmd_publish(push, src):
     with open(os.path.join(ROOT, pj), 'w', encoding='utf-8', newline='\n') as f: json.dump(proj, f, ensure_ascii=False, indent=1)
     entry = dict(issue=num, v=2, text=title_of(proj), summary=describe(proj), project=pj, hash=h, author=author,
                  date=datetime.now(timezone.utc).replace(microsecond=0).isoformat(), likes=0, gif=gif, cover=cover, frames=info['frames'])
+    if description(body): entry['desc'] = description(body)
     existing = []
     def add(idx):
         existing[:] = [e for e in idx['entries'] if e['issue'] == num]

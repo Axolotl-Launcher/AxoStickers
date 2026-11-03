@@ -51,7 +51,8 @@ jobs:
           cd site
           npm ci --no-audit --no-fund --ignore-scripts
           npm run build
-          mkdir -p dist/models && cp ../kit/model/axolotl_logo.glb dist/models/
+          mkdir -p dist/models && cp ../kit/model/axolotl_logo.glb ../workshop/models/*.json dist/models/
+          cp ../workshop/models/*.glb dist/models/ 2>/dev/null || true   # 工坊里的模型（logo 的文件在 kit/model/）
       - name: 出图（断网、没有权限的容器）
         if: steps.prep.outputs.status == 'ok'
         run: |

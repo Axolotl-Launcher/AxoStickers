@@ -26,6 +26,9 @@ export function el(tag, attrs = {}, ...kids) {
 }
 
 let toastTimer;
+// 表情同款字体（111 个按字切开的 woff2 的 @font-face）：不挡首屏，异步载入；要在画布上用它的（首页标题）先等它
+export const fontsCss = import('./gen/fonts.css').catch(() => {});
+
 export function toast(msg) {
   const t = $('#toast');
   t.textContent = msg; t.classList.add('show');
