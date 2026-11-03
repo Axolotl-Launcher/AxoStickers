@@ -1,0 +1,95 @@
+// 这台设备上的组件库：从工坊下载的、自己写的、从文件载入的组件代码。
+// 存在浏览器的 IndexedDB（站点数据）里：「删除」就是真的从浏览器里删掉这一条，不是藏起来。
+// 几个标签页之间用 BroadcastChannel 同步；IndexedDB 用不了（隐私模式、被禁用）时退回只在内存里，关掉页面就没了。
+// 收藏是另一回事：只是一串 `类型:id`，存在 localStorage。
+const DB = 'axo-studio', STORE = 'library', LEGACY = 'axo-my-components-v1', FAVS = 'axo-favs-v1';
+const items = new Map();                                       // origin -> 条目
+const listeners = new Set();
+let db = null;
+const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('axo-library') : null;
+
+const req = (r) => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+function store(mode) { return db.transaction(STORE, mode).objectStore(STORE); }
+async function reload() {
+  if (!db) return;
+  const all = await req(store('readonly').getAll());
+  items.clear(); for (const e of all) items.set(e.origin, e);
+}
+const emit = (why) => { for (const f of listeners) f(why); };
+
+// 从源码里读出 id / 类型 / 名字（只用正则，不执行代码）；工坊文件开头的 /* @axo {...} */ 说明卡优先
+export function describe(source) {
+  const head = /^\s*\/\*\s*@axo\s*(\{[\s\S]*?\})\s*\*\//.exec(source);
+  let meta = {};
+  try { meta = head ? JSON.parse(head[1]) : {}; } catch { /* 说明卡写坏了就按源码猜 */ }
+  const pick = (re) => (re.exec(source) || [])[1];
+  return {
+    id: meta.id || pick(/id:\s*['"]([^'"]+)['"]/), type: meta.type || pick(/type:\s*['"](\w+)['"]/),
+    name: meta.name || pick(/name:\s*['"]([^'"]+)['"]/), author: meta.author || '', version: meta.version || '', description: meta.description || '',
+  };
+}
+
+// 先把数据库打开、读进来；之后的写入都排在它后面（不然启动时刚新建的组件会被读进来的旧内容盖掉）
+const opened = (async () => {
+  try {
+    db = await new Promise((res, rej) => {
+      const r = indexedDB.open(DB, 1);
+      r.onupgradeneeded = () => r.result.createObjectStore(STORE, { keyPath: 'origin' });
+      r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+    });
+    await reload();
+  } catch { db = null; }
+})();
+export const ready = (async () => {
+  await opened;
+  try {                                                         // 第一版存在 localStorage 的「我的组件」搬过来
+    const old = JSON.parse(localStorage.getItem(LEGACY) || '[]');
+    for (const m of old) if (m?.origin && m.source && !items.has(m.origin)) await write({ ...describe(m.source), name: m.name, type: m.type || describe(m.source).type, origin: m.origin, source: m.source, from: 'mine' });
+    if (db && old.length) localStorage.removeItem(LEGACY);       // 只有真的存进 IndexedDB 了才删旧的；数据库打不开就留着，下次再搬
+  } catch { /* 没有 localStorage */ }
+  bc?.addEventListener('message', () => serial(reload).then(() => emit('sync')).catch(() => {}));
+})();
+// 读、写、删排成一队：别的标签页通知来的 reload 不会和这边刚写的东西交错（读到写之前的旧内容、把新加的盖掉）
+let queue = opened;
+const serial = (f) => { const run = queue.then(f, f); queue = run.catch(() => {}); return run; };
+
+export const list = () => [...items.values()].sort((a, b) => (b.at || 0) - (a.at || 0));
+let isLoaded = false; opened.then(() => { isLoaded = true; });
+export const loaded = () => isLoaded;                          // 数据库读完了没有（没读完时「库里没有」不算数）
+export const get = (origin) => items.get(origin) || null;
+export const has = (origin) => items.has(origin);
+export const onChange = (f) => { listeners.add(f); return () => listeners.delete(f); };
+
+async function write(entry) {
+  const e = { ...(typeof entry.source === 'string' ? describe(entry.source) : {}), ...entry, at: Date.now() };   // 模型 / 字体（kind: model / font）存的是 bytes
+  if (db) await req(store('readwrite').put(e));               // 先真的存进数据库（空间不够会在这里报错），界面上再显示「已添加」
+  items.set(e.origin, e);
+  return e;
+}
+// 放进组件库（同一个 origin 覆盖）。from：repo（工坊）/ mine（自己写的）/ file（从文件载入）
+export async function put(entry) {
+  const e = await serial(() => write(entry));
+  emit('put'); bc?.postMessage('put');
+  return e;
+}
+
+// 真的删掉：IndexedDB 里这一条没了
+export async function remove(origin) {
+  await serial(async () => { if (db) await req(store('readwrite').delete(origin)); items.delete(origin); });   // 数据库里删掉了才算删掉
+  emit('remove'); bc?.postMessage('remove');
+}
+
+// ---------------- 收藏 ----------------
+let favs = new Set();
+const loadFavs = () => { try { return new Set(JSON.parse(localStorage.getItem(FAVS) || '[]')); } catch { return favs; } };
+favs = loadFavs();
+try { addEventListener('storage', (e) => { if (e.key === FAVS) { favs = loadFavs(); emit('fav'); } }); } catch { /* 没有 window */ }   // 别的标签页改了收藏
+export const isFav = (key) => favs.has(key);
+export const favList = () => [...favs];
+export function toggleFav(key, on = !favs.has(key)) {
+  favs = loadFavs();                                            // 先读最新的再改这一个：两个标签页各收藏一个，谁也不会盖掉谁
+  if (on) favs.add(key); else favs.delete(key);
+  try { localStorage.setItem(FAVS, JSON.stringify([...favs])); } catch { /* 存不下就只在这次有效 */ }
+  emit('fav');
+  return on;
+}

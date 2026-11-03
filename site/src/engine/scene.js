@@ -71,7 +71,7 @@ export class Scene {
     this.faceLayer = of('face')[0] || null;
     this.spec = { hold: this.props[0]?.component, face: this.faceLayer && !this.faceLayer.face ? this.faceLayer.component : undefined };
     this.texts = of('text').map((l) => {
-      const lay = l.text ? layout(l.text, l.y, l.scale, l.x) : [];
+      const lay = l.text ? layout(l.text, l.y, l.scale, l.x, l.font) : [];
       const anim = this.instance('textanim', l, { lay }) || this.instance('textanim', { ...l, component: 'stay' }, { lay });
       return { l, lay, anim };
     });
@@ -421,7 +421,7 @@ export class Scene {
         const r = this.guard(anim, () => anim.def.xf.call(anim, i, n, t)) || [0, 0, 1, 0, true];
         const [dx, dy, sc, rot, vis] = r;
         if (!vis || sc < 0.03) return;
-        const spr = charSprite(c, ch, l.style);
+        const spr = charSprite(c, ch, l.style, l.font);
         ctx.setTransform(1, 0, 0, 1, x + dx, y + dy + 8);
         if (Math.abs(rot) > 0.05) ctx.rotate(-rot * Math.PI / 180);
         if (Math.abs(sc - 1) > 1e-3) ctx.scale(sc, sc);

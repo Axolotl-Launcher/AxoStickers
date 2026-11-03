@@ -1,11 +1,15 @@
 // 入口：路由（#/ 图鉴、#/s/编号 大图、#/editor 创意工坊、#/workshop 工坊作品、#/w/issue 号）。
-import './gen/fonts.css';
 import './style.css';
-import { RELEASE, $, encodePath, toast } from './util.js';
+import { RELEASE, $, encodePath, toast } from './util.js';   // util.js 一载入就开始异步拿字体样式（fontsCss）
 import { G, initGallery } from './gallery.js';
 import { WS, initWorkshop, sorted } from './workshop.js';
 import { openDetail, closeDetail } from './detail.js';
 import { initHero } from './hero.js';
+import { detectPerf } from './perf.js';
+
+// 设备档位挂到 <html> 上：样式据此关掉没有显卡加速时很费的效果（毛玻璃、常驻动画）
+const perf = detectPerf();
+Object.assign(document.documentElement.dataset, { perf: perf.tier, gpu: perf.gpu, device: perf.device });
 
 $('#zip-link').href = RELEASE.url;
 $('#zip-size').textContent = RELEASE.size;
@@ -26,9 +30,29 @@ const retryable = (key, init) => (ready[key] ||= init().catch((e) => { ready[key
 const gallery = () => retryable('gallery', () => initGallery().then(() => { initHero(G.items, () => view === 'gallery').catch(console.error); }));
 const workshop = () => retryable('workshop', initWorkshop);
 
+// 给浏览器里的 AI 助手 / 自动化脚本：编辑器还没打开时，axo.studio() 会打开它并等预览准备好，然后返回完整接口（说明：llms.txt）
+const openStudioApi = async () => {
+  if (!location.hash.startsWith('#/editor')) location.hash = '#/editor';
+  await loadStudio();
+  for (let i = 0; i < 400 && window.axo.studio === openStudioApi; i++) await new Promise((r) => setTimeout(r, 50));
+  if (window.axo.studio === openStudioApi) throw new Error('编辑器 20 秒内没打开（看页面上的提示，刷新再试）');
+  return window.axo.studio();
+};
+window.axo = Object.assign(window.axo || {}, {
+  version: 2, perf,
+  help: () => '先 await axo.studio()：打开创意工坊编辑器并等预览准备好，返回编辑器的全部接口（再调 axo.help() 看）。axo.stickers() 列出图鉴里的表情。完整说明：llms.txt',
+  studio: openStudioApi,
+  stickers: async () => { await gallery(); return G.items.map((it) => ({ key: it.key, text: it.text, category: it.category, gif: it.gif, motion: it.motion, face: it.face })); },
+  go: (route) => { location.hash = route.startsWith('#') ? route : `#/${route.replace(/^\/+/, '')}`; return location.hash; },
+});
+
 function show(v) {
+  delete document.documentElement.dataset.route;                // 换成按 hidden 显示（index.html 里按地址先显示的那一层不要了）
   if (v !== view) {
-    for (const s of document.querySelectorAll('.view')) s.hidden = s.dataset.view !== v;
+    for (const s of document.querySelectorAll('.view')) {
+      s.hidden = s.dataset.view !== v;
+      if (!s.hidden && view !== null) { s.classList.remove('view-enter'); void s.offsetWidth; s.classList.add('view-enter'); }   // 换页淡入（CSS 里按设备档位、减少动画开关）
+    }
     for (const a of document.querySelectorAll('.nav a')) {
       if (a.dataset.view === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     }
@@ -44,6 +68,7 @@ async function route() {
   const seq = ++routeSeq, hash = location.hash;
   const [path, query] = location.hash.replace(/^#\/?/, '').split('?');   // 先拆再解码：配方里的 + 不能被当成空格
   const [head, arg] = path.split('/').map((x) => { try { return decodeURIComponent(x); } catch { return x; } });
+  if (head === 'e' && arg) { history.replaceState(null, '', `#/editor?k=${encodeURIComponent(arg)}`); return route(); }   // 1 分钟短链接
   if (head === 'editor') {
     closeDetail(true);
     show('editor');
@@ -59,8 +84,8 @@ async function route() {
       } else if (e) recipe = e.recipe;
     }
     if (seq !== routeSeq || location.hash !== hash) return;
-    await m.openStudio($('#studio-root'), { recipe, project, shared: q.get('s') });
-    if ((q.get('r') || q.get('w') || q.get('s')) && location.hash === hash) history.replaceState(null, '', '#/editor');
+    await m.openStudio($('#studio-root'), { recipe, project, shared: q.get('s'), short: q.get('k') });
+    if ((q.get('r') || q.get('w') || q.get('s') || q.get('k')) && location.hash === hash) history.replaceState(null, '', '#/editor');
     return;
   }
   if (head === 'workshop' || head === 'w') {

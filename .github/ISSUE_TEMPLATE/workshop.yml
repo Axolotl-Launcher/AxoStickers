@@ -8,6 +8,11 @@ body:
       value: |
         提交后 GitHub Actions 会在隔离的环境里用网站同一个引擎重新出图（要几分钟），出好的图会出现在 [工坊作品](https://axolotl-launcher.github.io/AxoStickers/#/workshop)，机器人会在这里回复，然后把 issue 关掉。
         工程里带的组件代码只在断网的沙盒里运行，维护者也会看。别人给这个 issue 点 👍 就是点赞；维护者觉得不合适会撤下。
+  - type: input
+    id: description
+    attributes:
+      label: 说明
+      description: 可选。一句话介绍这张表情（会显示在工坊作品的详情里，最多 140 个字）。
   - type: textarea
     id: project
     attributes:

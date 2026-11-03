@@ -29,7 +29,8 @@ export function normalizeProject(p = {}) {
     layers: (Array.isArray(P.layers) ? P.layers : []).slice(0, 40).map((l, i) => ({
       id: String(l.id || `l${i}`), type: String(l.type || ''), component: String(l.component || ''), params: l.params || {},
       start: num(l.start, 0, 0, 1), end: num(l.end, 1, 0, 1), strength: num(l.strength, 1, 0, 2), hidden: !!l.hidden,
-      ...(l.type === 'text' ? { text: String(l.text ?? '').slice(0, 24), style: String(l.style || 'pink'), y: num(l.y, 118, 0, 512), x: num(l.x, 0, -256, 256), scale: num(l.scale, 1, 0.3, 2) } : {}),
+      ...(l.type === 'text' ? { text: String(l.text ?? '').slice(0, 24), style: String(l.style || 'pink'), y: num(l.y, 118, 0, 512), x: num(l.x, 0, -256, 256), scale: num(l.scale, 1, 0.3, 2),
+        ...(l.font && l.font !== 'axo' ? { font: String(l.font).slice(0, 80) } : {}) } : {}),   // 默认字体不写进工程（工坊只认默认字体）
       ...(l.type === 'face' ? { face: l.face && typeof l.face === 'object' ? l.face : null, blink: l.blink !== false } : {}),
     })),
   };

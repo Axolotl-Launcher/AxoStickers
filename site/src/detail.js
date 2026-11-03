@@ -34,7 +34,8 @@ function fill() {
     : it.special ? '特别篇 · 水龙卷' : `#${it.key} · ${CAT.categories[it.category] || it.category_zh}`;
   $('#d-meta').textContent = meta;
   const dl = $('#d-recipe');
-  dl.replaceChildren(...(it.special ? [el('dt', { text: '动作' }), el('dd', { text: '水龙卷（转着圈飞上天，又掉回来）' })]
+  dl.replaceChildren(...(kind === 'workshop' && it.desc ? [el('dt', { text: '说明' }), el('dd', { text: it.desc })] : []),   // 投稿时写的一句话（纯文本）
+    ...(it.special ? [el('dt', { text: '动作' }), el('dd', { text: '水龙卷（转着圈飞上天，又掉回来）' })]
     : kind === 'workshop' && !recipe ? summaryRows(it.summary) : rows(recipe)));
   const down = $('#d-download');
   down.href = gif;

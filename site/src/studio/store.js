@@ -1,7 +1,7 @@
-// 工程状态：当前工程 + 撤销 / 重做 + 自动存草稿；「我的组件」（自己写的、从文件载入的）也存在这台设备上。
+// 工程状态：当前工程 + 撤销 / 重做 + 自动存草稿。组件库（下载的 / 自己写的组件）在 library.js。
 import { normalizeProject, DEFAULTS } from '../engine/project.js';
 
-const DRAFT = 'axo-studio-draft-v2', MINE = 'axo-my-components-v1';
+const DRAFT = 'axo-studio-draft-v2';
 const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
 
@@ -26,13 +26,11 @@ export class Store {
     const d = load(DRAFT, null);
     this.p = d ? normalizeProject(d) : STARTER();
     this.selected = null;                                    // 选中的图层 id；null = 工程设置
-    this.mine = load(MINE, []);                              // [{ origin, name, type, source, at }]
     this.lastPush = 0;
     this.foreign = false;                                    // 另一个标签页存过草稿以后，这边就不再自动覆盖它
     try {
       window.addEventListener('storage', (e) => {
         if (e.key === DRAFT && e.newValue && !this.foreign) { this.foreign = true; this.tell('foreign'); }
-        if (e.key === MINE) { this.mine = load(MINE, []); this.tell('mine'); }
       });
     } catch { /* 没有 window（测试环境） */ }
   }
@@ -41,14 +39,21 @@ export class Store {
   emit(why) { this.tell(why); if (!this.foreign) save(DRAFT, this.p); }
 
   // 改工程：fn 直接改 draft；coalesce 用来把拖滑块这种连续操作合成一步撤销
+  // fn 抛错时整个改动作废、工程回到改之前；带 userFacing 的错误（比如组件代码太多了）交给 onError 提示，不往外抛
   change(fn, { coalesce = null } = {}) {
-    const now = performance.now();
-    if (!(coalesce && this.lastKey === coalesce && now - this.lastPush < 800)) { this.past.push(JSON.stringify(this.p)); if (this.past.length > 120) this.past.shift(); }
+    const now = performance.now(), snap = JSON.stringify(this.p);
+    const pushed = !(coalesce && this.lastKey === coalesce && now - this.lastPush < 800);
+    try { fn(this.p); } catch (e) {
+      this.p = normalizeProject(JSON.parse(snap));
+      if (e.userFacing && this.onError) { this.onError(e); return false; }
+      throw e;
+    }
+    if (pushed) { this.past.push(snap); if (this.past.length > 120) this.past.shift(); }
     this.lastKey = coalesce; this.lastPush = now;
     this.future = [];
-    fn(this.p);
     this.p = normalizeProject(this.p);
     this.emit('change');
+    return true;
   }
   replace(p, why = 'load') {
     this.past.push(JSON.stringify(this.p)); this.future = [];
@@ -56,7 +61,7 @@ export class Store {
   }
   undo() { if (!this.past.length) return; this.future.push(JSON.stringify(this.p)); this.p = normalizeProject(JSON.parse(this.past.pop())); this.emit('history'); }
   redo() { if (!this.future.length) return; this.past.push(JSON.stringify(this.p)); this.p = normalizeProject(JSON.parse(this.future.pop())); this.emit('history'); }
-  select(id) { this.selected = id; for (const f of this.listeners) f('select'); }
+  select(id) { if (id === this.selected) return; this.selected = id; for (const f of this.listeners) f('select'); }   // 同一个不重画：拖时间轴时重画会把正在拖的条换掉
 
   layer(id = this.selected) { return this.p.layers.find((l) => l.id === id) || null; }
   first(type) { return this.p.layers.find((l) => l.type === type) || null; }
@@ -70,13 +75,6 @@ export class Store {
   }
   dropComponent(origin) { this.change((p) => { p.components = p.components.filter((c) => c.origin !== origin); }); }
 
-  saveMine(entry) {
-    this.mine = load(MINE, this.mine);                       // 先读一遍：别的标签页可能刚存过
-    const i = this.mine.findIndex((m) => m.origin === entry.origin);
-    if (i >= 0) this.mine[i] = { ...this.mine[i], ...entry, at: Date.now() }; else this.mine.unshift({ ...entry, at: Date.now() });
-    return save(MINE, this.mine);
-  }
-  removeMine(origin) { this.mine = load(MINE, this.mine).filter((m) => m.origin !== origin); save(MINE, this.mine); }
 }
 
 export { DEFAULTS };

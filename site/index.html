@@ -11,12 +11,15 @@
 <meta property="og:title" content="美西螈表情包 · AxoStickers">
 <meta property="og:description" content="300 张美西螈动图表情 + 创意工坊。群里答疑专用，不保证能解决问题，但能表达情绪。">
 <meta property="og:image" content="https://axolotl-launcher.github.io/AxoStickers/out/_%E6%80%BB%E8%A7%88.png">
+<link rel="help" href="llms.txt" title="给 AI 助手的说明">
+<!-- 脚本还没跑起来之前就按地址显示对的那一页：直接打开 #/editor、#/workshop 时首屏不会先闪一下图鉴再跳（布局偏移） -->
+<script>document.documentElement.dataset.route = ((/^#\/?([a-z]+)/.exec(location.hash) || [])[1] || '').replace(/^e$/, 'editor').replace(/^w$/, 'workshop');</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='2' width='14' height='12' rx='3' fill='%23fe3e8c'/%3E%3Crect x='1' y='11' width='14' height='3' fill='%23c41660'/%3E%3Crect x='4' y='6' width='2' height='2' fill='%2342147a'/%3E%3Crect x='10' y='6' width='2' height='2' fill='%2342147a'/%3E%3C/svg%3E">
 </head>
 <body>
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="brand" href="#/"><i class="brand-dot" aria-hidden="true"></i><span>美西螈表情包</span></a>
+    <a class="brand" href="#/" aria-label="美西螈表情包（回首页）"><i class="brand-dot" aria-hidden="true"></i><span>美西螈表情包</span></a>
     <nav class="nav" aria-label="主导航">
       <a href="#/" data-view="gallery">图鉴</a>
       <a href="#/editor" data-view="editor">创意工坊</a>
@@ -78,7 +81,7 @@
 
   <!-- ======== 创意工坊 · 编辑器（studio/studio.js 按需加载） ======== -->
   <section class="view studio-view" id="view-editor" data-view="editor" hidden>
-    <div id="studio-root"><p class="empty"><b>正在打开创意工坊…</b></p></div>
+    <div id="studio-root"><div class="empty boot-empty" role="status"><span class="spin" aria-hidden="true"></span><b>正在打开创意工坊…</b></div></div>
   </section>
 
   <!-- ======== 工坊作品 ======== -->

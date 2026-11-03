@@ -65,13 +65,17 @@ const reported = () => page.evaluate(() => window.__msgs.flatMap((m) => (m.type 
 const ready = await waitFor('ready');
 if (ready.type !== 'ready') await fail('沙盒没起来：' + (ready.message || ready.type));
 const gl = await page.evaluate(() => { const c = document.createElement('canvas').getContext('webgl2') || document.createElement('canvas').getContext('webgl'); const d = c && c.getExtension('WEBGL_debug_renderer_info'); return c ? (d ? c.getParameter(d.UNMASKED_RENDERER_WEBGL) : 'webgl') : null; });
-if (project.model?.component === 'logo') {                   // 网站自带的另一个模型（dist/models/，沙盒页面自己不能联网，从这边递进去）
-  const glb = fs.readFileSync(path.join(ROOT, 'models', 'axolotl_logo.glb')).toString('base64');
-  const m = await page.evaluate((b64) => {
+const MODEL_ID = project.model?.component;
+if (MODEL_ID && MODEL_ID !== 'axolotl') {                   // 工坊里的模型（dist/models/<id>.json 写着文件名；沙盒页面自己不能联网，从这边递进去）
+  if (!/^[a-z0-9][a-z0-9_-]{0,47}$/.test(MODEL_ID)) await fail('模型 id 不对：' + MODEL_ID);
+  const meta = JSON.parse(fs.readFileSync(path.join(ROOT, 'models', `${MODEL_ID}.json`), 'utf8'));
+  if (!/^[\w.-]+\.glb$/.test(meta.file || '')) await fail('模型文件名不对');
+  const glb = fs.readFileSync(path.join(ROOT, 'models', meta.file)).toString('base64');
+  const m = await page.evaluate(([b64, id]) => {
     const s = atob(b64), u = new Uint8Array(s.length);
     for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
-    window.postMessage({ type: 'model', req: 'm', id: 'logo', bytes: u.buffer }, '*', [u.buffer]);
-  }, glb).then(() => waitFor('model-done'));
+    window.postMessage({ type: 'model', req: 'm', id, bytes: u.buffer }, '*', [u.buffer]);
+  }, [glb, MODEL_ID]).then(() => waitFor('model-done'));
   if (!m.ok) await fail('模型没载进来：' + (m.message || m.type));
 }
 await page.evaluate((p) => window.postMessage({ type: 'project', project: p }, '*'), project);
@@ -81,6 +85,7 @@ if ((await reported()).length) await fail('组件报错了', await reported());
 await page.evaluate(() => window.postMessage({ type: 'export', req: 1, format: 'gif' }, '*'));
 const done = await waitFor('exported');
 if (done.type !== 'exported') await fail('导出失败：' + (done.message || done.type));
+if (done.errors?.length) await fail('组件报错了', done.errors.map((e) => ({ key: e.key, message: String(e.message || ''), line: e.line ?? null })));
 if ((await reported()).length) await fail('组件报错了', await reported());
 const b64 = await page.evaluate(() => {
   const m = window.__msgs.find((x) => x.type === 'exported'), u = new Uint8Array(m.bytes);

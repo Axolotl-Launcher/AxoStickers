@@ -1,9 +1,11 @@
-# 组件库
+# 工坊
 
-这里的 `*.axo.js` 会出现在网站编辑器的「组件」里，所有人都能直接用。加一个组件就是往这个文件夹开一个 PR：
-在编辑器的「代码」面板里写好，点「提交到组件库」，GitHub 会帮你 fork 并开 PR；也可以自己把文件放进来。
+这里的 `*.axo.js` 会出现在网站编辑器的「工坊」里，所有人都能看到、一键添加（下载到自己浏览器的组件库，之后在它那一类里就能用）。加一个组件就是往这个文件夹开一个 PR：
+在编辑器的「代码」面板里写好，点「提交到工坊」，GitHub 会帮你 fork 并开 PR；也可以自己把文件放进来。
 
-不想进组件库也行：「下载」成 `.axo.js` 发给别人，对方把文件拖进编辑器就能用；发布到工坊时，工程里用到的自己的组件会一起带上。
+分类按 `type` 来：`scene`（多种效果拼起来、接管整帧的，比如水龙卷）在工坊里叫「组件」；`textanim` 归「文字」，`fx` 归「特效」，`motion` 归「动作」，以此类推。
+
+不想进工坊也行：「下载」成 `.axo.js` 发给别人，对方把文件拖进编辑器就能用；发布作品时，工程里用到的组件代码会一起带上。
 
 ## 文件长什么样
 
@@ -51,6 +53,18 @@ component({
 骨骼的 `addrot` `legmix` `LEGS` `GILLS` `BONES`，颜色的 `hex` `rgb2hsl` `hsl2rgb` `recolor`。编辑器里打字会自动补全，Ctrl+Enter 运行。
 
 参数（`params`）会自动出现在右边的属性面板：`type` 可以是 `int` `number` `bool` `select`（加 `options`）`color` `icon` `text`，都要写 `default`。
+
+## 模型
+
+`workshop/models/` 放模型：一个说明卡 `<id>.json` 加一个 `.glb` 文件，出现在工坊的「模型」分类里，添加后在编辑器「模型」里能换上，也能发布到工坊。
+
+```json
+{"id": "my-model", "type": "model", "name": "我的模型", "author": "你的 GitHub 名字", "version": "1.0.0", "description": "一句话说明", "file": "my-model.glb", "face": false}
+```
+
+- 用 Blockbench 做方块模型，导出成 `.glb`（贴图内嵌），最多 4 MB。节点名叫 `head`、`body`、`tail`、`leg1`～`leg4`、`top_gills`、`left_gills`、`right_gills` 的会跟着动作动。
+- `face`：要不要在头的正面画表情（脸不在那儿的模型写 `false`）。
+- 先在编辑器里「载入模型文件」试一下能不能读出来、动作对不对，再开 PR。
 
 ## 规矩
 
