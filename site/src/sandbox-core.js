@@ -47,7 +47,9 @@ export function startCore(env) {
       } catch { if (env.fetchFont) f.face = null; }               // 没下下来：下次改字再试
     }));
     const bad = need.filter((f) => f.face?.status !== 'loaded');
-    return String.fromCodePoint(...cps.filter((cp) => bad.some((f) => covers(f, cp))));
+    // failed：切片没下下来的字；absent：Axo 黑体里本来就没有的字（比如 emoji，没有哪个切片的 unicode-range 写了它）。两种画出来都会是系统字体
+    return { failed: String.fromCodePoint(...cps.filter((cp) => bad.some((f) => covers(f, cp)))),
+      absent: slices.length ? String.fromCodePoint(...cps.filter((cp) => !slices.some((f) => covers(f, cp)))) : '' };
   }
 
   const reg = builtinRegistry();
@@ -112,22 +114,25 @@ export function startCore(env) {
   function errorsOf(s) { return s ? [...s.errors].map(([key, e]) => ({ key, message: e.message, line: e.line ?? null })) : []; }
 
   // 工程里每种字体用到的字：只下这些字所在的切片，等它们能用了再画（第一帧、导出都不会先用系统字体顶着）。返回没加载上的字
+  // 返回问题说明（空 = 都能用表情字体画）
   async function glyphs(p) {
-    const texts = p.layers.filter((l) => l.type === 'text' && !l.hidden), missing = [];
+    const texts = p.layers.filter((l) => l.type === 'text' && !l.hidden), failed = [], absent = [];
     for (const f of new Set(texts.map((l) => l.font || 'axo'))) {
       const t = texts.filter((l) => (l.font || 'axo') === f).map((l) => l.text).join('').replace(/[/\s]/g, '');
       const font = hasFont(f) ? f : 'axo';
-      if (t && font === 'axo') { const bad = await axoGlyphs(t); if (bad) missing.push(bad); }
-      if (t && !await loadFont(t, font)) missing.push(t);
+      if (t && font === 'axo') { const g = await axoGlyphs(t); if (g.failed) failed.push(g.failed); if (g.absent) absent.push(g.absent); }
+      if (t && !await loadFont(t, font)) failed.push(t);
     }
-    return missing.join('');
+    const cut = (a) => [...new Set([...a.join('')])].slice(0, 12).join('');
+    return [failed.length ? `表情字体没下载下来（「${cut(failed)}」，网络好了改一下字就会重新下载）` : '',
+      absent.length ? `Axo 黑体里没有「${cut(absent)}」（要用的话在「字体」里换成系统字体）` : ''].filter(Boolean).join('；');
   }
   async function build() {
     if (!project) return;
     const missing = await glyphs(project);
     useModel();
     scene = new Scene(project, reg, R);
-    if (missing) scene.fail('font', 'AxoSans', new Error(`表情字体没下载下来（「${missing.slice(0, 12)}」）：画出来是系统字体，导出不了。网络好了改一下字就会重新下载`));
+    if (missing) scene.fail('font', 'AxoSans', new Error(`${missing}：这些字画出来是系统字体，导出不了`));
     lastFrame = -1; resetCache();
     scene.frame(ctx, playing ? 0 : tHold);                     // 先同步画一帧：组件一出错马上能报出来
     reported = scene.errors.size;
@@ -240,7 +245,7 @@ export function startCore(env) {
       const { req, format = 'gif', size, colors, maxKb, loops = 3 } = msg;
       if (!scene) { post({ type: 'export-error', req, message: '预览还没准备好，等一下再导出' }); return; }
       const missing = await glyphs(msg.project || project);     // 导出前再确认一遍字都能用表情字体画（没下下来就不导，免得导出一张系统字体的）
-      if (missing) { post({ type: 'export-error', req, message: `表情字体没下载下来（「${missing.slice(0, 12)}」），这时候导出会变成系统字体：网络好了再试` }); return; }
+      if (missing) { post({ type: 'export-error', req, message: `${missing}：这时候导出会变成系统字体，先改好再导出` }); return; }
       if (!['gif', 'png-zip', 'png', 'video'].includes(format)) { post({ type: 'export-error', req, message: `不支持的格式 ${format}（能用 gif / png-zip / png / video）` }); return; }
       exporting = true; R.setQuality(2);                        // 导出总是全画质；导出期间预览先不画，省出来给导出
       try {

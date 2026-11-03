@@ -12,12 +12,13 @@ const ROOT = path.resolve(argv[0]), BASE = opt('--base', '/'), RATE = +opt('--ra
 // 要和改之前一样在慢 CPU 上量引擎本身（导出用时、预览帧率），就让它在沙盒页面里跑
 const EDITOR = argv.includes('--page') ? '#/editor?worker=0' : '#/editor';
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.webp': 'image/webp', '.gif': 'image/gif', '.glb': 'model/gltf-binary', '.mp4': 'video/mp4', '.svg': 'image/svg+xml', '.txt': 'text/plain' };
-const server = http.createServer((req, res) => {                // 和 GitHub Pages 一样发 ACAO: *（沙盒是不透明来源，取模块要 CORS）
+const server = http.createServer((req, res) => {                // 和 GitHub Pages 一样发 ACAO: *（沙盒是不透明来源，取模块要 CORS）；只听 127.0.0.1
   let url = decodeURIComponent(req.url.split('?')[0]);
   if (!url.startsWith(BASE)) { res.writeHead(404); res.end(); return; }
   url = '/' + url.slice(BASE.length);
-  const file = path.resolve(ROOT, '.' + (url.endsWith('/') ? url + 'index.html' : url));
-  if (!file.startsWith(ROOT) || !fs.existsSync(file) || !fs.statSync(file).isFile()) { res.writeHead(404, { 'Access-Control-Allow-Origin': '*' }); res.end(); return; }
+  const file = path.resolve(ROOT, '.' + (url.endsWith('/') ? url + 'index.html' : url)), rel = path.relative(ROOT, file);
+  const inside = rel && !rel.startsWith('..') && !path.isAbsolute(rel);   // 只给 ROOT 里面的文件（startsWith 会放过同名前缀的兄弟目录，比如 site 和 site-old）
+  if (!inside || !fs.existsSync(file) || !fs.statSync(file).isFile()) { res.writeHead(404, { 'Access-Control-Allow-Origin': '*' }); res.end(); return; }
   res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' });
   fs.createReadStream(file).pipe(res);
 });
