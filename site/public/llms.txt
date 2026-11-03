@@ -1,6 +1,7 @@
 # 美西螈表情包 · AxoStickers
 
-> 给 AI 助手 / 浏览器自动化工具的说明（llms.txt）。Axolotl Launcher 的美西螈动图表情包网站：图鉴（300 张 GIF）、创意工坊编辑器（在浏览器里做动图）、工坊作品（大家发布的）。
+[[contribute]] > 给 AI 助手 / 浏览器自动化工具的说明（llms.txt）。Axolotl Launcher 的美西螈动图表情包网站：图鉴（300 张 GIF）、创意工坊编辑器（在浏览器里做动图）、工坊作品（大家发布的）。
+[[!contribute]] > 给 AI 助手 / 浏览器自动化工具的说明（llms.txt）。Axolotl Launcher 的美西螈动图表情包网站：图鉴（300 张 GIF）、创意工坊编辑器（在浏览器里做动图）、工坊作品（用同一个引擎出图的作品）。
 > Guide for AI agents driving this site in a browser. The UI is Chinese; every control also has a stable `data-ax` name and an accessible label.
 
 网站：https://axolotl-launcher.github.io/AxoStickers/
@@ -32,7 +33,8 @@ axo.layers.remove('l3');
 const gif = await axo.export({ format: 'gif', size: 240, maxKb: 500 });   // → { url, kb, mime, blob, errors }；url 用完了 URL.revokeObjectURL(gif.url)
 const link = await axo.share();            // → { long }：能打开这个工程的完整链接
 const both = await axo.share({ short: true });   // → { long, short, expires }：短链接 1 分钟后失效（工程加密后经 ntfy.sh 中转）
-axo.fonts.list();                          // 字体：axo（Axo 黑体，默认，唯一能发布的）、sys-sans / sys-serif / sys-kai / sys-round（系统字体）、font:文件名（导入的）
+[[contribute]] axo.fonts.list();                          // 字体：axo（Axo 黑体，默认，唯一能发布的）、sys-sans / sys-serif / sys-kai / sys-round（系统字体）、font:文件名（导入的）
+[[!contribute]] axo.fonts.list();                          // 字体：axo（Axo 黑体，默认）、sys-sans / sys-serif / sys-kai / sys-round（系统字体）、font:文件名（导入的）
 axo.fonts.use('sys-kai', { all: true });   // 所有文字换字体；{ layer: '图层id' } 只换一层
 axo.models.list();                         // 模型：axolotl（原版）+ 库里的（工坊下载的 / 载入的文件）
 await axo.models.use('logo');              // 换模型（要先在库里：axo.workshop.add('logo')）
@@ -41,7 +43,7 @@ axo.layers.update('w1', { params: { gy: 3, gs: 1.2 } });   // 帽子戴在哪：
 axo.layers.update('t1', { style: '#33aa77' });             // 字色可以是内置的名字，也可以是 #rrggbb
 await axo.projects.save();                 // 「我的工程」：存在这台设备浏览器里；await list() / open(origin) / remove(origin)（都是 Promise）。别的标签页改过同一份时会另存一份，不覆盖
 await axo.export({ format: 'video', size: 480, loops: 3 });   // 视频（浏览器能录 MP4 就是 MP4，不然 WebM），按真实时间录
-await axo.publishUrl({ title: '收到', description: '一句话' });   // → { url, problems }：填好的 GitHub 投稿链接（不打开；problems 不空就先改）
+[[contribute]] await axo.publishUrl({ title: '收到', description: '一句话' });   // → { url, problems }：填好的 GitHub 投稿链接（不打开；problems 不空就先改）
 ```
 
 工坊（组件库）：
@@ -61,7 +63,8 @@ axo.favorites.toggle('motion:hop');        // 收藏：键是「类型:id」，�
 - 等编辑器根节点 `.studio[data-state="ready"]` 出现再操作（`booting` = 沙盒还在启动，`error` = 没启动起来）。
 - 预览是沙盒 iframe 里的画布，读不到内容；看 `[data-ax="status"]`（读屏用的一句话，描述当前工程）和 `[data-ax="frame-counter"]`。
 - 按钮都有中文名字（aria-label），也有稳定的 `data-ax`：
-  - 顶栏：`back` `project-name` `save-state`（自动保存的状态）`undo` `redo` `new` `open` `save` `projects`（我的工程）`random` `help` `share` `publish` `export`
+[[contribute]]   - 顶栏：`back` `project-name` `save-state`（自动保存的状态）`undo` `redo` `new` `open` `save` `projects`（我的工程）`random` `help` `share` `publish` `export`
+[[!contribute]]   - 顶栏：`back` `project-name` `save-state`（自动保存的状态）`undo` `redo` `new` `open` `save` `projects`（我的工程）`random` `help` `share` `export`
   - 网站顶栏（图鉴 / 创意工坊 / 工坊作品）在编辑器里会收起来：鼠标移到窗口最上沿、或者 Tab 到导航时出来；自动化工具直接 `location.hash = '#/'` 换页就行
   - 预览：在 `.st-stage-box` 上拖 = 挪选中的文字（没选中文字就挪模型），滚轮缩放；`guides` 参考线开关
   - 模型的大小和位置（素材栏「模型」和工程设置里）：`field:model-scale` `field:model-x` `field:model-y` `field:model-rot`（数字框，加 `:range` 是滑块）、`model-flip` `model-reset`
@@ -74,7 +77,7 @@ axo.favorites.toggle('motion:hop');        // 收藏：键是「类型:id」，�
   - 模型：`model:id`（换上）、`model-remove`、`models-workshop`、`load-model`、`model-face`
   - 字体（文字抽屉和文字图层的属性里）：`font:id`、`import-font`、`font-all`
   - 分享弹窗：`share-url`（完整链接）、`share-make-short`、`share-short-url`、`share-short-left`（还剩几秒）
-  - 发布弹窗：`publish-title` `publish-desc` `publish-agree` `publish-checks`（检查结果，li.ok / li.bad）`publish-go`（确定投稿，检查没过时是 disabled）`publish-copy`
+[[contribute]]   - 发布弹窗：`publish-title` `publish-desc` `publish-agree` `publish-checks`（检查结果，li.ok / li.bad）`publish-go`（确定投稿，检查没过时是 disabled）`publish-copy`
   - 预览没启动：`boot-retry`（重试）
   - 舞台：`zoom` `stage-bg` `quality`（自动 / 流畅 / 清晰）；播放 `play` `first` `prev` `next` `last` `scrub` `speed` `onion`
   - 时间轴：`[data-ax="layer"][data-layer][data-type][data-component]`，里面 `layer-select` `layer-visible`
@@ -87,11 +90,14 @@ axo.favorites.toggle('motion:hop');        // 收藏：键是「类型:id」，�
 
 - 工程（project）= 画布设置 + 一叠图层。图层类型：motion 动作（可以叠多个）、face 表情、prop 道具、wear 帽子、fx 特效、text 文字（带文字动画 textanim）、scene 场景组件。
 - 组件（component）是一段 `component({...})` JavaScript，只在沙盒 iframe 里跑（不透明来源，不能联网）。
-- 「工坊」= 仓库里 workshop/components 文件夹，大家用 PR 往里加。添加 = 下载到这台设备浏览器的组件库（IndexedDB），之后在它那一类里能用；删除 = 从浏览器里真的删掉。
+[[contribute]] - 「工坊」= 仓库里 workshop/components 文件夹，大家用 PR 往里加。添加 = 下载到这台设备浏览器的组件库（IndexedDB），之后在它那一类里能用；删除 = 从浏览器里真的删掉。
+[[!contribute]] - 「工坊」= 仓库里 workshop/components 文件夹。添加 = 下载到这台设备浏览器的组件库（IndexedDB），之后在它那一类里能用；删除 = 从浏览器里真的删掉。
 - 只有水龙卷这种多种效果拼起来、代码很多的整帧场景才叫「组件」（类型 scene）；工坊里的动作、特效、文字动画下载后分别出现在「动作」「特效」「文字」里。
-- 模型也在工坊里（仓库 workshop/models，类型 model）：添加 = 把 .glb 存进这台设备的库；工坊里的模型能发布，自己载入的模型文件只在本机。
-- 字体：文字图层可以换字体、导入 .ttf / .otf / .woff / .woff2（存在本机的库里）。工坊出图只认默认的 Axo 黑体。
-- 发布到工坊：编辑器「发布到工坊」在页面里写标题、说明，看预览和检查结果；「确定投稿」打开填好的 GitHub issue 表单（要登录 GitHub，在那边勾「授权」后由真人提交）。
+[[contribute]] - 模型也在工坊里（仓库 workshop/models，类型 model）：添加 = 把 .glb 存进这台设备的库；工坊里的模型能发布，自己载入的模型文件只在本机。
+[[!contribute]] - 模型也在工坊里（仓库 workshop/models，类型 model）：添加 = 把 .glb 存进这台设备的库；用了工坊里的模型，分享出去别人也能打开，自己载入的模型文件只在本机。
+[[contribute]] - 字体：文字图层可以换字体、导入 .ttf / .otf / .woff / .woff2（存在本机的库里）。工坊出图只认默认的 Axo 黑体。
+[[!contribute]] - 字体：文字图层可以换字体、导入 .ttf / .otf / .woff / .woff2（存在本机的库里）。
+[[contribute]] - 发布到工坊：编辑器「发布到工坊」在页面里写标题、说明，看预览和检查结果；「确定投稿」打开填好的 GitHub issue 表单（要登录 GitHub，在那边勾「授权」后由真人提交）。
 - 分享：完整链接把工程整个装在链接里；短链接 1 分钟后失效（工程在浏览器里加密，只把密文交给公开中转站 ntfy.sh）。
 
 ## 性能
