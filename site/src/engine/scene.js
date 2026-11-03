@@ -77,11 +77,7 @@ export class Scene {
     this.props = of('prop'); this.wears = of('wear');
     this.faceLayer = of('face')[0] || null;
     this.spec = { hold: this.props[0]?.component, face: this.faceLayer && !this.faceLayer.face ? this.faceLayer.component : undefined };
-    this.texts = of('text').map((l) => {
-      const lay = l.text ? layout(l.text, l.y, l.scale, l.x, l.font) : [];
-      const anim = this.instance('textanim', l, { lay }) || this.instance('textanim', { ...l, component: 'stay' }, { lay });
-      return { l, lay, anim };
-    });
+    this.texts = of('text').map((l) => this.textEntry(l));
     this.motions = of('motion').map((l) => this.instance('motion', l)).filter(Boolean);
     this.scenes = of('scene').map((l) => this.instance('scene', l)).filter(Boolean);
     this.fx = of('fx').map((l) => this.instance('fx', l)).filter(Boolean);
@@ -91,6 +87,20 @@ export class Scene {
       this.skin = [this.skinFn(), JSON.stringify(P.skin) + this.reg.version];
       this.R.setSkin(...this.skin);
     }
+  }
+
+  textEntry(l) {
+    const lay = l.text ? layout(l.text, l.y, l.scale, l.x, l.font) : [];
+    const anim = this.instance('textanim', l, { lay }) || this.instance('textanim', { ...l, component: 'stay' }, { lay });
+    return { l, lay, anim };
+  }
+  // 预览上拖着一行字（不重建场景）：这一行按新位置重新排、文字动画重新建一份（setup 按新的图层和排版再跑一遍，和松手后重建出来的一样）。
+  // 字的精灵按字号缓存着、模型几何不动，照旧用
+  moveText(id, { x, y, scale }) {
+    const i = this.texts.findIndex((t) => t.l.id === id);
+    if (i < 0) return;
+    Object.assign(this.texts[i].l, { x, y, scale });
+    this.texts[i] = this.textEntry(this.texts[i].l);
   }
 
   // ---- 组件实例：this = 这一层的上下文（原型链连到场景，所以 this.T、this.ls、this.headPt 都能用） ----

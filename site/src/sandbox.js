@@ -19,7 +19,7 @@ if (!OPAQUE && !LOCAL) {
 }
 
 const params = new URLSearchParams(location.search), choice = params.get('q') || 'auto', perf = detectPerf();
-const REQUESTS = new Set(['components', 'source', 'remove', 'project', 'transport', 'export', 'quality', 'filmstrip', 'thumbs', 'model', 'font', 'font-bytes', 'ping']);
+const REQUESTS = new Set(['components', 'source', 'remove', 'project', 'transport', 'export', 'quality', 'filmstrip', 'thumbs', 'model', 'font', 'font-bytes', 'ping', 'live', 'live-end']);
 const toParent = (msg, transfer) => parent.postMessage(msg, '*', transfer || []);
 const movable = (m) => [...(m?.bytes instanceof ArrayBuffer ? [m.bytes] : []), ...(Array.isArray(m?.bitmaps) ? m.bitmaps : [])];   // 消息里能转手的大块数据（不复制）
 

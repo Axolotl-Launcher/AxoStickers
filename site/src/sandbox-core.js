@@ -60,6 +60,9 @@ export function startCore(env) {
   const canvas = env.canvas, ctx = canvas.getContext('2d');
   let scene = null, project = null, playing = true, speed = 1, t0 = performance.now(), tHold = 0, lastFrame = -1, onion = false;
   let visible = true, exporting = false;                       // 舞台看不见 / 正在导出：预览不画
+  // 预览上正在拖 / 捏 / 滚轮的那个东西（编辑器还没写进工程）：{ g 第几次手势, kind 'model' | 'text', id 文字图层 id, x, y, scale, rot }。
+  // 直接改正在播的场景（不重建：模型的几何、字的精灵都照旧用），按屏幕刷新率重画；每次重建场景也先叠上它，免得手势中途到的旧工程把它拽回去
+  let live = null, trace = false, drawnSeq = -1;                 // trace：每画出一个手势位置报一次 drawn（量跟手程度用）
 
   // 预览帧缓存：一圈的帧第一次画完就存成位图，之后循环播放只贴图（三维渲染 + 合成都省了）。工程一变就清空。
   // 总是存原尺寸（缩小了再放大会糊）；内存预算不够存一整圈时只存前面那些帧，剩下的照常画
@@ -127,6 +130,19 @@ export function startCore(env) {
     return [failed.length ? `表情字体没下载下来（「${cut(failed)}」，网络好了改一下字就会重新下载）` : '',
       absent.length ? `Axo 黑体里没有「${cut(absent)}」（要用的话在「字体」里换成系统字体）` : ''].filter(Boolean).join('；');
   }
+  function applyLive(p, s) {
+    if (!live) return;
+    const v = { x: live.x, y: live.y, scale: live.scale };
+    if (live.kind === 'model') {
+      const m = live.rot === undefined ? v : { ...v, rot: live.rot };
+      if (p) p.model = { ...p.model, ...m };
+      if (s) Object.assign(s.P.model, m);
+    } else {
+      const l = p?.layers?.find((x) => x.id === live.id && x.type === 'text');
+      if (l) Object.assign(l, v);
+      s?.moveText(live.id, v);
+    }
+  }
   let buildGen = 0;
   async function build() {
     if (!project) return;
@@ -134,6 +150,7 @@ export function startCore(env) {
     const missing = await glyphs(p);
     if (gen !== buildGen) return;
     useModel();
+    applyLive(p, null);                                         // 手势还没完：这份工程可能是手势开始前发的，先叠上手势的位置
     scene = new Scene(p, reg, R);
     if (missing) scene.fail('font', 'AxoSans', new Error(`${missing}：这些字画出来是系统字体，导出不了`));
     lastFrame = -1; resetCache();
@@ -153,7 +170,7 @@ export function startCore(env) {
     const t = currentT(now), f = Math.min(scene.N - 1, Math.floor(t * scene.FPS + 1e-6));
     if (f === lastFrame && !scene.dirty) return;               // 和 GIF 一样一帧一帧地换：帧没变就不重画（60 Hz 的屏幕上省掉 3/4）
     scene.dirty = false;
-    const tf = playing ? f / scene.FPS : t, aligned = Math.abs(tf * scene.FPS - f) < 1e-6;
+    const tf = playing ? f / scene.FPS : t, aligned = !live && Math.abs(tf * scene.FPS - f) < 1e-6;   // 动画照旧按 15 fps 一格一格走；手势进行中每来一个新位置就重画，不用也不存缓存的帧
     if (onion && !playing) {                                   // 洋葱皮：前一帧半透明垫在下面
       scene.frame(ctx, ((f - 1 + scene.N) % scene.N) / scene.FPS);
       const prev = makeCanvas(W, W); prev.getContext('2d').drawImage(canvas, 0, 0);
@@ -161,6 +178,7 @@ export function startCore(env) {
       ctx.save(); ctx.globalAlpha = 0.35; ctx.drawImage(prev, 0, 0); ctx.restore();
     } else if (!(aligned && drawCached(f))) { scene.frame(ctx, tf); if (aligned) remember(f); }
     if (f !== lastFrame) { lastFrame = f; post({ type: 'time', t, frame: f, playing }); }
+    if (trace && live && live.seq !== drawnSeq) { drawnSeq = live.seq; post({ type: 'drawn', seq: live.seq, t: live.t, x: live.x, y: live.y, scale: live.scale }); }
     if (scene.errors.size !== reported) { reported = scene.errors.size; post({ type: 'errors', errors: errorsOf(scene) }); }
   }
 
@@ -233,7 +251,19 @@ export function startCore(env) {
       hadErrors = errors.length > 0;
       await build();
     },
-    transport({ playing: pl, speed: sp, t, onion: on, visible: vis }) {
+    // 预览上的手势：每个指针帧一条，马上改到场景上（不排队等重建），下一个动画帧画出来
+    live({ g, kind, id, x, y, scale, rot, seq, t }) {
+      if (kind !== 'model' && !(kind === 'text' && typeof id === 'string')) return;
+      const fin = (v, d) => (Number.isFinite(v) ? v : d);
+      if (live?.g !== g) { live = { g, kind, id }; resetCache(); }  // 新的一次手势：缓存的帧是挪之前的样子
+      Object.assign(live, { x: fin(x, 0), y: fin(y, 0), scale: fin(scale, 1), rot: Number.isFinite(rot) ? rot : undefined, seq, t });
+      applyLive(project, scene);
+      if (scene) scene.dirty = true;
+    },
+    // 手势完了：编辑器接着就发写好的工程（和最后一个位置一样）。排在之前的重建后面，那些建出来的场景也叠着这次手势的位置
+    'live-end'({ g }) { if (live?.g === g) live = null; },
+    transport({ playing: pl, speed: sp, t, onion: on, visible: vis, trace: tr }) {
+      if (tr !== undefined) trace = !!tr;
       if (vis !== undefined) { visible = !!vis; if (scene) scene.dirty = true; }
       if (sp) speed = sp;
       if (on !== undefined) { onion = !!on; if (scene) scene.dirty = true; }
@@ -352,7 +382,7 @@ export function startCore(env) {
 
   // 导出要好几秒：期间改工程 / 换组件 / 换模型的消息先排队，等导出完再处理，免得一张 GIF 里混着两个版本
   let busy = Promise.resolve();
-  const CHANGES = new Set(['project', 'components', 'remove', 'model', 'font', 'quality']);
+  const CHANGES = new Set(['project', 'components', 'remove', 'model', 'font', 'quality', 'live-end']);
   let fontSeq = 0;
   async function handle(data) {                                // 消息已经由沙盒页面查过来源（sandbox.js）
     if (!data || typeof data.type !== 'string' || !handlers[data.type]) return;

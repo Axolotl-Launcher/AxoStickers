@@ -29,6 +29,7 @@ export class Store {
     this.lastRaw = raw;                                      // 和工程来自同一次读取：存之前比一比，别的标签页写过就不盖
     this.selected = null;                                    // 选中的图层 id；null = 工程设置
     this.lastPush = 0;
+    this.beforeChange = null;                                // 改工程 / 撤销 / 重做 / 换工程之前叫一声：预览上还没写进工程的手势先写进当前这份
     this.foreign = false;                                    // 另一个标签页存过草稿以后，这边就不再自动覆盖它
     try {
       window.addEventListener('storage', (e) => {
@@ -68,6 +69,7 @@ export class Store {
   // 改工程：fn 直接改 draft；coalesce 用来把拖滑块这种连续操作合成一步撤销
   // fn 抛错时整个改动作废、工程回到改之前；带 userFacing 的错误（比如组件代码太多了）交给 onError 提示，不往外抛
   change(fn, { coalesce = null } = {}) {
+    this.beforeChange?.();
     const now = performance.now();
     const pushed = !(coalesce && this.lastKey === coalesce && now - this.lastPush < 800);
     // 新的一步：拍下改之前的样子（进撤销栈，出错时也回到这里）。合进上一步的连续改动（拖滑块，一秒几十次）不再拍整份快照：
@@ -88,11 +90,12 @@ export class Store {
     return true;
   }
   replace(p, why = 'load') {
+    this.beforeChange?.();
     this.past.push(JSON.stringify(this.p)); this.future = [];
     this.p = normalizeProject(p); this.selected = null; this.emit(why);
   }
-  undo() { if (!this.past.length) return; this.future.push(JSON.stringify(this.p)); this.p = normalizeProject(JSON.parse(this.past.pop())); this.emit('history'); }
-  redo() { if (!this.future.length) return; this.past.push(JSON.stringify(this.p)); this.p = normalizeProject(JSON.parse(this.future.pop())); this.emit('history'); }
+  undo() { this.beforeChange?.(); if (!this.past.length) return; this.future.push(JSON.stringify(this.p)); this.p = normalizeProject(JSON.parse(this.past.pop())); this.emit('history'); }
+  redo() { this.beforeChange?.(); if (!this.future.length) return; this.past.push(JSON.stringify(this.p)); this.p = normalizeProject(JSON.parse(this.future.pop())); this.emit('history'); }
   select(id) { if (id === this.selected) return; this.selected = id; for (const f of this.listeners) f('select'); }   // 同一个不重画：拖时间轴时重画会把正在拖的条换掉
 
   layer(id = this.selected) { return this.p.layers.find((l) => l.id === id) || null; }
