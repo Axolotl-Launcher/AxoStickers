@@ -1,0 +1,73 @@
+# 美西螈表情包 · AxoStickers
+
+> 给 AI 助手 / 浏览器自动化工具的说明（llms.txt）。Axolotl Launcher 的美西螈动图表情包网站：图鉴（300 张 GIF）、创意工坊编辑器（在浏览器里做动图）、工坊作品（大家发布的）。
+> Guide for AI agents driving this site in a browser. The UI is Chinese; every control also has a stable `data-ax` name and an accessible label.
+
+网站：https://axolotl-launcher.github.io/AxoStickers/
+源码：https://github.com/Axolotl-Launcher/AxoStickers
+
+## 路由（地址栏 # 后面）
+
+- `#/` 图鉴；`#/s/001` 打开第 1 张的大图（逐帧播放器，空格暂停，←/→ 逐帧）
+- `#/editor` 创意工坊编辑器；`#/editor?s=分享码` 打开分享的工程；`#/editor?w=issue号` 把工坊作品载进编辑器
+- `#/workshop` 工坊作品；`#/w/12` 打开第 12 号作品
+
+## 最稳的用法：window.axo（能在页面里执行 JavaScript 的工具）
+
+点按钮、拖滑块容易点偏；能执行 JS 就直接调接口，每个函数都返回普通的 JSON 数据或 Promise。
+
+```js
+const axo = await window.axo.studio();     // 打开编辑器并等预览沙盒准备好，返回完整接口
+axo.help();                                // 接口一览（中文）
+axo.state();                               // { ready, playing, frame, frames, fps, selected, errors, perf, status }
+axo.project.summary();                     // 名字、尺寸、帧率、模型、皮肤、图层列表
+axo.catalog('motion');                     // 能用的动作；类型：motion face fx textanim prop wear skin scene
+axo.use('motion', 'hop');                  // 换动作；{ add: true } 再叠一层
+axo.use('face', 'smile');
+axo.use('fx', 'hearts', { add: true });
+axo.text('早安/打工人');                    // 改第一行字（/ 换行）
+axo.layers.add('text', 'pop', { text: '收到', y: 300, style: 'gold' });
+axo.layers.update('l3', { start: 0.2, end: 0.8, strength: 0.6 });   // 时间段是 0～1 的比例
+axo.layers.remove('l3');
+const gif = await axo.export({ format: 'gif', size: 240, maxKb: 500 });   // → { url, kb, mime, blob }
+const link = await axo.share();            // 能打开这个工程的链接
+```
+
+工坊（组件库）：
+
+```js
+await axo.workshop.list();                 // 工坊里的全部组件：{ id, type, kind, name, author, description, file, added, favorite }
+await axo.workshop.add('tornado', { use: true });   // 下载到这台设备的组件库并用上
+axo.workshop.library();                    // 这台设备上已经有的（下载的 / 自己写的 / 文件载入的）
+await axo.workshop.remove('repo:tornado.axo.js');   // 从浏览器里真的删掉（不弹确认框）
+axo.favorites.toggle('motion:hop');        // 收藏：键是「类型:id」，模板是「tpl:编号」
+```
+
+图鉴页面没打开编辑器时也有：`axo.stickers()` 列出全部表情，`axo.go('editor')` 换页面。
+
+## 只能看页面、点按钮的工具
+
+- 等编辑器根节点 `.studio[data-state="ready"]` 出现再操作（`booting` = 沙盒还在启动，`error` = 没启动起来）。
+- 预览是沙盒 iframe 里的画布，读不到内容；看 `[data-ax="status"]`（读屏用的一句话，描述当前工程）和 `[data-ax="frame-counter"]`。
+- 按钮都有中文名字（aria-label），也有稳定的 `data-ax`：
+  - 顶栏：`back` `project-name` `undo` `redo` `new` `open` `save` `share` `random` `help` `publish` `export`
+  - 素材栏：`drawer:templates|text|motion|face|fx|prop|wear|skin|model|workshop`；搜索 `search`；只看收藏 `fav-only`
+  - 素材：`[data-ax="item"][data-type][data-id]` 里面的 `use`（换上）、`add-layer`（再叠一层）、`fav`（收藏）
+  - 工坊：`workshop-tab:browse|mine`、`workshop-filter:all|fav|added|scene|motion|fx|textanim|face|prop|wear|skin`、卡片 `[data-ax="workshop-item"][data-id]` 里的 `workshop-add` `workshop-add-use` `workshop-use` `workshop-remove`；组件库 `library-use` `library-remove`
+  - 舞台：`zoom` `stage-bg` `quality`（自动 / 流畅 / 清晰）；播放 `play` `first` `prev` `next` `last` `scrub` `speed` `onion`
+  - 时间轴：`[data-ax="layer"][data-layer][data-type][data-component]`，里面 `layer-select` `layer-visible`
+  - 属性面板：`layer-up` `layer-down` `layer-duplicate` `layer-delete` `deselect`，参数输入框 `field:参数名`（数字框）和 `field:参数名:range`（滑块）
+  - 弹窗：`[data-ax="dialog"]` 里的 `dialog-ok` `dialog-close`、输入框 `dialog-input:标签`
+- 不用浏览器原生的 confirm / prompt：所有确认都是页面里的弹窗，能正常点。
+
+## 概念
+
+- 工程（project）= 画布设置 + 一叠图层。图层类型：motion 动作（可以叠多个）、face 表情、prop 道具、wear 帽子、fx 特效、text 文字（带文字动画 textanim）、scene 场景组件。
+- 组件（component）是一段 `component({...})` JavaScript，只在沙盒 iframe 里跑（不透明来源，不能联网）。
+- 「工坊」= 仓库里 workshop/components 文件夹，大家用 PR 往里加。添加 = 下载到这台设备浏览器的组件库（IndexedDB），之后在它那一类里能用；删除 = 从浏览器里真的删掉。
+- 只有水龙卷这种多种效果拼起来、代码很多的整帧场景才叫「组件」（类型 scene）；工坊里的动作、特效、文字动画下载后分别出现在「动作」「特效」「文字」里。
+- 发布到工坊：编辑器「发布到工坊」打开 GitHub issue 表单（要登录 GitHub，需要真人提交）。
+
+## 性能
+
+编辑器按设备分档（`axo.state().perf`）：有显卡加速的电脑高画质；手机 / 平板标准；没有显卡加速（软件渲染）的省电预览。预览和 GIF 一样一帧一帧地换，每帧画一次就缓存；导出总是全画质。

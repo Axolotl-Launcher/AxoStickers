@@ -292,3 +292,11 @@ footer a { color: #0d3f66; font-weight: 700; }
   .bubbles i { animation: none; display: none; }
   html { scroll-behavior: auto; }
 }
+
+/* ---------------- 设备档位（main.js 挂在 <html data-perf>）：没有显卡加速时，毛玻璃、常驻动画、悬停位移都在 CPU 上画，关掉 ---------------- */
+html[data-perf="low"] .topbar { backdrop-filter: none; background: #fff; }
+html[data-perf="low"] dialog.detail::backdrop { backdrop-filter: none; background: rgba(120, 180, 230, .7); }
+html[data-perf="low"] .bubbles i { animation: none; display: none; }
+html[data-perf="low"] .card, html[data-perf="low"] .btn { transition: none; }
+html[data-perf="low"] .card:hover { transform: none; }
+html[data-device="phone"] .bubbles i:nth-child(n+7) { display: none; }

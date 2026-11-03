@@ -1,4 +1,5 @@
 // 公用的小工具：配置、分类名、配方转换、提示条、懒加载 GIF。
+import { detectPerf } from './perf.js';
 import CAT from '../../workshop/catalog.json';
 
 export { CAT };
@@ -55,9 +56,12 @@ export function recipeRows(r) {
 }
 
 // ---------------- 卡片：先放静态缩略图；悬停（手机上停在屏幕里）就播 240px 的小视频预览（几十 KB，比 1 MB 的 GIF 快得多） ----------------
+// 同时播几个按设备档位来：没有显卡加速的手机不自动播（点开大图照样能看），省流量模式也不自动播
 const touch = matchMedia('(hover: none)').matches;
 const playing = new Set();
-const MAX_PLAYING = touch ? 6 : 9;
+const perf = detectPerf();
+const MAX_PLAYING = touch ? { high: 6, mid: 4, low: 0 }[perf.tier] : { high: 9, mid: 6, low: 3 }[perf.tier];
+const AUTOPLAY = touch && MAX_PLAYING > 0 && !perf.save && !perf.reduced;
 function play(card) {
   const img = card.querySelector('.pic');
   if (!img || card.dataset.playing) return;
@@ -98,8 +102,8 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries)
 }, { threshold: [0, 0.6] }) : null;
 
 export function animated(card) {
-  if (touch && io) io.observe(card);
-  else {
+  if (touch) { if (AUTOPLAY && io) io.observe(card); }
+  else if (MAX_PLAYING) {
     card.addEventListener('pointerenter', () => play(card));
     card.addEventListener('pointerleave', () => stop(card));
     card.addEventListener('focus', () => play(card));

@@ -230,10 +230,10 @@ const material = (top) => new ShaderMaterial({ vertexShader: VERT, fragmentShade
 
 // ---------------- the 3D axolotl renderer ----------------
 export class AxoRenderer {
-  constructor(ss = 2) {
+  constructor(ss = 2, { power = 'default' } = {}) {
     this.ss = ss;
     this.canvas = makeCanvas(BOX * ss, BOX * ss);
-    this.gl = new WebGLRenderer({ canvas: this.canvas, antialias: false, alpha: true, preserveDrawingBuffer: true });
+    this.gl = new WebGLRenderer({ canvas: this.canvas, antialias: false, alpha: true, preserveDrawingBuffer: true, powerPreference: power });
     this.gl.setPixelRatio(1);
     this.gl.setSize(BOX * ss, BOX * ss, false);
     this.gl.setClearColor(0x000000, 0);
@@ -250,6 +250,12 @@ export class AxoRenderer {
     this.faceMesh.matrixAutoUpdate = false; this.faceMesh.frustumCulled = false; this.scene.add(this.faceMesh);
     this.faceKey = null; this.faceGeo = new Map();
     this.itemGeo = new Map(); this.itemMeshes = [];
+  }
+
+  // 三维部分的超采样：没有显卡加速时用 1（像素少 4 倍），导出时总是换回 2
+  setQuality(ss) {
+    if (ss === this.ss) return;
+    this.ss = ss; this.gl.setSize(BOX * ss, BOX * ss, false);
   }
 
   // 换模型（model.js 读出来的，或者原版 BUILTIN_MODEL）

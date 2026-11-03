@@ -1,7 +1,7 @@
-// 工程状态：当前工程 + 撤销 / 重做 + 自动存草稿；「我的组件」（自己写的、从文件载入的）也存在这台设备上。
+// 工程状态：当前工程 + 撤销 / 重做 + 自动存草稿。组件库（下载的 / 自己写的组件）在 library.js。
 import { normalizeProject, DEFAULTS } from '../engine/project.js';
 
-const DRAFT = 'axo-studio-draft-v2', MINE = 'axo-my-components-v1';
+const DRAFT = 'axo-studio-draft-v2';
 const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
 
@@ -26,13 +26,11 @@ export class Store {
     const d = load(DRAFT, null);
     this.p = d ? normalizeProject(d) : STARTER();
     this.selected = null;                                    // 选中的图层 id；null = 工程设置
-    this.mine = load(MINE, []);                              // [{ origin, name, type, source, at }]
     this.lastPush = 0;
     this.foreign = false;                                    // 另一个标签页存过草稿以后，这边就不再自动覆盖它
     try {
       window.addEventListener('storage', (e) => {
         if (e.key === DRAFT && e.newValue && !this.foreign) { this.foreign = true; this.tell('foreign'); }
-        if (e.key === MINE) { this.mine = load(MINE, []); this.tell('mine'); }
       });
     } catch { /* 没有 window（测试环境） */ }
   }
@@ -70,13 +68,6 @@ export class Store {
   }
   dropComponent(origin) { this.change((p) => { p.components = p.components.filter((c) => c.origin !== origin); }); }
 
-  saveMine(entry) {
-    this.mine = load(MINE, this.mine);                       // 先读一遍：别的标签页可能刚存过
-    const i = this.mine.findIndex((m) => m.origin === entry.origin);
-    if (i >= 0) this.mine[i] = { ...this.mine[i], ...entry, at: Date.now() }; else this.mine.unshift({ ...entry, at: Date.now() });
-    return save(MINE, this.mine);
-  }
-  removeMine(origin) { this.mine = load(MINE, this.mine).filter((m) => m.origin !== origin); save(MINE, this.mine); }
 }
 
 export { DEFAULTS };

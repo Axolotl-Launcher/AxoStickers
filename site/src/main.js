@@ -6,6 +6,11 @@ import { G, initGallery } from './gallery.js';
 import { WS, initWorkshop, sorted } from './workshop.js';
 import { openDetail, closeDetail } from './detail.js';
 import { initHero } from './hero.js';
+import { detectPerf } from './perf.js';
+
+// 设备档位挂到 <html> 上：样式据此关掉没有显卡加速时很费的效果（毛玻璃、常驻动画）
+const perf = detectPerf();
+Object.assign(document.documentElement.dataset, { perf: perf.tier, gpu: perf.gpu, device: perf.device });
 
 $('#zip-link').href = RELEASE.url;
 $('#zip-size').textContent = RELEASE.size;
@@ -25,6 +30,21 @@ const ready = { gallery: null, workshop: null };
 const retryable = (key, init) => (ready[key] ||= init().catch((e) => { ready[key] = null; console.error(e); }));
 const gallery = () => retryable('gallery', () => initGallery().then(() => { initHero(G.items, () => view === 'gallery').catch(console.error); }));
 const workshop = () => retryable('workshop', initWorkshop);
+
+// 给浏览器里的 AI 助手 / 自动化脚本：编辑器还没打开时，axo.studio() 会打开它并等预览准备好，然后返回完整接口（说明：llms.txt）
+const openStudioApi = async () => {
+  if (!location.hash.startsWith('#/editor')) location.hash = '#/editor';
+  await loadStudio();
+  for (let i = 0; i < 400 && window.axo.studio === openStudioApi; i++) await new Promise((r) => setTimeout(r, 50));
+  return window.axo.studio();
+};
+window.axo = Object.assign(window.axo || {}, {
+  version: 2, perf,
+  help: () => '先 await axo.studio()：打开创意工坊编辑器并等预览准备好，返回编辑器的全部接口（再调 axo.help() 看）。axo.stickers() 列出图鉴里的表情。完整说明：llms.txt',
+  studio: openStudioApi,
+  stickers: async () => { await gallery(); return G.items.map((it) => ({ key: it.key, text: it.text, category: it.category, gif: it.gif, motion: it.motion, face: it.face })); },
+  go: (route) => { location.hash = route.startsWith('#') ? route : `#/${route.replace(/^\/+/, '')}`; return location.hash; },
+});
 
 function show(v) {
   if (v !== view) {

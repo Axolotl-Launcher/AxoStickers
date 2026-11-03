@@ -3,8 +3,8 @@
 //       沙盒 → 主页面 ready / catalog / scene / errors / time / progress / exported / export-error / *-done（带 req 的回复）/ pong / fatal。
 // 回复的类型名故意和请求不一样：沙盒单独当顶层页面打开时（CI 出图），消息会发给自己。
 export class Runner {
-  constructor(mount, { sandboxed = true } = {}) {
-    this.mount = mount; this.sandboxed = sandboxed;
+  constructor(mount, { sandboxed = true, src = 'sandbox.html' } = {}) {
+    this.mount = mount; this.sandboxed = sandboxed; this.src = src;
     this.handlers = new Map(); this.pending = new Map(); this.req = 0;
     this.queue = []; this.ready = false;
     window.addEventListener('message', (e) => this.onMessage(e));
@@ -19,7 +19,7 @@ export class Runner {
     this.pending.clear(); this.queue = [];
     const f = this.frame = document.createElement('iframe');
     if (this.sandboxed) f.setAttribute('sandbox', 'allow-scripts');     // 不给 allow-same-origin：碰不到本站的存储和页面
-    f.src = 'sandbox.html';
+    f.src = this.src;
     f.title = '预览';
     f.className = 'stage-iframe';
     f.setAttribute('allow', '');

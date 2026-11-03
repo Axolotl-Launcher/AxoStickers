@@ -81,6 +81,7 @@ if ((await reported()).length) await fail('组件报错了', await reported());
 await page.evaluate(() => window.postMessage({ type: 'export', req: 1, format: 'gif' }, '*'));
 const done = await waitFor('exported');
 if (done.type !== 'exported') await fail('导出失败：' + (done.message || done.type));
+if (done.errors?.length) await fail('组件报错了', done.errors.map((e) => ({ key: e.key, message: String(e.message || ''), line: e.line ?? null })));
 if ((await reported()).length) await fail('组件报错了', await reported());
 const b64 = await page.evaluate(() => {
   const m = window.__msgs.find((x) => x.type === 'exported'), u = new Uint8Array(m.bytes);

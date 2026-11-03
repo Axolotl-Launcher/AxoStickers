@@ -9,4 +9,4 @@ export { loadFont, charSprite } from './draw.js';
 export { exportGif, renderFrames } from './gif.js';
 
 let R = null;
-export function renderer() { return (R ||= new AxoRenderer(2)); }
+export function renderer(opts) { return (R ||= new AxoRenderer(opts?.ss ?? 2, opts)); }   // opts 只在第一次创建时有用（沙盒按设备档位传）
