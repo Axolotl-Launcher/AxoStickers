@@ -132,11 +132,19 @@ export function layout(text, y0 = 118, scale = 1, dx = 0, font = 'axo') {
   return out;
 }
 
+// 字色：内置的名字（pink blue…），或者 #rrggbb 自己挑的颜色：深一档做描边、更深的做厚度、浅的做渐变
+export function styleColors(style) {
+  if (E.styles[style]) return E.styles[style].map(hx);
+  const m = /^#?([0-9a-f]{6})$/i.exec(style || '');
+  if (!m) return E.styles.pink.map(hx);
+  const c = hx(m[1]), mix = (k, to) => c.map((v, i) => Math.round(v + (to[i] - v) * k));
+  return [c, mix(0.3, [0, 0, 0]), mix(0.68, [0, 0, 0]), mix(0.82, [255, 255, 255])];
+}
 const SPR = new Map();
 export function charSprite(c, ch, style = 'pink', font = 'axo') {
   const key = `${c}|${ch}|${style}|${font}`;
   if (SPR.has(key)) return SPR.get(key);
-  const [HOT, DEEP, PLUM, TINT] = E.styles[style].map(hx);
+  const [HOT, DEEP, PLUM, TINT] = styleColors(style);
   const s1 = Math.max(6, pyRound(ch * 0.134)), s2 = Math.max(4, pyRound(ch * 0.09)), dep = Math.max(4, pyRound(ch * 0.08));
   const pad = Math.floor(ch * 0.36), sz = ch + 2 * pad;
   const cv = canvas(sz, sz + 20), g = cv.getContext('2d');

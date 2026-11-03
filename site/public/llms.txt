@@ -36,6 +36,11 @@ axo.fonts.list();                          // 字体：axo（Axo 黑体，默认
 axo.fonts.use('sys-kai', { all: true });   // 所有文字换字体；{ layer: '图层id' } 只换一层
 axo.models.list();                         // 模型：axolotl（原版）+ 库里的（工坊下载的 / 载入的文件）
 await axo.models.use('logo');              // 换模型（要先在库里：axo.workshop.add('logo')）
+axo.models.transform({ x: 40, y: -20, scale: 1.3, rot: 10, flip: true });   // 模型整体挪（像素，-256～256）、缩放（0.3～2.5）、转（度）、左右镜像
+axo.layers.update('w1', { params: { gy: 3, gs: 1.2 } });   // 帽子戴在哪：gx gy gz 挪、gs 缩放、rx ry rz 转
+axo.layers.update('t1', { style: '#33aa77' });             // 字色可以是内置的名字，也可以是 #rrggbb
+await axo.projects.save();                 // 「我的工程」：存在这台设备浏览器里；await list() / open(origin) / remove(origin)（都是 Promise）。别的标签页改过同一份时会另存一份，不覆盖
+await axo.export({ format: 'video', size: 480, loops: 3 });   // 视频（浏览器能录 MP4 就是 MP4，不然 WebM），按真实时间录
 await axo.publishUrl({ title: '收到', description: '一句话' });   // → { url, problems }：填好的 GitHub 投稿链接（不打开；problems 不空就先改）
 ```
 
@@ -56,7 +61,13 @@ axo.favorites.toggle('motion:hop');        // 收藏：键是「类型:id」，�
 - 等编辑器根节点 `.studio[data-state="ready"]` 出现再操作（`booting` = 沙盒还在启动，`error` = 没启动起来）。
 - 预览是沙盒 iframe 里的画布，读不到内容；看 `[data-ax="status"]`（读屏用的一句话，描述当前工程）和 `[data-ax="frame-counter"]`。
 - 按钮都有中文名字（aria-label），也有稳定的 `data-ax`：
-  - 顶栏：`back` `project-name` `undo` `redo` `new` `open` `save` `share` `random` `help` `publish` `export`
+  - 顶栏：`back` `project-name` `save-state`（自动保存的状态）`undo` `redo` `new` `open` `save` `projects`（我的工程）`random` `help` `share` `publish` `export`
+  - 网站顶栏（图鉴 / 创意工坊 / 工坊作品）在编辑器里会收起来：鼠标移到窗口最上沿、或者 Tab 到导航时出来；自动化工具直接 `location.hash = '#/'` 换页就行
+  - 预览：在 `.st-stage-box` 上拖 = 挪选中的文字（没选中文字就挪模型），滚轮缩放；`guides` 参考线开关
+  - 模型的大小和位置（素材栏「模型」和工程设置里）：`field:model-scale` `field:model-x` `field:model-y` `field:model-rot`（数字框，加 `:range` 是滑块）、`model-flip` `model-reset`
+  - 帽子的「戴在哪」：`field:gx` … `field:rz`、`wear-reset`；字色：`style:pink`… 和 `style:custom`（颜色选择器）；背景 `field:background`（white / transparent / color / gradient）
+  - 我的工程弹窗：`project-save` `project-save-new`，卡片 `[data-ax="project-item"][data-origin]` 里的 `project-open` `project-remove`
+  - 导出：`export-format`（gif / video / png-zip / png）`export-size` `export-colors` `export-maxkb` `export-loops` `export-start`
   - 素材栏：`drawer:templates|text|motion|face|fx|prop|wear|skin|model|workshop`；搜索 `search`；只看收藏 `fav-only`
   - 素材：`[data-ax="item"][data-type][data-id]` 里面的 `use`（换上）、`add-layer`（再叠一层）、`fav`（收藏）
   - 工坊：`workshop-tab:browse|mine`、`workshop-filter:all|fav|added|scene|model|motion|fx|textanim|face|prop|wear|skin`、卡片 `[data-ax="workshop-item"][data-id]` 里的 `workshop-add` `workshop-add-use` `workshop-use` `workshop-remove`；组件库 `library-use` `library-remove`。点了要等的按钮会带 `aria-busy="true"`，做完才去掉

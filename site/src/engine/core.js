@@ -114,7 +114,11 @@ export function itemXf(pose, it) {
   const at = it.at || 'head';
   const Wm = at === 'head' ? headWorld(pose) : at === 'root' ? rootM(pose) : new Matrix4();
   const R = rotEuler(it.rx || 0, it.ry || 0, it.rz || 0);
-  if ((it.gear || E.gear[it.kind]) && it.x === undefined) return Wm.multiply(R);
+  if ((it.gear || E.gear[it.kind]) && it.x === undefined) {   // 帽子：按它本来的位置戴；调过「戴在哪」的再挪一挪、缩一缩
+    if (!it.gx && !it.gy && !it.gz && (it.gs ?? 1) === 1) return Wm.multiply(R);
+    R.multiplyScalar(it.gs ?? 1); R.elements[15] = 1;
+    return Wm.multiply(M4(R, [(it.gx || 0) * U, (it.gy || 0) * U, (it.gz || 0) * U]));
+  }
   R.multiplyScalar(it.s ?? 1); R.elements[15] = 1;
   return Wm.multiply(M4(R, [(it.x || 0) * U, (it.y || 0) * U, (it.z ?? -13) * U]));
 }

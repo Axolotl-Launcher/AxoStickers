@@ -181,6 +181,13 @@ def validate_project(p):
         errs.append(f'模型只能用网站自带的（{"、".join(MODELS.values())}）：自己载入的模型文件只在你的浏览器里，发不上来')
         mid = 'axolotl'
     out['model'] = {'component': mid, 'face': model.get('face') if isinstance(model.get('face'), bool) else None}
+    for k, lo, hi, d in (('x', -256, 256, 0), ('y', -256, 256, 0), ('scale', 0.3, 2.5, 1), ('rot', -180, 180, 0)):   # 模型整体的位置 / 大小 / 角度
+        v = model.get(k, d)
+        if number(v, lo, hi): out['model'][k] = v
+        else: errs.append(f'模型的 {k} 要在 {lo}～{hi} 之间：{show(v)}')
+    flip = model.get('flip', False)
+    if not isinstance(flip, bool): errs.append(f'模型的 flip 要是 true 或 false：{show(flip)}'); flip = False
+    out['model']['flip'] = flip
 
     comps = p.get('components', [])
     if not isinstance(comps, list) or len(comps) > LIM['components']:
@@ -228,8 +235,8 @@ def validate_project(p):
                 errs.append(f'{where}的文字里有不支持的字符：{show(bad)}（只能用{CATALOG["text"]["hint"].split("：", 1)[-1]}，用 / 换行）')
             q['text'] = text
             style = l.get('style', 'pink')
-            if not isinstance(style, str) or style not in CATALOG['styles']:
-                errs.append(f'{where}的字色不对：{show(style)}（只能用内置的：{"、".join(CATALOG["styles"])}）'); style = 'pink'
+            if not isinstance(style, str) or not (style in CATALOG['styles'] or re.fullmatch(r'#[0-9a-fA-F]{6}', style)):
+                errs.append(f'{where}的字色不对：{show(style)}（用内置的 {"、".join(CATALOG["styles"])}，或者 #rrggbb）'); style = 'pink'
             q['style'] = style
         if t == 'face' and l.get('face') is not None:
             if not isinstance(l['face'], dict) or not plain(l['face']): errs.append(f'{where}的表情部件 face 格式不对')

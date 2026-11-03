@@ -73,6 +73,11 @@ export async function put(entry) {
   return e;
 }
 
+// 直接从数据库读这一条最新的（别的标签页刚改过 / 删掉的，内存里可能还没同步过来）
+export async function fresh(origin) {
+  return serial(async () => (db ? (await req(store('readonly').get(origin))) || null : items.get(origin) || null));
+}
+
 // 真的删掉：IndexedDB 里这一条没了
 export async function remove(origin) {
   await serial(async () => { if (db) await req(store('readwrite').delete(origin)); items.delete(origin); });   // 数据库里删掉了才算删掉

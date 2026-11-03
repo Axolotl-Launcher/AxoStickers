@@ -304,6 +304,24 @@ footer a { color: #0d3f66; font-weight: 700; }
   html { scroll-behavior: auto; }
 }
 
+/* ---------------- 创意工坊里网站顶栏收起来：鼠标到最上沿（.topbar-hot）、Tab 到导航、触屏点把手时再出来 ---------------- */
+.topbar-hot, .topbar-handle { display: none; }
+html.in-editor .topbar, html[data-route="editor"] .topbar {
+  position: fixed; left: 0; right: 0; top: 0; transform: translateY(calc(-100% - 4px)); transition: transform .22s ease, box-shadow .22s;
+}
+html.in-editor .topbar.peek, html.in-editor .topbar:focus-within { transform: none; box-shadow: 0 8px 24px rgba(20, 60, 100, .16); }
+html.in-editor .topbar-hot { display: block; position: fixed; left: 0; right: 0; top: 0; height: 6px; z-index: 19; }
+@media (min-width: 901px) { html.in-editor .studio { height: 100dvh; } }   /* 窄屏上编辑器本来就按内容往下长 */
+html.in-editor #studio-root { min-height: 100dvh; }
+@media (pointer: coarse) {
+  html.in-editor .topbar-handle {
+    display: grid; place-items: center; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 21; width: 52px; height: 18px;
+    border: 0; border-radius: 0 0 10px 10px; background: var(--surface, #fff); color: var(--ink-soft); box-shadow: 0 2px 0 var(--line); padding: 0;
+  }
+  html.in-editor.topbar-open .topbar-handle { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { html.in-editor .topbar { transition: none; } }
+
 /* ---------------- 动效：换页淡入、卡片出场、按钮和导航的反馈、弹窗弹出、提示条滑入（减少动画 / 低档设备不放） ---------------- */
 @media (prefers-reduced-motion: no-preference) {
   html:not([data-perf="low"]) .view-enter { animation: view-in .28s ease-out; }

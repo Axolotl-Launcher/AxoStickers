@@ -200,19 +200,22 @@ const handlers = {
     if (playing) t0 = now - (tHold / speed) * 1000;
     if (scene) scene.dirty = true;
   },
-  async export({ req, format = 'gif', size, colors, maxKb }) {
+  async export(msg) {
+    const { req, format = 'gif', size, colors, maxKb, loops = 3 } = msg;
     if (!scene) { post({ type: 'export-error', req, message: '预览还没准备好，等一下再导出' }); return; }
-    if (!['gif', 'png-zip', 'png'].includes(format)) { post({ type: 'export-error', req, message: `不支持的格式 ${format}（能用 gif / png-zip / png）` }); return; }
+    if (!['gif', 'png-zip', 'png', 'video'].includes(format)) { post({ type: 'export-error', req, message: `不支持的格式 ${format}（能用 gif / png-zip / png / video）` }); return; }
     exporting = true; R.setQuality(2);                        // 导出总是全画质；导出期间预览先不画，省出来给导出
     try {
       const progress = (p) => post({ type: 'progress', req, p });
-      const s = new Scene(project, reg, R);                   // 独立一份，不打断预览
+      const s = new Scene(msg.project || project, reg, R);    // 独立一份，不打断预览（「我的工程」存小图时给的是要存的那一份快照）
       let bytes, mime = 'image/gif';
       if (format === 'gif') bytes = await exportGif(s, { size, colors, maxKb }, progress);
       else if (format === 'png-zip') {                         // 按时间顺序从第一帧开始，每帧马上压成 PNG（不把整帧像素都留在内存里）
         const files = [];
         await eachFrame(s, size || s.P.size, async (_, i, c) => { files.push({ name: `frame_${String(i + 1).padStart(3, '0')}.png`, data: await canvasBytes(c) }); }, { fromCover: false, onProgress: progress });
         bytes = zipStore(files); mime = 'application/zip';
+      } else if (format === 'video') {                         // 视频（发朋友圈、短视频平台用）：浏览器能录 MP4 就录 MP4，不然 WebM
+        ({ bytes, mime } = await recordVideo(s, size || s.P.size, loops, progress));
       } else if (format === 'png') {
         const c = makeCanvas(size || s.P.size, size || s.P.size), b = makeCanvas(W, W);
         s.frame(b.getContext('2d'), currentT(performance.now())); c.getContext('2d').drawImage(b, 0, 0, c.width, c.height);   // 正在播就存当下这一帧
@@ -286,6 +289,45 @@ const handlers = {
   },
   ping({ n }) { post({ type: 'pong', n }); },
 };
+
+// 录视频：先把一圈的帧都画好（每帧时间准），再按帧率一张张贴到画布上让 MediaRecorder 录下来，循环 loops 遍。
+// 视频没有透明：透明背景垫白底。录的时候按真实时间走（48 帧 15 fps 一遍 3.2 秒），标签页切到后台会被浏览器放慢
+async function recordVideo(s, size, loops, progress) {
+  if (typeof MediaRecorder === 'undefined' || !HTMLCanvasElement.prototype.captureStream) throw new Error('这个浏览器录不了视频，导出 GIF 吧');
+  const type = ['video/mp4;codecs=avc1.42E01E', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find((t) => MediaRecorder.isTypeSupported(t));
+  if (!type) throw new Error('这个浏览器录不了视频，导出 GIF 吧');
+  const n = Math.max(1, Math.min(10, Math.round(loops) || 3)), side = Math.max(64, Math.min(1080, Math.round(size / 2) * 2));   // 视频的边长要是偶数
+  const frames = [];
+  let stream = null, rec = null;
+  try {                                                      // 中途出错也要把位图、录像轨道放掉（finally）
+    const big = makeCanvas(W, W), bg = big.getContext('2d');
+    for (let i = 0; i < s.N; i++) { s.frame(bg, i / s.FPS); frames.push(await createImageBitmap(big)); progress(0.4 * (i + 1) / s.N); }
+    const c = document.createElement('canvas'); c.width = c.height = side;
+    const g = c.getContext('2d'); g.imageSmoothingQuality = 'high';
+    const paint = (b) => { g.fillStyle = '#fff'; g.fillRect(0, 0, side, side); g.drawImage(b, 0, 0, side, side); };
+    paint(frames[0]);
+    stream = c.captureStream(s.FPS); rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 5e6 });
+    const chunks = [];
+    rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    const stopped = new Promise((res) => { rec.onstop = res; });
+    rec.start();
+    const dt = 1000 / s.FPS, t0 = performance.now(), total = s.N * n;
+    for (let k = 0; k < total; k++) {
+      const wait = t0 + k * dt - performance.now();
+      if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+      paint(frames[k % s.N]);
+      progress(0.4 + 0.6 * (k + 1) / total);
+    }
+    await new Promise((r) => setTimeout(r, dt));
+    rec.stop(); await stopped;
+    const mime = type.split(';')[0], blob = new Blob(chunks, { type: mime });
+    return { bytes: new Uint8Array(await blob.arrayBuffer()), mime };
+  } finally {
+    if (rec && rec.state !== 'inactive') try { rec.stop(); } catch { /* 已经停了 */ }
+    for (const b of frames) b.close();
+    stream?.getTracks().forEach((t) => t.stop());
+  }
+}
 
 // 组件在定时器、await 之后抛的错（包括循环保险）不经过 scene.guard：也记成组件错误，出图时就不会悄悄发布
 const asyncFail = (err) => {
