@@ -45,7 +45,7 @@ button, input, select { font: inherit; color: inherit; }
 }
 .topbar-inner { max-width: 1180px; margin: 0 auto; padding: 0 16px; height: 56px; display: flex; align-items: center; gap: 16px; }
 .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); font: 900 18px/1 var(--font-big); white-space: nowrap; }
-.brand-logo { width: 32px; height: 32px; flex: none; image-rendering: pixelated; }   /* 美西螈头的像素画（public/favicon.svg，16×16 放大两倍正好是整像素） */
+.brand-logo { height: 30px; width: auto; flex: none; }   /* 网页引擎渲染的 Logo 版美西螈（正面，public/logo.png） */
 @media (prefers-reduced-motion: no-preference) {
   html:not([data-perf="low"]) .brand:hover .brand-logo { animation: brand-wiggle .5s ease-in-out; }
 }
