@@ -1,6 +1,7 @@
 # 美西螈表情包 · AxoStickers
 
-> 给 AI 助手 / 浏览器自动化工具的说明（llms.txt）。Axolotl Launcher 的美西螈动图表情包网站：图鉴（300 张 GIF）、创意工坊编辑器（在浏览器里做动图）、工坊作品（大家发布的）。
+[[contribute]] > 给 AI 助手 / 浏览器自动化工具的说明（llms.txt）。Axolotl Launcher 的美西螈动图表情包网站：图鉴（300 张 GIF）、创意工坊编辑器（在浏览器里做动图）、工坊作品（大家发布的）。
+[[!contribute]] > 给 AI 助手 / 浏览器自动化工具的说明（llms.txt）。Axolotl Launcher 的美西螈动图表情包网站：图鉴（300 张 GIF）、创意工坊编辑器（在浏览器里做动图）、工坊作品（用同一个引擎出图的作品）。
 > Guide for AI agents driving this site in a browser. The UI is Chinese; every control also has a stable `data-ax` name and an accessible label.
 
 网站：https://axolotl-launcher.github.io/AxoStickers/
