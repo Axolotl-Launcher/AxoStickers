@@ -172,8 +172,12 @@ export function charSprite(c, ch, style = 'pink', font = 'axo') {
   return cv;
 }
 
+// 只把这些字用到的字体切片下下来（@font-face 按 unicode-range 切好了），等它们真的能用。
+// 返回 true = 这些字都能用这个字体画了；false = 有切片没下下来（断网之类）：画出来会是系统字体，导出要拦下
 export async function loadFont(text, font = 'axo') {
   const fonts = globalThis.document?.fonts || globalThis.fonts;
-  if (!fonts) return;
-  try { await fonts.load(fontCss(100, font), text || '美西螈'); } catch { /* 字体没加载上就用系统字体 */ }
+  if (!fonts) return true;
+  const spec = fontCss(100, font), t = text || '美西螈';
+  try { await fonts.load(spec, t); } catch { /* 下面 check 会说没加载上 */ }
+  try { return fonts.check(spec, t); } catch { return true; }
 }

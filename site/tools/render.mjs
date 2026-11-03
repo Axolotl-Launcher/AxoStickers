@@ -95,7 +95,7 @@ const b64 = await page.evaluate(() => {
 const bytes = Buffer.from(b64, 'base64');
 fs.writeFileSync(out, bytes);
 // 封面就是 GIF 的第一帧（导出时已经把文字刚好出全的那一帧转到最前面了），publish 直接取第 0 帧
-const report = { ok: true, kb: Math.round(bytes.length / 1024), frames: scene.N, fps: scene.fps, errors: [], renderer: gl };
+const report = { ok: true, kb: Math.round(bytes.length / 1024), frames: scene.N, fps: scene.fps, errors: [], renderer: gl, thread: ready.perf?.thread };
 fs.writeFileSync(out.replace(/\.gif$/i, '') + '.json', JSON.stringify(report, null, 1));
 console.log(JSON.stringify(report));
 clearTimeout(timer); await browser.close(); server.close();

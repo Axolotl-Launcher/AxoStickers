@@ -1,4 +1,5 @@
 /* 创意工坊编辑器：左素材栏 + 抽屉 | 舞台 + 播放条 + 时间轴 / 代码 | 右属性。
+   界面上的字全用系统字体（--font-ui）：表情同款的 Axo 黑体按字切成一百多个文件，界面用它的话一打开就要下 1.5 MB；它只用在画布上的表情字。
    平板竖屏 / 手机：舞台在上，下面页签切换素材 / 属性 / 时间轴 / 代码。
    data-perf="low"（没有显卡加速 / 省流量）：去掉阴影、过渡这类费 GPU 的效果。 */
 .studio-view { background: #eef6ff; }
@@ -9,7 +10,7 @@
 }
 .studio.dropping::after {
   content: "松手：打开工程 / 载入组件"; position: fixed; inset: 12px; border: 4px dashed var(--pink); border-radius: 18px;
-  background: rgba(255, 227, 240, .85); display: grid; place-items: center; font: 900 28px var(--font-big); color: var(--pink-deep); z-index: 40;
+  background: rgba(255, 227, 240, .85); display: grid; place-items: center; font: 800 28px var(--font-ui); color: var(--pink-deep); z-index: 40;
 }
 
 /* 图标 */
@@ -41,7 +42,7 @@
 .st-top { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--surface); border-bottom: 2px solid var(--line); min-height: var(--top); }
 .st-back { display: grid; place-items: center; width: var(--hit); height: var(--hit); border-radius: 10px; color: var(--ink-soft); }
 .st-back:hover { background: var(--bg); color: var(--ink); }
-.st-name { border: 0; font: 900 17px/1 var(--font-big); padding: 7px 9px; border-radius: 9px; width: 10em; min-width: 5em; background: transparent; }
+.st-name { border: 0; font: 800 17px/1 var(--font-ui); padding: 7px 9px; border-radius: 9px; width: 10em; min-width: 5em; background: transparent; }
 .st-name:hover, .st-name:focus { background: var(--bg); outline: none; box-shadow: inset 0 0 0 2px var(--line); }
 .st-group-btns { display: flex; gap: 4px; }
 .st-sep { width: 2px; height: 24px; background: var(--line); margin: 0 2px; border-radius: 2px; }
@@ -71,7 +72,7 @@
 .st-drawer { display: flex; flex-direction: column; min-height: 0; background: var(--surface-2); border-right: 2px solid var(--line); }
 .st-drawer-head { padding: 12px 12px 8px; display: grid; gap: 8px; }
 .st-drawer-title { display: flex; align-items: baseline; gap: 8px; }
-.st-drawer-head h3 { margin: 0; font: 900 18px var(--font-big); }
+.st-drawer-head h3 { margin: 0; font: 800 18px var(--font-ui); }
 .st-count { color: var(--ink-soft); font-size: 12px; font-weight: 700; }
 .st-searchrow { display: flex; gap: 6px; }
 .st-search { height: var(--hit); flex: 1; border-radius: 10px; }
@@ -263,10 +264,10 @@
 /* 属性 */
 .st-inspector { overflow-y: auto; background: var(--surface-2); border-left: 2px solid var(--line); padding: 10px 12px 24px; overscroll-behavior: contain; }
 .st-insphead { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
-.st-insphead b { font: 900 16px var(--font-big); margin-left: 2px; }
+.st-insphead b { font: 800 16px var(--font-ui); margin-left: 2px; }
 .st-group { padding: 12px 0; border-bottom: 2px solid var(--line); display: grid; gap: 9px; }
 .st-group:last-child { border-bottom: 0; }
-.st-group h3 { margin: 0; font: 900 14px var(--font-big); }
+.st-group h3 { margin: 0; font: 800 14px var(--font-ui); }
 .st-field { display: grid; gap: 3px; font-size: 12px; font-weight: 700; color: var(--ink-soft); }
 .st-field.row { grid-template-columns: 1fr auto; align-items: center; }
 .st-field.check { display: flex; align-items: center; gap: 6px; color: var(--ink); }
@@ -279,7 +280,7 @@
 /* 弹窗 */
 .st-dialog { border: 0; border-radius: 18px; padding: 20px 22px; width: min(520px, calc(100vw - 24px)); box-shadow: 0 6px 0 #9fd0f3, 0 30px 80px rgba(20, 60, 100, .35); }
 .st-dialog::backdrop { background: rgba(120, 180, 230, .5); }
-.st-dialog h2 { font: 900 22px var(--font-big); margin: 0 0 8px; }
+.st-dialog h2 { font: 800 22px var(--font-ui); margin: 0 0 8px; }
 .st-dialog h4 { display: flex; align-items: center; margin: 14px 0 6px; font-size: 13px; color: var(--ink-soft); }
 .st-dialog .st-field { margin: 8px 0; }
 .st-dlgactions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; flex-wrap: wrap; }

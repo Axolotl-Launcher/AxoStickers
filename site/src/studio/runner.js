@@ -44,6 +44,7 @@ export class Runner {
     const m = e.data;
     if (!m || typeof m.type !== 'string') return;
     this.lastPong = performance.now(); this.unanswered = 0;            // 沙盒发来的任何消息（导出进度、播放时间…）都说明它还活着
+    if (m.type === 'font-fetch') { this.fetchFont(m); return; }
     if (m.type === 'booting') { this.booting = true; this.armBoot(60000, '沙盒的脚本一直没加载完'); return; }
     if (m.type === 'boot-error') { if (!this.ready) { clearTimeout(this.bootTimer); this.emit('boot-failed', { reason: m.message }); } return; }
     if (m.type === 'ready') {
@@ -59,6 +60,19 @@ export class Runner {
     }
     if (m.type === 'pong') this.lastPong = performance.now();
     this.emit(m.type, m);
+  }
+
+  // 沙盒的 Worker 自己下不了字体（不透明来源，CSP 的 'self' 对不上）：替它下本站的字体切片，把字节递回去。只下本站的 .woff2
+  async fetchFont({ id, url }) {
+    let bytes = null, error = null;
+    try {
+      const u = new URL(url, location.href);
+      if (u.origin !== location.origin || !/\.woff2$/i.test(u.pathname)) throw new Error('只能下本站的字体文件');
+      const r = await fetch(u);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      bytes = await r.arrayBuffer();
+    } catch (e) { error = String(e?.message || e); }
+    this.frame?.contentWindow?.postMessage({ type: 'font-bytes', id, bytes, error }, '*', bytes ? [bytes] : []);
   }
 
   post(msg, transfer) {

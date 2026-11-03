@@ -72,6 +72,7 @@ export default defineConfig({
   plugins: [repoFiles(), sandboxNoHmr()],
   // 沙盒 iframe 取资源的 CORS 见上面 repoFiles 里的中间件；GitHub Pages 本来就发 ACAO: *
   server: { port: 5173, strictPort: true, fs: { allow: [ROOT] }, cors: { origin: [/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/] } },
+  worker: { format: 'iife' },                                  // 沙盒的 Worker 打成一个普通脚本塞进 blob:（不透明来源里开不了模块 Worker，也 import 不了别的文件）
   build: {
     outDir: 'dist', emptyOutDir: true, assetsInlineLimit: 0, chunkSizeWarningLimit: 1500,
     rollupOptions: { input: { index: path.join(import.meta.dirname, 'index.html'), sandbox: path.join(import.meta.dirname, 'sandbox.html') } },
