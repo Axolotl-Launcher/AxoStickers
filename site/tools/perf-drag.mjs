@@ -1,7 +1,8 @@
 // 拖动基准：在编辑器预览上拖模型、拖文字、滚轮缩放，量「跟手」的程度。
 //   node tools/perf-drag.mjs <拼好的网站目录> [--base /AxoStickers/] [--phone --rate 6] [--page] [--json out.json]
 // 量的是：拖动期间预览上的位置每秒更新几次、从输入到画出来多久（沙盒报 drawn 时带回输入的时间戳，到编辑器页面收到为止；旧版本没有这条消息，就按 scene 消息算）、
-// 开始拖以后多久第一次看到变化、松手以后多久画到最后的位置、画出来的位置落后指针多少（画布像素）、
+// 开始拖以后多久第一次看到变化、松手以后多久画到最后的位置、沙盒报回来的画出位置落后指针多少（画布像素；这是 drawn 回音里的坐标，
+// 画面上是不是真的画在那儿由 --snap 的截图来查）、
 // 编辑器线程上的长任务、任务时间（CDP TaskDuration，每秒手势占多少毫秒）和动画帧间隔、松手后存进工程的位置和最后画出来的位置是不是一样。
 // --phone 多量一个双指捏合（CDP 发触摸事件）；--page 让引擎在沙盒页面里跑（#/editor?worker=0），降速对引擎也有效；
 // --snap 再查一遍「拽不回去」：暂停在第 0 帧，拖到一半时把拖动前的工程发给沙盒（就像一条过期的同步晚到了），
@@ -78,7 +79,8 @@ async function gesture(name, select, run, drags = true) {
   const finalShown = d.msgs.find((m) => m.at >= lastMove && (m.type === 'scene' || (m.type === 'drawn' && m.seq === Math.max(...seen.keys())))) || null;
   const L = d.long.filter(([s]) => s >= t0 && s <= t1 + 1500);
   const firstMove = d.moves[0]?.[0] ?? t0, first = d.msgs.find((m) => m.at >= firstMove);
-  // 画出来的位置落后指针多少：编辑器收到 drawn 的那一刻，指针（最近一下移动）对应的位置 和 画出来的位置 差几个画布像素
+  // 沙盒报回来的画出位置落后指针多少：编辑器收到 drawn 的那一刻，指针（最近一下移动）对应的位置 和 drawn 里的位置 差几个画布像素。
+  // 只说明消息链路跟不跟得上；场景有没有真的按这个位置画，看 --snap（拖着时的截图要和松手后按工程重建出来的一模一样）
   const b0 = pick(before), lagPx = [];
   if (d.down && drags) for (const m of seen.values()) {
     const mv = d.moves.filter((x) => x[0] <= m.at && x[1] !== undefined).at(-1);

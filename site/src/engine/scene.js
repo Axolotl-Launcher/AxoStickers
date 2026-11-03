@@ -77,11 +77,7 @@ export class Scene {
     this.props = of('prop'); this.wears = of('wear');
     this.faceLayer = of('face')[0] || null;
     this.spec = { hold: this.props[0]?.component, face: this.faceLayer && !this.faceLayer.face ? this.faceLayer.component : undefined };
-    this.texts = of('text').map((l) => {
-      const lay = l.text ? layout(l.text, l.y, l.scale, l.x, l.font) : [];
-      const anim = this.instance('textanim', l, { lay }) || this.instance('textanim', { ...l, component: 'stay' }, { lay });
-      return { l, lay, anim };
-    });
+    this.texts = of('text').map((l) => this.textEntry(l));
     this.motions = of('motion').map((l) => this.instance('motion', l)).filter(Boolean);
     this.scenes = of('scene').map((l) => this.instance('scene', l)).filter(Boolean);
     this.fx = of('fx').map((l) => this.instance('fx', l)).filter(Boolean);
@@ -93,13 +89,18 @@ export class Scene {
     }
   }
 
-  // 预览上拖着一行字（不重建场景）：只重新排一下字的位置，字的精灵按字号缓存着、照旧用
+  textEntry(l) {
+    const lay = l.text ? layout(l.text, l.y, l.scale, l.x, l.font) : [];
+    const anim = this.instance('textanim', l, { lay }) || this.instance('textanim', { ...l, component: 'stay' }, { lay });
+    return { l, lay, anim };
+  }
+  // 预览上拖着一行字（不重建场景）：这一行按新位置重新排、文字动画重新建一份（setup 按新的图层和排版再跑一遍，和松手后重建出来的一样）。
+  // 字的精灵按字号缓存着、模型几何不动，照旧用
   moveText(id, { x, y, scale }) {
-    const e = this.texts.find((t) => t.l.id === id);
-    if (!e) return;
-    Object.assign(e.l, { x, y, scale });
-    if (e.anim.layer !== e.l) Object.assign(e.anim.layer, { x, y, scale });   // 组件没找到、换成「stay」时用的是一份拷贝
-    e.lay = e.anim.lay = e.l.text ? layout(e.l.text, e.l.y, e.l.scale, e.l.x, e.l.font) : [];
+    const i = this.texts.findIndex((t) => t.l.id === id);
+    if (i < 0) return;
+    Object.assign(this.texts[i].l, { x, y, scale });
+    this.texts[i] = this.textEntry(this.texts[i].l);
   }
 
   // ---- 组件实例：this = 这一层的上下文（原型链连到场景，所以 this.T、this.ls、this.headPt 都能用） ----

@@ -176,8 +176,8 @@ function build(root) {
   // 顶栏：左边回首页、工程名、自动保存的状态；然后撤销重做、文件（新建 打开 保存 我的工程）、随机；右边是往外拿的：帮助、分享、发布、导出
   const name = el('input', { class: 'st-name', value: store.p.name, placeholder: '给它起个名', maxlength: 40, 'aria-label': '工程名', 'data-ax': 'project-name' });
   name.addEventListener('change', () => store.change((p) => { p.name = name.value.trim(); }));
-  S.undoBtn = btn('撤销', '撤销（Ctrl+Z）', () => { S.endLive?.(); store.undo(); }, { ico: 'undo', ax: 'undo', hideLabel: true });
-  S.redoBtn = btn('重做', '重做（Ctrl+Shift+Z）', () => { S.endLive?.(); store.redo(); }, { ico: 'redo', ax: 'redo', hideLabel: true });
+  S.undoBtn = btn('撤销', '撤销（Ctrl+Z）', () => store.undo(), { ico: 'undo', ax: 'undo', hideLabel: true });
+  S.redoBtn = btn('重做', '重做（Ctrl+Shift+Z）', () => store.redo(), { ico: 'redo', ax: 'redo', hideLabel: true });
   S.saved = el('span', { class: 'st-saved', role: 'status', 'data-ax': 'save-state', title: '草稿一改就自动存在这台设备的浏览器里；想长期留着就「存到我的工程」或者「保存」成文件' }, icon('check', 'tiny'), el('span', { text: '已自动保存' }));
   const top = el('header', { class: 'st-top', 'aria-label': '工程' },
     el('a', { class: 'st-back', href: '#/', title: '回图鉴（首页）', 'aria-label': '回图鉴', 'data-ax': 'back' }, icon('home')), name, S.saved,
@@ -356,7 +356,7 @@ function stageInteract() {
     }
     if (!wheel) { live.wheel = false; live.ws = undefined; }   // 拖过就不和前后的滚轮合成一步撤销；捏合改过大小，滚轮从新的大小接着算
     Object.assign(live, v);
-    if (S.runner.ready) S.runner.post({ type: 'live', g: live.g, target: t || 'model', x: live.x, y: live.y, scale: live.scale, rot: live.rot, seq: ++seq, t: at });
+    if (S.runner.ready) S.runner.post({ type: 'live', g: live.g, kind: t ? 'text' : 'model', id: t, x: live.x, y: live.y, scale: live.scale, rot: live.rot, seq: ++seq, t: at });
   };
   const commit = () => {
     clearTimeout(wheelTimer); wheelTimer = 0;
@@ -364,13 +364,22 @@ function stageInteract() {
     if (!L) return;
     live = null; S.live = false;
     S.runner.post({ type: 'live-end', g: L.g });
-    if ((L.x !== L.from[0] || L.y !== L.from[1] || L.scale !== L.from[2]) && target(L.t)) {   // 没挪动（或者那行字中途被删了）就不记一步撤销
-      S.store.change((p) => { const o = L.t ? p.layers.find((l) => l.id === L.t) : p.model; if (o) Object.assign(o, { x: L.x, y: L.y, scale: L.scale }); },
+    const v = {};                                               // 只写这次手势改过的字段：滚轮只改大小，不会把别处刚改的位置盖回去
+    if (L.x !== L.from[0]) v.x = L.x;
+    if (L.y !== L.from[1]) v.y = L.y;
+    if (L.scale !== L.from[2]) v.scale = L.scale;
+    if (Object.keys(v).length && target(L.t)) {                // 没挪动（或者那行字中途被删了）就不记一步撤销
+      S.store.change((p) => { const o = L.t ? p.layers.find((l) => l.id === L.t) : p.model; if (o) Object.assign(o, v); },
         { coalesce: L.wheel ? `wheel:${L.t || 'model'}` : null });   // 拖动 / 捏合一次一步；连着滚的几下滚轮合成一步
     }
     if (sendPending()) sendProject(true);                      // 马上同步（不等 60 毫秒）：沙盒那边接着就是这份工程
   };
-  S.endLive = () => { if (!drag) commit(); };                   // 撤销 / 重做之前：滚轮还没算完的先写进工程
+  S.endLive = () => {                                          // 别的操作要改 / 读工程之前（撤销、换工程、存文件…）：手势到此为止，先写进当前这份工程
+    if (drag) { drag = null; pts.clear(); box.classList.remove('dragging'); }   // 还按着的手指之后的移动、松手都不再算（不会把旧坐标写到撤销后的工程上）
+    commit();
+  };
+  S.store.beforeChange = () => S.endLive();                    // 改工程、撤销 / 重做、换工程都先叫它（写手势本身时 live 已经清掉，不会绕回来）
+  document.addEventListener('pointerdown', (e) => { if (live && !box.contains(e.target)) S.endLive(); }, true);   // 滚轮还没算完就去点别的按钮（导出、分享…）
   const begin = (e) => {
     const t = live ? live.t : textSel()?.id || null, v = cur(t), k = 512 / box.getBoundingClientRect().width, [a, b] = [...pts.values()];
     drag = { k, t, x0: e.clientX, y0: e.clientY, sx: v.x, sy: v.y, s0: v.scale, d0: b ? Math.hypot(a[0] - b[0], a[1] - b[1]) : 0, moved: !!live };
@@ -1986,13 +1995,14 @@ function onKey(e) {
   if (!S?.active || e.defaultPrevented) return;
   if (e.target.closest('input, textarea, select, .cm-editor, dialog')) return;
   const k = e.key, mod = e.ctrlKey || e.metaKey;
+  if (mod && k.length === 1) S.endLive?.();                    // Ctrl+S 存文件、Ctrl+C 复制图层这些只读工程：拖着的、滚轮还没算完的先写进去（光按住 Ctrl 不算：Ctrl+滚轮要接着滚）
   if (k === ' ') { setPlaying(!S.playing); e.preventDefault(); }
   else if (k === 'ArrowLeft' && !e.altKey) { seek(S.frame - (e.shiftKey ? 10 : 1)); e.preventDefault(); }
   else if (k === 'ArrowRight' && !e.altKey) { seek(S.frame + (e.shiftKey ? 10 : 1)); e.preventDefault(); }
   else if (k === 'Home') seek(0);
   else if (k === 'End') seek(S.N - 1);
-  else if (mod && k.toLowerCase() === 'z') { S.endLive?.(); (e.shiftKey ? S.store.redo() : S.store.undo()); e.preventDefault(); }
-  else if (mod && k.toLowerCase() === 'y') { S.endLive?.(); S.store.redo(); e.preventDefault(); }
+  else if (mod && k.toLowerCase() === 'z') { (e.shiftKey ? S.store.redo() : S.store.undo()); e.preventDefault(); }
+  else if (mod && k.toLowerCase() === 'y') { S.store.redo(); e.preventDefault(); }
   else if (mod && k.toLowerCase() === 's') { saveProjectFile(); e.preventDefault(); }
   else if (mod && k.toLowerCase() === 'd' && S.store.layer()) { duplicateLayer(S.store.layer()); e.preventDefault(); }
   else if (mod && k.toLowerCase() === 'c' && S.store.layer() && !String(getSelection?.() || '')) { S.clip = structuredClone(S.store.layer()); toast('复制了这一层：Ctrl+V 粘贴'); }

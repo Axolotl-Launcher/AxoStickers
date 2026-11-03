@@ -58,7 +58,7 @@ export function startCore(env) {
   const canvas = env.canvas, ctx = canvas.getContext('2d');
   let scene = null, project = null, playing = true, speed = 1, t0 = performance.now(), tHold = 0, lastFrame = -1, onion = false;
   let visible = true, exporting = false;                       // 舞台看不见 / 正在导出：预览不画
-  // 预览上正在拖 / 捏 / 滚轮的那个东西（编辑器还没写进工程）：{ g 第几次手势, target 'model' 或文字图层 id, x, y, scale, rot }。
+  // 预览上正在拖 / 捏 / 滚轮的那个东西（编辑器还没写进工程）：{ g 第几次手势, kind 'model' | 'text', id 文字图层 id, x, y, scale, rot }。
   // 直接改正在播的场景（不重建：模型的几何、字的精灵都照旧用），按屏幕刷新率重画；每次重建场景也先叠上它，免得手势中途到的旧工程把它拽回去
   let live = null, trace = false, drawnSeq = -1;                 // trace：每画出一个手势位置报一次 drawn（量跟手程度用）
 
@@ -128,14 +128,14 @@ export function startCore(env) {
   function applyLive(p, s) {
     if (!live) return;
     const v = { x: live.x, y: live.y, scale: live.scale };
-    if (live.target === 'model') {
+    if (live.kind === 'model') {
       const m = live.rot === undefined ? v : { ...v, rot: live.rot };
       if (p) p.model = { ...p.model, ...m };
       if (s) Object.assign(s.P.model, m);
     } else {
-      const l = p?.layers?.find((x) => x.id === live.target && x.type === 'text');
+      const l = p?.layers?.find((x) => x.id === live.id && x.type === 'text');
       if (l) Object.assign(l, v);
-      s?.moveText(live.target, v);
+      s?.moveText(live.id, v);
     }
   }
   async function build() {
@@ -244,10 +244,10 @@ export function startCore(env) {
       await build();
     },
     // 预览上的手势：每个指针帧一条，马上改到场景上（不排队等重建），下一个动画帧画出来
-    live({ g, target, x, y, scale, rot, seq, t }) {
-      if (typeof target !== 'string') return;
+    live({ g, kind, id, x, y, scale, rot, seq, t }) {
+      if (kind !== 'model' && !(kind === 'text' && typeof id === 'string')) return;
       const fin = (v, d) => (Number.isFinite(v) ? v : d);
-      if (live?.g !== g) { live = { g, target }; resetCache(); }  // 新的一次手势：缓存的帧是挪之前的样子
+      if (live?.g !== g) { live = { g, kind, id }; resetCache(); }  // 新的一次手势：缓存的帧是挪之前的样子
       Object.assign(live, { x: fin(x, 0), y: fin(y, 0), scale: fin(scale, 1), rot: Number.isFinite(rot) ? rot : undefined, seq, t });
       applyLive(project, scene);
       if (scene) scene.dirty = true;
