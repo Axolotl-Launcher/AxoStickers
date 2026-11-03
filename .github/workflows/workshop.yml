@@ -4,6 +4,8 @@
 #   publish：从事件里重新读、重新校验工程（不信 render 交回来的任何东西），GIF 用 Pillow 解码检查、重新编码 →
 #     提交 GIF、封面、工程和 workshop/index.json → 回复并关掉 issue → 重新部署网站。
 # 维护者给投稿 issue 打上 rejected 标签就撤下。
+# 投稿暂未开放：render / publish 只在仓库变量 WORKSHOP_OPEN 是 'true' 时跑（Settings → Secrets and variables → Actions → Variables），
+#   没设就是关着，新的 [工坊] issue 一律跳过；撤下（reject）照常，已经收进来的作品不受影响。重新开放的其他步骤见 README 的维护者说明。
 # issue 正文是不可信输入：只由 workshop/tools/workshop.py 从事件文件里读出来当 JSON 校验，从不拼进 shell 命令。
 name: 工坊 · 出图
 
@@ -16,6 +18,7 @@ permissions: {}
 jobs:
   render:
     if: >-
+      vars.WORKSHOP_OPEN == 'true' &&
       github.event.action != 'labeled' &&
       github.event.issue.state == 'open' &&
       !contains(github.event.issue.labels.*.name, 'rejected') &&
@@ -80,7 +83,7 @@ jobs:
 
   publish:
     needs: render
-    if: ${{ !cancelled() && needs.render.result != 'skipped' }}
+    if: ${{ !cancelled() && vars.WORKSHOP_OPEN == 'true' && needs.render.result != 'skipped' }}
     # 同一个 issue 的发布一次只跑一个（不同 issue 互不影响）：两次运行同时查「回复过没有」会各发一条。
     # 排队时更新的那次会顶掉更早还没开始的那次，正好：要发的就是最新的正文。撤下不进这个组（它不能被顶掉）
     concurrency:
