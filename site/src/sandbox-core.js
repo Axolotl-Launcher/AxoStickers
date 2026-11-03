@@ -127,11 +127,14 @@ export function startCore(env) {
     return [failed.length ? `表情字体没下载下来（「${cut(failed)}」，网络好了改一下字就会重新下载）` : '',
       absent.length ? `Axo 黑体里没有「${cut(absent)}」（要用的话在「字体」里换成系统字体）` : ''].filter(Boolean).join('；');
   }
+  let buildGen = 0;
   async function build() {
     if (!project) return;
-    const missing = await glyphs(project);
+    const p = project, gen = ++buildGen;                       // 这次建的是哪一份：等字体的时候又来了新工程，这次就作废（不把旧工程的缺字说明挂到新场景上）
+    const missing = await glyphs(p);
+    if (gen !== buildGen) return;
     useModel();
-    scene = new Scene(project, reg, R);
+    scene = new Scene(p, reg, R);
     if (missing) scene.fail('font', 'AxoSans', new Error(`${missing}：这些字画出来是系统字体，导出不了`));
     lastFrame = -1; resetCache();
     scene.frame(ctx, playing ? 0 : tHold);                     // 先同步画一帧：组件一出错马上能报出来
@@ -294,7 +297,7 @@ export function startCore(env) {
         const c = makeCanvas(size, size); c.getContext('2d').drawImage(big, 0, 0, size, size);
         out.push(c.transferToImageBitmap ? c.transferToImageBitmap() : await createImageBitmap(c));
       }
-      post({ type: 'filmstrip-done', req, bitmaps: out }, out);
+      post({ type: 'filmstrip-done', req, bitmaps: out, N: s.N }, out);
     },
     // 素材库的小图：表情 / 道具 / 帽子 / 皮肤直接画在模型上，裁出脑袋附近
     async thumbs({ req, kind, ids = [], size = 96 }) {

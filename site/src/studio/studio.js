@@ -571,15 +571,15 @@ function scheduleFilmstrip() {
     const r = await S.runner.request({ type: 'filmstrip', n, size: 56 }).catch(() => null);
     if (r && my !== filmSeq) { for (const b of r.bitmaps || []) b.close?.(); return; }   // 晚回来的：位图不用了，放掉
     if (!r) return;
-    S.filmBitmaps = r.bitmaps; drawFilmstrip();
+    S.filmBitmaps = r.bitmaps; S.filmN = r.N || S.N; drawFilmstrip();
   }, 700);
 }
 function drawFilmstrip() {
   if (!S.filmBitmaps) return;
   S.filmStrip ||= el('div', { class: 'tl-film' });
-  const count = S.filmBitmaps.length;                          // 位图画完就放掉了：点帧时用记下来的张数
+  const count = S.filmBitmaps.length, frames = S.filmN || S.N;  // 这条是按多少帧画的、几张：点帧时用它们（位图画完就放掉了；工程改了帧数、新的这条还没来时也对得上）
   S.filmCanvases = S.filmBitmaps.map((b, i) => {
-    const c = el('canvas', { width: 56, height: 56, title: `第 ${i + 1} 帧`, onclick: () => seek(Math.floor(i * S.N / count)) });
+    const c = el('canvas', { width: 56, height: 56, title: `第 ${i + 1} 帧`, onclick: () => seek(Math.min(S.N - 1, Math.floor(i * frames / count))) });
     c.getContext('2d').drawImage(b, 0, 0);
     b.close?.();
     return c;
