@@ -45,9 +45,11 @@ button, input, select { font: inherit; color: inherit; }
 }
 .topbar-inner { max-width: 1180px; margin: 0 auto; padding: 0 16px; height: 56px; display: flex; align-items: center; gap: 16px; }
 .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); font: 900 18px/1 var(--font-big); white-space: nowrap; }
-.brand-dot { width: 22px; height: 22px; background: var(--pink); border-radius: 5px; box-shadow: inset 0 -4px 0 var(--pink-deep); position: relative; }
-.brand-dot::before, .brand-dot::after { content: ""; position: absolute; top: 7px; width: 4px; height: 4px; background: #42147a; }
-.brand-dot::before { left: 4px; } .brand-dot::after { right: 4px; }
+.brand-logo { width: 32px; height: 32px; flex: none; image-rendering: pixelated; }   /* 美西螈头的像素画（public/favicon.svg，16×16 放大两倍正好是整像素） */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-perf="low"]) .brand:hover .brand-logo { animation: brand-wiggle .5s ease-in-out; }
+}
+@keyframes brand-wiggle { 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
 .nav { display: flex; gap: 4px; margin-left: auto; }
 .nav a {
   text-decoration: none; color: var(--ink-soft); font-weight: 700; padding: 8px 12px; border-radius: 10px; white-space: nowrap;
