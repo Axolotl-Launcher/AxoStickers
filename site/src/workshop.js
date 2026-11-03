@@ -1,5 +1,5 @@
 // 工坊作品：workshop/index.json 里的投稿（GitHub Actions 用真引擎出的图），按最新 / 最多赞排。
-import { $, el, encodePath, animated, unobserve } from './util.js';
+import { $, el, encodePath, animated, unobserve, CONTRIBUTE } from './util.js';
 import { loadFailed, loadOk } from './gallery.js';
 
 export const WS = { entries: [], ready: null, sort: 'new' };
@@ -37,6 +37,7 @@ function render() {
 }
 
 export async function initWorkshop() {
+  if (!CONTRIBUTE) $('#ws-empty').replaceChildren(el('b', { text: '这里还空着' }), '先去创意工坊自己做一张吧。', el('br'), el('br'), el('a', { class: 'btn primary', href: '#/editor', text: '去做一张' }));   // 投稿入口关着：不招呼人来发布
   try { await loadWorkshop(); } catch (e) { loadFailed($('#ws-empty'), '工坊作品'); throw e; }
   loadOk($('#ws-empty'));
   const chips = $('#ws-sort');

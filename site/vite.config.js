@@ -2,6 +2,8 @@ import { defineConfig } from 'vite';
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { CONTRIBUTE } from './src/flags.js';
+
 const ROOT = path.resolve(import.meta.dirname, '..');
 const TYPES = { '.gif': 'image/gif', '.png': 'image/png', '.webp': 'image/webp', '.json': 'application/json', '.mp4': 'video/mp4', '.js': 'text/javascript', '.glb': 'model/gltf-binary' };
 
@@ -67,9 +69,29 @@ function sandboxNoHmr() {
   };
 }
 
+// llms.txt 里只在投稿入口开着时才有的行写成「[[contribute]] …」，关着时才有的写成「[[!contribute]] …」：按 src/flags.js 的 CONTRIBUTE 留一种
+// （开发服务器上现做现给；构建时 public/ 拷进 dist 以后改写那一份）
+const llmsText = (s) => s.split('\n').flatMap((l) => { const m = /^\[\[(!?)contribute\]\] ?/.exec(l); return !m ? [l] : (m[1] === '!') !== CONTRIBUTE ? [l.slice(m[0].length)] : []; }).join('\n');
+function llmsTxt() {
+  let outDir = 'dist';
+  return [{
+    name: 'llms-txt-serve', apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if ((req.url || '').split('?')[0] !== '/llms.txt') return next();
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8'); res.end(llmsText(fs.readFileSync(path.join(import.meta.dirname, 'public', 'llms.txt'), 'utf8')));
+      });
+    },
+  }, {
+    name: 'llms-txt-build', apply: 'build',
+    configResolved(c) { outDir = path.resolve(c.root, c.build.outDir); },
+    closeBundle() { const f = path.join(outDir, 'llms.txt'); if (fs.existsSync(f)) fs.writeFileSync(f, llmsText(fs.readFileSync(f, 'utf8'))); },
+  }];
+}
+
 export default defineConfig({
   base: './',
-  plugins: [repoFiles(), sandboxNoHmr()],
+  plugins: [repoFiles(), sandboxNoHmr(), llmsTxt()],
   // 沙盒 iframe 取资源的 CORS 见上面 repoFiles 里的中间件；GitHub Pages 本来就发 ACAO: *
   server: { port: 5173, strictPort: true, fs: { allow: [ROOT] }, cors: { origin: [/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/] } },
   worker: { format: 'iife' },                                  // 沙盒的 Worker 打成一个普通脚本塞进 blob:（不透明来源里开不了模块 Worker，也 import 不了别的文件）

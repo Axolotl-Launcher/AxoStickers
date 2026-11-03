@@ -1,7 +1,7 @@
 // 创意工坊 · 编辑器（v2）：左边素材库，中间舞台 + 播放条 + 时间轴 / 代码，右边属性。
 // 所有组件代码都在沙盒 iframe 里跑（runner.js）；这里只管界面和工程数据（store.js）。
 import CAT from '../../../workshop/catalog.json';
-import { $, el, toast, REPO, STYLE_COLORS } from '../util.js';
+import { $, el, toast, REPO, STYLE_COLORS, CONTRIBUTE } from '../util.js';
 import { fromRecipe, normalizeProject } from '../engine/project.js';
 import { Store, newId, STARTER } from './store.js';
 import { Runner } from './runner.js';
@@ -192,7 +192,7 @@ function build(root) {
     el('span', { class: 'st-grow' }),
     btn('帮助', '快捷键和给 AI 助手的说明（?）', () => showKeys(), { ico: 'help', ax: 'help', hideLabel: true }),
     btn('分享', '分享链接：完整链接，或者 1 分钟就失效的短链接', () => shareLink(), { ico: 'share', ax: 'share', cls: 'st-share' }),
-    btn('发布到工坊', '写好标题和说明，用 GitHub issue 发布，真引擎重新出图', () => publish(), { cls: 'water', ico: 'publish', ax: 'publish' }),
+    CONTRIBUTE ? btn('发布到工坊', '写好标题和说明，用 GitHub issue 发布，真引擎重新出图', () => publish(), { cls: 'water', ico: 'publish', ax: 'publish' }) : null,   // 投稿入口：见 flags.js
     btn('导出', '导出 GIF / 逐帧 PNG', () => showExport(), { cls: 'primary', ico: 'download', ax: 'export' }));
 
   // 左：素材栏 + 抽屉
@@ -522,15 +522,16 @@ function applyFont(id, all = false) {
   if (all) S.store.change((p) => { for (const l of p.layers) if (l.type === 'text') l.font = id; });
   else applyToText((l) => { l.font = id; });
 }
+const fontDesc = (f) => (f.id === 'axo' && CONTRIBUTE ? `${f.desc} · 能发布到工坊` : f.desc);   // 投稿入口开着时，Axo 黑体是唯一能发布的
 function fontRow() {
   const l = S.store.layer(), cur = (l?.type === 'text' ? l.font : S.store.first('text')?.font) || 'axo';
   const chip = (id, name, desc) => el('button', { class: 'chip st-fontchip', type: 'button', 'aria-pressed': String(cur === id), title: desc, 'aria-label': `字体：${name}`, 'data-ax': `font:${id}`, style: `font-family:${fontCssOf(id)}`, onclick: () => applyFont(id) }, name);
   return el('div', { class: 'st-fonts' },
-    el('div', { class: 'chips', role: 'group', 'aria-label': '字体' }, ...FONT_LIST.map((f) => chip(f.id, f.name, f.desc)), ...libFonts().map((e) => chip(e.id, e.name, `导入的字体 · ${e.kb || '?'} KB（只在这台设备上）`))),
+    el('div', { class: 'chips', role: 'group', 'aria-label': '字体' }, ...FONT_LIST.map((f) => chip(f.id, f.name, fontDesc(f))), ...libFonts().map((e) => chip(e.id, e.name, `导入的字体 · ${e.kb || '?'} KB（只在这台设备上）`))),
     el('div', { class: 'st-row' },
       btn('导入字体', '导入 .ttf / .otf / .woff / .woff2 字体文件（存在这台设备上）', () => pickFile('.ttf,.otf,.woff,.woff2'), { cls: 'small', ico: 'open', ax: 'import-font' }),
       btn('所有文字都用它', '把所有文字图层换成这个字体', () => applyFont(cur, true), { cls: 'small', ax: 'font-all' })),
-    cur !== 'axo' ? el('p', { class: 'st-note', text: '工坊出图只认「Axo 黑体」：换了字体导出 GIF 没问题，发布到工坊前要换回来。系统字体在别的设备上可能长得不一样。' }) : null);
+    cur !== 'axo' ? el('p', { class: 'st-note', text: CONTRIBUTE ? '工坊出图只认「Axo 黑体」：换了字体导出 GIF 没问题，发布到工坊前要换回来。系统字体在别的设备上可能长得不一样。' : '换了字体导出 GIF 没问题；系统字体在别的设备上可能长得不一样。' }) : null);
 }
 async function importFont(f) {
   if (f.size > 40 << 20) { toast(`${f.name} 太大了（字体最多 40 MB）`); return; }
@@ -812,7 +813,7 @@ async function renderDrawer() {
     S.drawerCount.textContent = `${mine.length + 1} 个`;
     fill(body,
       tile('axolotl', '原版体素', '内置 · 表情包用的那只：逐像素的方块，鳃和尾巴是 1 像素的薄片'),
-      ...mine.map((e) => tile(e.id, e.name, `${e.from === 'repo' ? '工坊 · 能发布' : '载入的文件 · 只在这台设备上'}${e.kb ? ` · ${e.kb} KB` : ''}`,
+      ...mine.map((e) => tile(e.id, e.name, `${e.from === 'repo' ? (CONTRIBUTE ? '工坊 · 能发布' : '工坊') : '载入的文件 · 只在这台设备上'}${e.kb ? ` · ${e.kb} KB` : ''}`,
         btn('删除', `从这台设备上删掉模型「${e.name}」`, () => deleteFromLibrary(e.origin), { cls: 'small danger', ico: 'trash', ax: 'model-remove', hideLabel: true }))),
       cur !== 'axolotl' && !mine.some((e) => e.id === cur) ? tile(cur, S.models.get(cur)?.name || cur.replace(/^file:/, ''), '这个工程用的（不在你的库里）') : null,
       el('div', { class: 'st-row' },
@@ -820,7 +821,7 @@ async function renderDrawer() {
         btn('载入模型文件', '载入 .glb / .gltf 模型文件（存在这台设备上）', () => pickFile('.glb,.gltf'), { cls: 'small', ico: 'open', ax: 'load-model' })),
       el('label', { class: 'st-field check' }, face, el('span', { text: '在头的正面画表情（别的模型脸不在那儿的话关掉）' })),
       el('h4', {}, icon('move', 'tiny'), '大小和位置'), modelControls('drawer'),
-      el('p', { class: 'st-note', text: '工坊里的模型「添加」后存在这台设备的库里，用了也能发布到工坊；自己载入的模型文件也存在库里，但只在这台设备上能用。能用 Blockbench 做的方块模型：节点名叫 head、body、tail、leg1～leg4、top_gills、left_gills、right_gills 的会跟着动作动，其他的跟着身体走。只支持贴图和数据都内嵌在文件里的 .glb / .gltf，模型会自动缩放到和原版差不多大。' }));
+      el('p', { class: 'st-note', text: (CONTRIBUTE ? '工坊里的模型「添加」后存在这台设备的库里，用了也能发布到工坊；' : '工坊里的模型「添加」后存在这台设备的库里，分享出去别人也能打开；') + '自己载入的模型文件也存在库里，但只在这台设备上能用。能用 Blockbench 做的方块模型：节点名叫 head、body、tail、leg1～leg4、top_gills、left_gills、right_gills 的会跟着动作动，其他的跟着身体走。只支持贴图和数据都内嵌在文件里的 .glb / .gltf，模型会自动缩放到和原版差不多大。' }));
     return;
   }
   const list = (S.catalog.get(k) || []).filter((m) => match(m, q));
@@ -1004,7 +1005,7 @@ function renderWorkshop(body, q) {
     S.drawerCount.textContent = `${items.length} / ${repo.length} 个`;
     listBox.removeAttribute('aria-busy');
     fill(listBox, items.length ? el('div', { class: 'st-wslist', role: 'list', 'aria-label': '工坊里的组件和模型' }, ...items.map(wsCard)) : el('p', { class: 'st-empty', text: repo.length ? '没有符合条件的。' : '工坊里还没有组件。' }),
-      el('p', { class: 'st-note' }, '工坊就是仓库里的 workshop/components（组件）和 workshop/models（模型）文件夹，大家用 PR 往里加。自己写的组件在代码面板里「提交到工坊」就能开 PR。'));
+      el('p', { class: 'st-note' }, CONTRIBUTE ? '工坊就是仓库里的 workshop/components（组件）和 workshop/models（模型）文件夹，大家用 PR 往里加。自己写的组件在代码面板里「提交到工坊」就能开 PR。' : '工坊就是仓库里的 workshop/components（组件）和 workshop/models（模型）文件夹。'));
   }).catch(() => { listBox.removeAttribute('aria-busy'); fill(listBox, el('p', { class: 'st-empty', text: '工坊没加载出来，过会儿再试。' }), btn('重试', '重新加载', () => { S.repo = null; renderDrawer(); }, { cls: 'small', ax: 'retry' })); });
 }
 
@@ -1051,7 +1052,7 @@ function renderLibrary(q) {
     el('div', { class: 'st-row' },
       btn('用上', '用到当前工程里', () => useFromLibrary(e), { cls: 'small primary', ico: 'check', ax: 'library-use' }),
       btn('下载', '下载成 .axo.js 文件', () => download(new Blob([e.source], { type: 'text/javascript' }), `${e.origin.replace(/^\w+:/, '').replace(/\.axo\.js$/, '')}.axo.js`), { cls: 'small', ico: 'download', ax: 'library-download', hideLabel: true }),
-      e.from !== 'repo' ? btn('提交到工坊', '开一个 PR 把它加进工坊', () => proposeComponent(e.source, e.id || e.origin.replace(/^\w+:/, '')), { cls: 'small', ico: 'publish', ax: 'library-propose' }) : null,
+      CONTRIBUTE && e.from !== 'repo' ? btn('提交到工坊', '开一个 PR 把它加进工坊', () => proposeComponent(e.source, e.id || e.origin.replace(/^\w+:/, '')), { cls: 'small', ico: 'publish', ax: 'library-propose' }) : null,
       btn('删除', '从这台设备上彻底删掉', () => deleteFromLibrary(e.origin), { cls: 'small danger', ico: 'trash', ax: 'library-remove', hideLabel: true })));
   const inProject = st.p.components.filter((c) => !lib.has(c.origin)).map((c) => el('li', {}, el('code', { text: c.origin }),
     btn('存到组件库', '存到这台设备的组件库（当成自己的组件）', () => lib.put({ origin: /^(mine|file):/.test(c.origin) ? c.origin : `mine:${lib.describe(c.source).id || c.origin.split(':').pop()}`, source: c.source, from: 'mine' }).then(() => toast('存进组件库了')).catch((er) => toast(`没存上：${er.message}`)), { cls: 'small', ax: 'project-component-save' }),
@@ -1393,7 +1394,7 @@ function codeHead() {
     own && (own.origin.startsWith('override:') || lib.get(own.origin)) ? btn('还原', '丢掉这个工程里的改动', () => revertCode(own), { cls: 'small', ico: 'undo', ax: 'code-revert' }) : null,
     btn('另存为组件', '存到这台设备的组件库', () => saveAsMine(ed.value, type), { cls: 'small', ico: 'save', ax: 'code-save-as' }),
     btn('下载', '下载成 .axo.js 文件', () => download(new Blob([ed.value], { type: 'text/javascript' }), `${id}.axo.js`), { cls: 'small', ico: 'download', ax: 'code-download', hideLabel: true }),
-    btn('提交到工坊', '开一个 PR 把它加进工坊', () => proposeComponent(ed.value, id), { cls: 'small', ico: 'publish', ax: 'code-propose' }));
+    CONTRIBUTE ? btn('提交到工坊', '开一个 PR 把它加进工坊', () => proposeComponent(ed.value, id), { cls: 'small', ico: 'publish', ax: 'code-propose' }) : null);
 }
 // 还原：改过的内置组件撤掉、换回内置的；改过的工坊 / 组件库组件撤掉 override，沙盒会把组件库那份重新编进来；自己的组件换回组件库里那份
 async function revertCode(own) {
@@ -1427,7 +1428,7 @@ async function saveAsMine(src, type) {
   S.store.putComponent(origin, out);
   const l = S.store.layer();
   if (l && (l.type === type || (l.type === 'text' && type === 'textanim'))) S.store.change((p) => { p.layers.find((x) => x.id === l.id).component = id; });
-  toast(`存好了：「${name}」。在「工坊 · 我的组件库」里能下载、提交到工坊`);
+  toast(`存好了：「${name}」。在「工坊 · 我的组件库」里能下载${CONTRIBUTE ? '、提交到工坊' : ''}`);
   loadCode();
 }
 function newComponent(type) {
@@ -1873,7 +1874,7 @@ function installApi() {
       'axo.models.list() / use(id) → 模型（原版、工坊里下载的、载入的文件）；axo.models.transform({ x, y, scale, rot, flip }) → 模型整体的位置 / 大小 / 角度 / 镜像', 'axo.fonts.list() / use(字体id, { all, layer })',
       'await axo.projects.list() / save({ asNew }) / open(origin) / remove(origin) → 存在这台设备浏览器里的「我的工程」',
       'axo.play() / pause() / seek(帧)', 'axo.export({ format: \'gif\'|\'video\'|\'png-zip\'|\'png\', size, colors, maxKb, loops }) → { url, kb, mime, blob }（video 按真实时间录，loops 遍）',
-      'axo.share({ short }) → { long, short?, expires? }（short: true 生成 1 分钟短链接）', 'axo.publishUrl({ title, description }) → { url, problems }（不打开，只给链接）',
+      'axo.share({ short }) → { long, short?, expires? }（short: true 生成 1 分钟短链接）', ...(CONTRIBUTE ? ['axo.publishUrl({ title, description }) → { url, problems }（不打开，只给链接）'] : []),
       'axo.open(\'motion\'|\'workshop\'|…) 打开素材栏；axo.dock(\'timeline\'|\'code\')', '说明：llms.txt',
       ...(prevHelp ? ['', '网站其他部分：', prevHelp()] : []),
     ].join('\n'),
@@ -1946,7 +1947,7 @@ function installApi() {
       },
     },
     fonts: {
-      list: () => [...FONT_LIST.map((f) => ({ id: f.id, name: f.name, note: f.desc })), ...libFonts().map((e) => ({ id: e.id, name: e.name, note: '导入的' }))],
+      list: () => [...FONT_LIST.map((f) => ({ id: f.id, name: f.name, note: fontDesc(f) })), ...libFonts().map((e) => ({ id: e.id, name: e.name, note: '导入的' }))],
       use: (id, { all = false, layer = null } = {}) => {
         if (!FONT_LIST.some((f) => f.id === id) && !libFonts().some((e) => e.id === id)) throw new Error(`没有字体 ${id}（axo.fonts.list() 看能用的）`);
         if (layer) { if (!st.change((p) => { const l = p.layers.find((x) => x.id === layer && x.type === 'text'); if (!l) throw Object.assign(new Error(`没有文字图层 ${layer}`), { userFacing: true }); l.font = id; })) throw new Error(`没有文字图层 ${layer}`); } else applyFont(id, all);
@@ -1972,7 +1973,7 @@ function installApi() {
       if (short) { const m = await createShort(code); Object.assign(out, { short: `${siteUrl()}#/e/${m.key}`, expires: new Date(m.expires).toISOString() }); setTimeout(() => dropShort(m), m.expires - Date.now()); }
       return out;
     },
-    publishUrl: async ({ title, description = '' } = {}) => { await loadRepo().catch(() => {}); const { url, fits, problems } = publishUrl(st.p, { title: title || defaultTitle(st.p), description }); return { url, fits, problems, note: fits ? '打开这个链接，在 GitHub 上勾「授权」再提交' : '工程放不进链接：打开后把 axo.project.get() 的 JSON 粘贴到「工程」栏' }; },
+    ...CONTRIBUTE && { publishUrl: async ({ title, description = '' } = {}) => { await loadRepo().catch(() => {}); const { url, fits, problems } = publishUrl(st.p, { title: title || defaultTitle(st.p), description }); return { url, fits, problems, note: fits ? '打开这个链接，在 GitHub 上勾「授权」再提交' : '工程放不进链接：打开后把 axo.project.get() 的 JSON 粘贴到「工程」栏' }; } },
     open: (k) => { openDrawer(k); return k; },
     dock: (d) => { if (!['timeline', 'code'].includes(d)) throw new Error('dock 只能是 timeline 或 code'); setDock(d); return d; },
   };
