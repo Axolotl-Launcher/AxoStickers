@@ -39,6 +39,13 @@ function blend(base, parts) {
   return out;
 }
 
+// 帽子的位置微调（属性面板「戴在哪」）：gx gy gz 挪（模型像素）、gs 缩放、rx ry rz 转；没调过就是空的，按帽子本来的位置戴
+function gearFit(q = {}) {
+  const out = {};
+  for (const k of ['gx', 'gy', 'gz', 'gs', 'rx', 'ry', 'rz']) if (typeof q[k] === 'number' && Number.isFinite(q[k]) && q[k] !== (k === 'gs' ? 1 : 0)) out[k] = q[k];
+  return out;
+}
+
 function affine(a) {                                       // 盒子像素 -> 画布像素：[m00, m10, m01, m11, ox, oy]
   const r = -a.roll * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
   const m00 = c * a.sx, m01 = -s * a.sy, m10 = s * a.sx, m11 = c * a.sy;
@@ -187,12 +194,14 @@ export class Scene {
     }
     for (const s of this.scenes) if (s.def.move && this.weight(s.layer, t) > 0) this.call(s, 'move', a, t);
     this.dress(a, t, act.some(([m, k]) => m.def.holdsItself && k >= 0.5));
+    const M = this.P.model;                                 // 工程里给模型整体定的大小 / 位置 / 角度 / 镜像，叠在动作上面（默认值就不碰：出图和以前逐字节一样）
+    if (M.x || M.y || M.rot || M.flip || M.scale !== 1) { a.dx += M.x; a.dy += M.y; a.roll += M.rot; a.sx *= M.scale * (M.flip ? -1 : 1); a.sy *= M.scale; }
     return a;
   }
   dress(a, t, holdsItself) {
     if (!('_face' in a.pose)) { const f = this.faceDict(t); if (Object.keys(f).length) a.pose._face = f; }
     for (const w of this.wears) {                         // 找不到的道具 / 帽子记成错误（出图会因此失败），别悄悄少画一样
-      if (this.reg.get('wear', w.component)) this.wear(a, w.component, { gear: true });
+      if (this.reg.get('wear', w.component)) this.wear(a, w.component, { gear: true, ...gearFit(w.params) });
       else this.fail('wear', w.component, new Error('组件库里没有这个帽子'));
     }
     if (!holdsItself) {
@@ -281,7 +290,10 @@ export class Scene {
     const bg = this.P.background;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     ctx.clearRect(0, 0, W, H);
-    if (bg.mode !== 'transparent') { ctx.fillStyle = bg.mode === 'color' ? bg.color : '#fff'; ctx.fillRect(0, 0, W, H); }
+    if (bg.mode === 'gradient') {                            // 上下渐变：color 在上、color2 在下
+      const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, bg.color || '#ffffff'); g.addColorStop(1, bg.color2 || '#ffe3f0');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    } else if (bg.mode !== 'transparent') { ctx.fillStyle = bg.mode === 'color' ? bg.color : '#fff'; ctx.fillRect(0, 0, W, H); }
   }
 
   // ---- 一帧：画到 ctx（W×H） ----

@@ -48,6 +48,7 @@ window.axo = Object.assign(window.axo || {}, {
 
 function show(v) {
   delete document.documentElement.dataset.route;                // 换成按 hidden 显示（index.html 里按地址先显示的那一层不要了）
+  document.documentElement.classList.toggle('in-editor', v === 'editor');   // 编辑器里网站顶栏收起来（见下面的 peekTopbar）
   if (v !== view) {
     for (const s of document.querySelectorAll('.view')) {
       s.hidden = s.dataset.view !== v;
@@ -62,6 +63,23 @@ function show(v) {
   if (studio) studio.then((m) => m.studioActive(v === 'editor'));
   document.title = { gallery: '美西螈表情包 · AxoStickers', editor: '创意工坊 · 美西螈表情包', workshop: '工坊作品 · 美西螈表情包' }[v];
 }
+
+// 创意工坊里网站的顶栏自己收起来，把高度让给编辑器：鼠标移到窗口最上沿、或者键盘 Tab 到导航时再出来；
+// 触屏没有悬停，顶上中间留一个小把手，点一下拉出来
+const topbar = $('.topbar');
+const hot = Object.assign(document.createElement('div'), { className: 'topbar-hot' });
+const handle = Object.assign(document.createElement('button'), { className: 'topbar-handle', type: 'button', title: '显示网站导航', innerHTML: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' });
+hot.setAttribute('aria-hidden', 'true'); handle.setAttribute('aria-label', '显示网站导航');
+document.body.prepend(hot, handle);
+let hideTimer;
+const setPeek = (on) => { topbar.classList.toggle('peek', on); document.documentElement.classList.toggle('topbar-open', on); };
+const peekTopbar = (on, delay = 400) => { clearTimeout(hideTimer); if (on) setPeek(true); else hideTimer = setTimeout(() => setPeek(false), delay); };
+hot.addEventListener('mouseenter', () => peekTopbar(true));
+topbar.addEventListener('mouseenter', () => peekTopbar(true));
+topbar.addEventListener('mouseleave', () => peekTopbar(false));
+handle.addEventListener('click', () => peekTopbar(!topbar.classList.contains('peek'), 0));
+document.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse' && topbar.classList.contains('peek') && !topbar.contains(e.target) && e.target !== handle) peekTopbar(false, 0); });
+topbar.addEventListener('click', (e) => { if (e.target.closest('a')) peekTopbar(false, 0); });   // 点了导航就收回去
 
 let routeSeq = 0;                                              // 每次换路由 +1：等载入的时候用户已经走开了，就别再把他拉回编辑器
 async function route() {

@@ -6,7 +6,7 @@ export const DEFAULTS = {
   water: { on: true, level: 405, calm: 1, bubbles: true, ripples: true, color: '#aadeff' },
   idle: { look: 20, gill: 1, tail: 1, paddle: 1, bob: 4 },
   skin: { component: 'lucy', params: {} },
-  model: { component: 'axolotl', face: null },
+  model: { component: 'axolotl', face: null, x: 0, y: 0, scale: 1, rot: 0, flip: false },
   layers: [],
 };
 const num = (v, d, lo, hi) => { v = Number(v); return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
@@ -22,7 +22,8 @@ export function normalizeProject(p = {}) {
     water: { ...d.water, ...(P.water || {}) },
     idle: { ...d.idle, ...(P.idle || {}) },
     skin: { ...d.skin, ...(P.skin || {}) },
-    model: { component: String(P.model?.component || 'axolotl').slice(0, 80), face: typeof P.model?.face === 'boolean' ? P.model.face : null },
+    model: { component: String(P.model?.component || 'axolotl').slice(0, 80), face: typeof P.model?.face === 'boolean' ? P.model.face : null,
+      x: num(P.model?.x, 0, -256, 256), y: num(P.model?.y, 0, -256, 256), scale: num(P.model?.scale, 1, 0.3, 2.5), rot: num(P.model?.rot, 0, -180, 180), flip: !!P.model?.flip },   // 模型整体挪、缩放、转、左右镜像
     components: (Array.isArray(P.components) ? P.components : []).slice(0, 24)
       .filter((c) => c && typeof c.source === 'string' && c.source.length <= 60000)
       .map((c) => ({ origin: String(c.origin || 'project').slice(0, 80), source: c.source })),

@@ -45,6 +45,11 @@
 .st-name:hover, .st-name:focus { background: var(--bg); outline: none; box-shadow: inset 0 0 0 2px var(--line); }
 .st-group-btns { display: flex; gap: 4px; }
 .st-sep { width: 2px; height: 24px; background: var(--line); margin: 0 2px; border-radius: 2px; }
+/* 「已自动保存」：每次改动闪一下 */
+.st-saved { display: inline-flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 700; color: #1d9a55; white-space: nowrap; padding: 2px 8px; border-radius: 999px; background: #eefbf3; }
+.st-saved.warn { color: #9a6200; background: #fff6e0; }
+.st-saved .ico.tiny { margin-right: 1px; }
+.st-share { margin-left: 2px; }
 .st-grow { flex: 1; }
 
 /* 主体 */
@@ -126,6 +131,19 @@
 .st-model-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; text-align: left; border: 0; background: none; padding: 6px; border-radius: 9px; cursor: pointer; color: inherit; }
 .st-model-text { display: grid; gap: 2px; min-width: 0; }
 .st-model-text small { color: var(--ink-soft); font-size: 12px; }
+.st-modelctl { display: grid; gap: 2px; margin-bottom: 8px; }
+/* 自己挑字色：彩虹色块，里面是颜色选择器 */
+.swatch.custom { position: relative; overflow: hidden; background: conic-gradient(#ff5434, #ffac1c, #24c66c, #18c4d6, #4098ff, #9e66ff, #fe3e8c, #ff5434); cursor: pointer; }
+.swatch.custom.on { background: var(--c); box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--ink); }
+.swatch.custom input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
+/* 我的工程 */
+.st-projgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; max-height: 56dvh; overflow: auto; padding: 2px; }
+.st-projcard { display: grid; gap: 4px; padding: 8px; border-radius: 12px; background: var(--surface); box-shadow: inset 0 0 0 2px var(--line); }
+.st-projcard.on { box-shadow: inset 0 0 0 3px var(--pink); }
+.st-projcard img, .st-projblank { width: 100%; height: auto; aspect-ratio: 1; border-radius: 9px; background: conic-gradient(#e6edf5 25%, #fff 0 50%, #e6edf5 0 75%, #fff 0) 0 0 / 16px 16px; display: grid; place-items: center; color: var(--ink-soft); }
+.st-projcard b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-projcard small { font-size: 11px; color: var(--ink-soft); }
+.st-dialog:has(.st-projgrid) { width: min(640px, calc(100vw - 24px)); }
 .st-list { margin: 0; padding-left: 18px; font-size: 12px; display: grid; gap: 6px; }
 .st-list li { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
 .st-list code { margin-right: 4px; }
@@ -163,6 +181,19 @@
 .st-stage { position: relative; flex: 1; min-height: 220px; display: grid; place-items: center; overflow: auto; padding: 4px 10px 8px; }
 .st-stage-box { position: relative; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 2px var(--line), 0 6px 0 #cfe6fb; flex: none; contain: strict; }
 .st-stage-box.fit { width: min(100%, calc(100dvh - 430px), 560px); aspect-ratio: 1; min-width: 200px; }
+/* 预览上直接拖（挪模型 / 文字）、滚轮缩放 */
+.st-stage-box { cursor: grab; touch-action: none; }
+.st-stage-box.dragging { cursor: grabbing; }
+.st-stagehint { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); font-size: 11px; font-weight: 700; color: #fff; background: rgba(20, 30, 50, .62); padding: 3px 10px; border-radius: 999px; pointer-events: none; opacity: 0; transition: opacity .2s; white-space: nowrap; max-width: calc(100% - 20px); overflow: hidden; text-overflow: ellipsis; }
+.st-stage:hover .st-stagehint { opacity: 1; }
+.st-stage:has(.dragging) .st-stagehint { opacity: 0; }
+@media (pointer: coarse) { .st-stagehint { display: none; } }
+/* 参考线：中心十字 + 表情的安全边距（四周留 8%，聊天里被圆角 / 气泡挡住的部分） */
+.st-guides { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.st-guides i { position: absolute; display: block; }
+.st-guides .v { left: 50%; top: 0; bottom: 0; border-left: 1px dashed rgba(254, 62, 140, .7); }
+.st-guides .h { top: 50%; left: 0; right: 0; border-top: 1px dashed rgba(254, 62, 140, .7); }
+.st-guides .safe { inset: 8%; border: 1.5px dashed rgba(64, 152, 255, .75); border-radius: 10px; }
 .st-stage-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; pointer-events: none; }   /* 预览只看不点：点上去焦点留在页面上，快捷键照常能用 */
 .bg-white { background: #fff; }
 .bg-checker { background: conic-gradient(#e6edf5 25%, #fff 0 50%, #e6edf5 0 75%, #fff 0) 0 0 / 24px 24px; }
@@ -349,8 +380,9 @@
 /* 中等宽度（小笔记本、横屏平板）：栏窄一点，顶栏的次要按钮只留图标 */
 @media (max-width: 1280px) {
   .studio { --drawer: 260px; --insp: 270px; --rail: 66px; }
-  .st-filebtns .st-btn-label { display: none; }
-  .st-filebtns .st-btn { width: var(--hit); padding: 0; }
+  .st-filebtns .st-btn-label, .st-random .st-btn-label, .st-share .st-btn-label { display: none; }
+  .st-filebtns .st-btn, .st-random, .st-share { width: var(--hit); padding: 0; }
+  .st-saved span { display: none; }
   .st-stagebar .st-perf { display: none; }
   .st-transport [data-ax="onion"] .st-btn-label { display: none; }
   .st-transport [data-ax="onion"] { width: 30px; padding: 0; }
@@ -376,12 +408,13 @@
 @media (max-width: 900px) {
   .studio { height: auto; min-height: 0; padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
   /* 顶栏两行：第一行 返回 · 名字 · 撤销重做 · 发布 · 导出；第二行 文件操作 · 帮助 */
-  .st-top { flex-wrap: wrap; position: sticky; top: 52px; z-index: 10; gap: 6px; padding: 6px 10px; }
+  .st-top { flex-wrap: wrap; position: sticky; top: 0; z-index: 10; gap: 6px; padding: 6px 10px; }   /* 网站顶栏在编辑器里收起来了，工程栏贴着最上面 */
   .st-name { width: 6em; flex: 1; }
   .st-top .st-grow { display: none; }
   .st-top .st-sep { order: 9; flex-basis: 100%; height: 0; margin: 0; background: none; }
   .st-top .st-filebtns { order: 10; flex: 1; }
-  .st-top [data-ax="help"] { order: 11; }
+  .st-top [data-ax="help"], .st-top .st-random { order: 11; }
+  .st-top .st-saved { display: none; }
   .st-top .water .st-btn-label { display: none; }
   .st-top .water { width: var(--hit); padding: 0; }
   .st-body { display: flex; flex-direction: column; }
