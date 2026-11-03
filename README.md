@@ -8,7 +8,7 @@ Axolotl Launcher 的美西螈动画表情包：300 张 + 水龙卷特别篇，�
 - 同一个体素美西螈、同一套粉色立体字和水面；75 种动作，同一个动作最多出现 7 次
 - 五个分类：群里答疑 55 · 日常回复 66 · 情绪 97 · 我的世界 34 · 生活 48
 - 一次性下载：见 [Releases](https://github.com/Axolotl-Launcher/AxoStickers/releases)
-- 网站：<https://axolotl-launcher.github.io/AxoStickers/>：在线挑、逐帧看、单张下载，还有创意工坊（在浏览器里做动图、改组件代码、发布给大家）
+- 网站：<https://axolotl-launcher.github.io/AxoStickers/>：在线挑、逐帧看、单张下载，还有创意工坊（在浏览器里做动图、改组件代码，导出 GIF 或者分享链接）
 
 ## 目录
 
@@ -23,9 +23,9 @@ Axolotl Launcher 的美西螈动画表情包：300 张 + 水龙卷特别篇，�
 | `skill/axolotl-sticker/` | 给 Claude Code 用的 skill：让 Claude 按这套风格做新表情 |
 | `site/` | 网站：图鉴（悬停就动、点开逐帧看）+ 创意工坊编辑器（Vite，three.js 版引擎，组件化） |
 | `site/src/components/` | 内置组件：75 个动作、49 个特效、13 个文字动画、皮肤，每个一个 `.axo.js` 文件 |
-| `workshop/components/` | 工坊：大家用 PR 加进来的组件（比如水龙卷、果冻字），写法见 [workshop/components/README.md](workshop/components/README.md) |
-| `workshop/` | 创意工坊：`index.json` 投稿清单、投稿出的图和工程、`tools/workshop.py` 校验 / 收图脚本 |
-| `.github/` | 发布到工坊的 issue 表单；出图、数点赞、部署网站的工作流 |
+| `workshop/components/` | 工坊里的组件（比如水龙卷、果冻字），写法见 [workshop/components/README.md](workshop/components/README.md) |
+| `workshop/` | 创意工坊：`index.json` 作品清单、作品的图和工程、`tools/workshop.py` 校验 / 收图脚本、`issue-form/` 停用中的投稿表单 |
+| `.github/` | 出图、数点赞、部署网站的工作流 |
 
 ## 自己出图
 
@@ -70,22 +70,26 @@ S('摸鱼', 'flagwave', 'happy', [], hold='fish', s=0.7)
 
 - 「代码」面板里能直接改任何一个组件（包括内置的），改完马上在预览里看到，出错会标到行；可以另存为自己的组件、下载成 `.axo.js`。
 - 「工坊」默认列出仓库 `workshop/components/` 里的全部组件。点「添加」就下载到这台设备浏览器的组件库（IndexedDB），之后在它那一类里就能用：下载的文字动画出现在「文字」、特效在「特效」……只有水龙卷这种多种效果拼起来、代码很多的整帧场景才算「组件」，在「工坊 · 我的组件库」里点「用上」。「删除」是真的从浏览器里删掉，当前工程里用到它的地方会一起拿掉。
-- 别人做的组件：把 `.axo.js` 拖进编辑器也能载入组件库；自己写的可以「下载」成 `.axo.js`，往 `workshop/components/` 开 PR 加进工坊（网站上的「提交到工坊」按钮开着时会帮你开 PR，现在藏着，见下面）。
-- 皮肤是给模型重新上色的组件。模型也在工坊里（`workshop/models/`，比如 Logo 版）：添加后存进本机的库，能发布；也能拖进自己的 `.glb` / `.gltf`（自动体素化，存在本机的库里，只在本机用）。
+- 别人做的组件：把 `.axo.js` 拖进编辑器也能载入组件库；自己写的可以「下载」成 `.axo.js` 发给别人。
+- 皮肤是给模型重新上色的组件。模型也在工坊里（`workshop/models/`，比如 Logo 版）：添加后存进本机的库，分享出去别人也能打开；也能拖进自己的 `.glb` / `.gltf`（自动体素化，存在本机的库里，只在本机用）。
 - 模型能整体挪位置、缩放、旋转、左右镜像（直接在预览上拖、滚轮缩放，或者在「模型」里拖滑块）；帽子能调「戴在哪」；字色除了内置几种还能自己挑；背景可以是上下渐变。
 - 「我的工程」把工程存在这台设备的浏览器里（带小图），随时打开接着改；导出除了 GIF 还有视频（MP4 / WebM）。进入创意工坊后网站顶栏自动收起来，鼠标移到最上沿再出来。
-- 文字可以换字体：默认的 Axo 黑体、几种系统字体，或者导入 `.ttf` / `.otf` / `.woff2`（存在本机的库里）。工坊出图只认 Axo 黑体。
+- 文字可以换字体：默认的 Axo 黑体、几种系统字体，或者导入 `.ttf` / `.otf` / `.woff2`（存在本机的库里）。
 - 分享有两种链接：完整链接（工程整个装在链接里，一直有效）和 1 分钟短链接（工程在浏览器里用随机密钥加密，只把密文交给公开中转站 [ntfy.sh](https://ntfy.sh) 存一下；密钥只在链接 `#` 后面，1 分钟后打不开）。
 - 组件代码只在 `<iframe sandbox="allow-scripts">` 里跑（`site/sandbox.html`，不透明来源，CSP 禁止联网），碰不到网站的页面和存储；死循环有保险，卡住了会自动重开。
 
-**发布到工坊：**
+**工坊投稿暂未开放。** 已有的工坊作品照常能看、点 👍；每一张都能点「在工坊里改一改」，把整个工程（连带它的组件代码）载进编辑器接着改。
 
-> 网站上的投稿入口（编辑器顶栏的「发布到工坊」、代码面板和「工坊 · 我的组件库」里的「提交到工坊」）现在先藏着：把 `site/src/flags.js` 的 `CONTRIBUTE` 改成 `true` 就都回来。下面的流程本身照常在：可以直接在 GitHub 上用 [工坊投稿表单](.github/ISSUE_TEMPLATE/workshop.yml) 开 issue（工程 JSON 用编辑器「保存」出来的文件内容），组件照常开 PR。
+<details>
+<summary>维护者：重新开放投稿</summary>
 
-1. 「发布到工坊」先在编辑器里写标题、一句话说明，看一眼预览和检查结果；「确定投稿」打开填好标题、说明、工程 JSON 的 issue（`.github/ISSUE_TEMPLATE/workshop.yml`），勾上授权提交就行。
-2. `工坊 · 出图` 工作流分两段。`render` 没有任何权限：校验工程（结构、大小、文字、授权、查重、每人每天 5 张），构建网站，在断网的容器里用无头 Chromium 打开同一个沙盒页面出图（`site/tools/render.mjs`）。`publish` 从事件里重新读、重新校验工程，只收那张 GIF：用 Pillow 解码、查尺寸帧数、重新编码，再把 GIF、封面、工程（`workshop/projects/N.json`）和 `workshop/index.json` 提交到 main，回复并关掉 issue，触发网站部署。
-3. 维护者给 issue 打 `rejected` 标签就会撤下。点赞就是 issue 上的 👍，`工坊 · 数点赞` 每 6 小时数一次写进 `index.json`。
-4. 工坊里每一张都能点「在工坊里改一改」，把整个工程（连带它的组件代码）载进编辑器接着改。
+1. `site/src/flags.js` 的 `CONTRIBUTE` 改成 `true`：网站上的「发布到工坊」「提交到工坊」和相关说明（含 `llms.txt`）回来。
+2. 把 `workshop/issue-form/workshop.yml` 挪回 `.github/ISSUE_TEMPLATE/`：GitHub 的 New issue 页面上出现「发布到创意工坊」。
+3. 仓库变量 `WORKSHOP_OPEN` 设成 `true`（Settings → Secrets and variables → Actions → Variables）：`工坊 · 出图` 的 `render` / `publish` 才会跑，没设就跳过所有 `[工坊]` issue。
+4. 撤下（给 issue 打 `rejected` 标签）和 `工坊 · 数点赞` 不受开关影响，一直能用。
+
+流程：`render` 没有任何权限，校验工程（结构、大小、文字、授权、查重、每人每天 5 张）、构建网站，在断网的容器里用无头 Chromium 打开同一个沙盒页面出图（`site/tools/render.mjs`）；`publish` 从事件里重新读、重新校验工程，GIF 用 Pillow 解码检查、重新编码，把 GIF、封面、工程（`workshop/projects/N.json`）和 `workshop/index.json` 提交到 main，回复并关掉 issue，触发网站部署。点赞是 issue 上的 👍，每 6 小时数一次。
+</details>
 
 **给 AI 助手和自动化工具用：** 能执行 JavaScript 的工具直接调 `window.axo`（`await axo.studio()` 打开编辑器，`axo.layers.add(...)`、`axo.workshop.add(...)`、`axo.export()` …），只能点按钮的工具每个控件都有中文名字和稳定的 `data-ax` 操作名，读不到画布就看 `[data-ax="status"]` 那一句描述。页面里不用浏览器原生的 confirm / prompt。完整说明在 [site/public/llms.txt](site/public/llms.txt)（网站根目录的 `llms.txt`）。
 
