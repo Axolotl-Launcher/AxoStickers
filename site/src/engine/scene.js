@@ -93,6 +93,15 @@ export class Scene {
     }
   }
 
+  // 预览上拖着一行字（不重建场景）：只重新排一下字的位置，字的精灵按字号缓存着、照旧用
+  moveText(id, { x, y, scale }) {
+    const e = this.texts.find((t) => t.l.id === id);
+    if (!e) return;
+    Object.assign(e.l, { x, y, scale });
+    if (e.anim.layer !== e.l) Object.assign(e.anim.layer, { x, y, scale });   // 组件没找到、换成「stay」时用的是一份拷贝
+    e.lay = e.anim.lay = e.l.text ? layout(e.l.text, e.l.y, e.l.scale, e.l.x, e.l.font) : [];
+  }
+
   // ---- 组件实例：this = 这一层的上下文（原型链连到场景，所以 this.T、this.ls、this.headPt 都能用） ----
   instance(type, layer, extra = {}) {
     const def = this.reg.get(type, layer.component);

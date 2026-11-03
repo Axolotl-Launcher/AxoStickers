@@ -1,6 +1,6 @@
 // 沙盒的遥控器：主页面从不执行组件代码，全部交给 sandbox.html（<iframe sandbox="allow-scripts">，不透明来源）。
-// 消息：主页面 → 沙盒 components / project / transport / export / filmstrip / source / remove / ping；
-//       沙盒 → 主页面 ready / catalog / scene / errors / time / progress / exported / export-error / *-done（带 req 的回复）/ pong / fatal。
+// 消息：主页面 → 沙盒 components / project / transport / export / filmstrip / source / remove / ping，live / live-end（预览上拖动中的位置、拖完了）；
+//       沙盒 → 主页面 ready / catalog / scene / errors / time / progress / exported / export-error / *-done（带 req 的回复）/ pong / fatal，drawn（transport 打开 trace 时）。
 // 回复的类型名故意和请求不一样：沙盒单独当顶层页面打开时（CI 出图），消息会发给自己。
 export class Runner {
   constructor(mount, { sandboxed = true, src = 'sandbox.html' } = {}) {

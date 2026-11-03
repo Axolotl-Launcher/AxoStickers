@@ -176,8 +176,8 @@ function build(root) {
   // 顶栏：左边回首页、工程名、自动保存的状态；然后撤销重做、文件（新建 打开 保存 我的工程）、随机；右边是往外拿的：帮助、分享、发布、导出
   const name = el('input', { class: 'st-name', value: store.p.name, placeholder: '给它起个名', maxlength: 40, 'aria-label': '工程名', 'data-ax': 'project-name' });
   name.addEventListener('change', () => store.change((p) => { p.name = name.value.trim(); }));
-  S.undoBtn = btn('撤销', '撤销（Ctrl+Z）', () => store.undo(), { ico: 'undo', ax: 'undo', hideLabel: true });
-  S.redoBtn = btn('重做', '重做（Ctrl+Shift+Z）', () => store.redo(), { ico: 'redo', ax: 'redo', hideLabel: true });
+  S.undoBtn = btn('撤销', '撤销（Ctrl+Z）', () => { S.endLive?.(); store.undo(); }, { ico: 'undo', ax: 'undo', hideLabel: true });
+  S.redoBtn = btn('重做', '重做（Ctrl+Shift+Z）', () => { S.endLive?.(); store.redo(); }, { ico: 'redo', ax: 'redo', hideLabel: true });
   S.saved = el('span', { class: 'st-saved', role: 'status', 'data-ax': 'save-state', title: '草稿一改就自动存在这台设备的浏览器里；想长期留着就「存到我的工程」或者「保存」成文件' }, icon('check', 'tiny'), el('span', { text: '已自动保存' }));
   const top = el('header', { class: 'st-top', 'aria-label': '工程' },
     el('a', { class: 'st-back', href: '#/', title: '回图鉴（首页）', 'aria-label': '回图鉴', 'data-ax': 'back' }, icon('home')), name, S.saved,
@@ -333,7 +333,8 @@ function build(root) {
 }
 
 // 在预览上直接拖：选中了文字就挪那行字，没选中（或者选的是别的图层）就挪模型；滚轮 / 双指捏合缩放。
-// 一次拖动只算一步撤销；改动按动画帧合并，拖得再快也不会每个像素都重建一次场景
+// 手势进行中不碰工程、不重建界面：每个指针帧给沙盒发一条小消息（挪谁、x / y / 大小 / 角度），沙盒直接改正在播的场景、按屏幕刷新率重画。
+// 松手时才写进工程（一次手势一步撤销），再照常同步一次工程、刷新一次界面。滚轮没有「松手」：停下 250 毫秒算完
 const clampN = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 function stageHint() {
   const l = S.store.layer();
@@ -341,58 +342,77 @@ function stageHint() {
 }
 function stageInteract() {
   const box = S.stageBox, pts = new Map();
-  let drag = null, raf = 0, pending = null, wheelS = null;     // wheelS：还没写进工程的滚轮缩放（一帧里来好几下滚轮要累积起来）
-  const flush = () => {
-    if (raf) cancelAnimationFrame(raf);
-    raf = 0; wheelS = null;
-    const p = pending; pending = null;
-    if (p) S.store.change(p.f, { coalesce: p.key });
-  };
-  const queue = (f, key) => { pending = { f, key }; raf ||= requestAnimationFrame(flush); };
+  let drag = null, live = null, gid = 0, seq = 0, wheelTimer = 0;   // live：这次手势里还没写进工程的值
   const textSel = () => { const l = S.store.layer(); return l?.type === 'text' ? l : null; };
-  const begin = (e) => {
-    const t = textSel(), M = S.store.p.model, k = 512 / box.getBoundingClientRect().width, [a, b] = [...pts.values()];
-    drag = { k, t: t?.id || null, x0: e.clientX, y0: e.clientY, sx: t ? t.x : M.x, sy: t ? t.y : M.y, s0: t ? t.scale : M.scale, d0: b ? Math.hypot(a[0] - b[0], a[1] - b[1]) : 0, moved: false };
+  const target = (t) => (t ? S.store.p.layers.find((l) => l.id === t) : S.store.p.model);
+  const cur = (t) => (live?.t === t ? live : target(t));       // 手势进行中：用还没写进工程的那份
+  const set = (t, v, at, wheel = false) => {
+    if (!live) {
+      const o = target(t);
+      if (!o) return;
+      if (sendPending()) sendProject(true);                    // 还排着的工程同步先发出去：手势期间不再发（旧工程会把挪着的东西拽回去）
+      live = { g: ++gid, t, x: o.x, y: o.y, scale: o.scale, rot: t ? undefined : o.rot, from: [o.x, o.y, o.scale], wheel };
+      S.live = true;
+    }
+    if (!wheel) { live.wheel = false; live.ws = undefined; }   // 拖过就不和前后的滚轮合成一步撤销；捏合改过大小，滚轮从新的大小接着算
+    Object.assign(live, v);
+    if (S.runner.ready) S.runner.post({ type: 'live', g: live.g, target: t || 'model', x: live.x, y: live.y, scale: live.scale, rot: live.rot, seq: ++seq, t: at });
   };
-  const scaleTo = (t, s, key) => queue((p) => {
-    if (t) { const l = p.layers.find((x) => x.id === t); if (l) l.scale = clampN(+s.toFixed(3), 0.3, 2); }
-    else p.model.scale = clampN(+s.toFixed(3), 0.3, 2.5);
-  }, key);
+  const commit = () => {
+    clearTimeout(wheelTimer); wheelTimer = 0;
+    const L = live;
+    if (!L) return;
+    live = null; S.live = false;
+    S.runner.post({ type: 'live-end', g: L.g });
+    if ((L.x !== L.from[0] || L.y !== L.from[1] || L.scale !== L.from[2]) && target(L.t)) {   // 没挪动（或者那行字中途被删了）就不记一步撤销
+      S.store.change((p) => { const o = L.t ? p.layers.find((l) => l.id === L.t) : p.model; if (o) Object.assign(o, { x: L.x, y: L.y, scale: L.scale }); },
+        { coalesce: L.wheel ? `wheel:${L.t || 'model'}` : null });   // 拖动 / 捏合一次一步；连着滚的几下滚轮合成一步
+    }
+    if (sendPending()) sendProject(true);                      // 马上同步（不等 60 毫秒）：沙盒那边接着就是这份工程
+  };
+  S.endLive = () => { if (!drag) commit(); };                   // 撤销 / 重做之前：滚轮还没算完的先写进工程
+  const begin = (e) => {
+    const t = live ? live.t : textSel()?.id || null, v = cur(t), k = 512 / box.getBoundingClientRect().width, [a, b] = [...pts.values()];
+    drag = { k, t, x0: e.clientX, y0: e.clientY, sx: v.x, sy: v.y, s0: v.scale, d0: b ? Math.hypot(a[0] - b[0], a[1] - b[1]) : 0, moved: !!live };
+  };
   box.addEventListener('pointerdown', (e) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    clearTimeout(wheelTimer); wheelTimer = 0;                  // 滚轮还没算完就按下去拖：算同一次手势，松手时一起写
     pts.set(e.pointerId, [e.clientX, e.clientY]);
     try { box.setPointerCapture(e.pointerId); } catch { /* 拿不到捕获也能拖 */ }
     begin(e);
   });
   box.addEventListener('pointermove', (e) => {
     if (!drag || !pts.has(e.pointerId)) return;
-    pts.set(e.pointerId, [e.clientX, e.clientY]);
-    if (pts.size >= 2 && drag.d0) { const [a, b] = [...pts.values()]; drag.moved = true; scaleTo(drag.t, drag.s0 * Math.hypot(a[0] - b[0], a[1] - b[1]) / drag.d0, `stage:${drag.t || 'model'}`); return; }   // 捏合也算这次手势改过了
-    const dx = (e.clientX - drag.x0) * drag.k, dy = (e.clientY - drag.y0) * drag.k;
+    const ev = e.getCoalescedEvents?.().at(-1) || e;            // 这一帧里攒下的几下移动：用最新的那下
+    const at = performance.timeOrigin + ev.timeStamp;
+    pts.set(e.pointerId, [ev.clientX, ev.clientY]);
+    if (pts.size >= 2 && drag.d0) {                            // 双指捏合：缩放
+      const [a, b] = [...pts.values()];
+      drag.moved = true;
+      set(drag.t, { scale: clampN(+(drag.s0 * Math.hypot(a[0] - b[0], a[1] - b[1]) / drag.d0).toFixed(3), 0.3, drag.t ? 2 : 2.5) }, at);
+      return;
+    }
+    const dx = (ev.clientX - drag.x0) * drag.k, dy = (ev.clientY - drag.y0) * drag.k;
     if (!drag.moved && Math.hypot(dx, dy) < 4) return;
     drag.moved = true; box.classList.add('dragging');
     const { t, sx, sy } = drag;
-    queue((p) => {
-      if (t) { const l = p.layers.find((x) => x.id === t); if (l) { l.x = clampN(Math.round(sx + dx), -256, 256); l.y = clampN(Math.round(sy + dy), 0, 512); } }
-      else { p.model.x = clampN(Math.round(sx + dx), -256, 256); p.model.y = clampN(Math.round(sy + dy), -256, 256); }
-    }, `stage:${t || 'model'}`);
+    set(t, { x: clampN(Math.round(sx + dx), -256, 256), y: clampN(Math.round(sy + dy), t ? 0 : -256, t ? 512 : 256) }, at);
   });
   const end = (e) => {
-    pts.delete(e.pointerId);
-    flush();                                                   // 还排着的最后一下先写进去（用这次手势的撤销键），再收尾
-    if (drag?.moved) S.store.lastKey = null;                   // 下一次拖动 / 捏合另算一步撤销
-    if (pts.size) { const [id, [x, y]] = [...pts][0]; begin({ pointerId: id, clientX: x, clientY: y }); return; }   // 双指松开一只：接着用剩下那只拖
+    if (!pts.delete(e.pointerId)) return;
+    if (pts.size) { const [id, [x, y]] = [...pts][0]; begin({ pointerId: id, clientX: x, clientY: y }); return; }   // 双指松开一只：接着用剩下那只拖（还是这次手势）
     drag = null; box.classList.remove('dragging');
+    commit();
   };
   box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
   box.addEventListener('wheel', (e) => {
     if (S.zoom !== 'fit' && !e.ctrlKey && !e.altKey) return;   // 放大看的时候滚轮是滚动舞台
     e.preventDefault();
-    const t = textSel(), cur = t ? t.scale : S.store.p.model.scale;
-    wheelS = clampN((wheelS ?? cur) * Math.exp(-e.deltaY * 0.0015), 0.3, t ? 2 : 2.5);   // 同一帧里的几下滚轮叠起来
-    const s = wheelS;
-    scaleTo(t?.id || null, s, `wheel:${t?.id || 'model'}`);
-    wheelS = s;                                                 // scaleTo 排队时不会清掉它，flush 写进工程后才清
+    const t = live ? live.t : textSel()?.id || null, ws = clampN((live?.ws ?? cur(t)?.scale ?? 1) * Math.exp(-e.deltaY * 0.0015), 0.3, t ? 2 : 2.5);   // ws：没取整的累计缩放（每下都取整会越滚越偏）
+    set(t, { scale: +ws.toFixed(3), ws }, performance.timeOrigin + e.timeStamp, true);
+    clearTimeout(wheelTimer);
+    if (!drag) wheelTimer = setTimeout(commit, 250);
   }, { passive: false });
   stageHint();
 }
@@ -515,11 +535,15 @@ async function importFont(f) {
 }
 
 // ---------------- 沙盒通信 ----------------
-let sendTimer;
-function sendProject() {
-  clearTimeout(sendTimer);
-  sendTimer = setTimeout(() => S.runner.post({ type: 'project', project: S.store.p }), 60);
+// 工程同步给沙盒：一般等 60 毫秒把连续的改动合成一次；预览上的手势进行中先不发（沙盒正直接挪着场景，旧工程会把它拽回去），松手时补发
+let sendTimer = 0, sendHeld = false;
+function sendProject(now = false) {
+  clearTimeout(sendTimer); sendTimer = 0;
+  if (S.live) { sendHeld = true; return; }
+  const go = () => { sendTimer = 0; sendHeld = false; S.runner.post({ type: 'project', project: S.store.p }); };
+  if (now) go(); else sendTimer = setTimeout(go, 60);
 }
+const sendPending = () => !!sendTimer || sendHeld;
 function setCatalog(list) {
   S.catalog = new Map();
   for (const m of list || []) { if (!S.catalog.has(m.type)) S.catalog.set(m.type, []); S.catalog.get(m.type).push(m); }
@@ -1967,8 +1991,8 @@ function onKey(e) {
   else if (k === 'ArrowRight' && !e.altKey) { seek(S.frame + (e.shiftKey ? 10 : 1)); e.preventDefault(); }
   else if (k === 'Home') seek(0);
   else if (k === 'End') seek(S.N - 1);
-  else if (mod && k.toLowerCase() === 'z') { (e.shiftKey ? S.store.redo() : S.store.undo()); e.preventDefault(); }
-  else if (mod && k.toLowerCase() === 'y') { S.store.redo(); e.preventDefault(); }
+  else if (mod && k.toLowerCase() === 'z') { S.endLive?.(); (e.shiftKey ? S.store.redo() : S.store.undo()); e.preventDefault(); }
+  else if (mod && k.toLowerCase() === 'y') { S.endLive?.(); S.store.redo(); e.preventDefault(); }
   else if (mod && k.toLowerCase() === 's') { saveProjectFile(); e.preventDefault(); }
   else if (mod && k.toLowerCase() === 'd' && S.store.layer()) { duplicateLayer(S.store.layer()); e.preventDefault(); }
   else if (mod && k.toLowerCase() === 'c' && S.store.layer() && !String(getSelection?.() || '')) { S.clip = structuredClone(S.store.layer()); toast('复制了这一层：Ctrl+V 粘贴'); }
