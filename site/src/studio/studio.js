@@ -127,6 +127,7 @@ function btn(label, title, on, { cls = '', ico = null, ax = null, hideLabel = fa
 
 function build(root) {
   const store = new Store();
+  store.onError = (e) => toast(e.message);
   const perf = detectPerf();
   let quality = 'auto';
   try { quality = localStorage.getItem('axo-quality') || 'auto'; } catch { /* 没有 localStorage */ }
@@ -226,13 +227,14 @@ function build(root) {
   const devNoSandbox = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && params.get('nosandbox') === '1';
   S.runner = new Runner(S.stageBox, { sandboxed: !devNoSandbox, src: `sandbox.html?q=${encodeURIComponent(quality)}` });
   S.runner.on('ready', (m) => {
+    S.sceneReady = false;
     S.bootMsg.hidden = true; S.root.dataset.state = 'ready'; setPerf(m.perf); setCatalog(m.catalog);
     for (const [id, x] of S.models) S.runner.request({ type: 'model', id, bytes: x.bytes.slice(0) });   // 沙盒重开过：模型再送一遍
     sendLibrary(); sendProject(); sendVisibility();
   });
   S.runner.on('perf', (m) => setPerf(m.perf));
   S.runner.on('catalog', (m) => { setCatalog(m.catalog); S.compileErrors = m.errors || []; showErrors(); });
-  S.runner.on('scene', (m) => { S.N = m.N; S.fps = m.fps; S.T = m.T; S.scrub.max = m.N - 1; S.errors = m.errors || []; showErrors(); updateCounter(); scheduleFilmstrip(); updateStatus(); });
+  S.runner.on('scene', (m) => { S.sceneReady = true; S.N = m.N; S.fps = m.fps; S.T = m.T; S.scrub.max = m.N - 1; S.errors = m.errors || []; showErrors(); updateCounter(); scheduleFilmstrip(); updateStatus(); });
   S.runner.on('errors', (m) => { S.errors = m.errors || []; showErrors(); });
   S.runner.on('time', (m) => { if (S.playing) { S.frame = m.frame; updateCounter(); } });
   S.runner.on('fatal', (m) => toast('沙盒出错：' + m.message));
@@ -403,12 +405,19 @@ function openDrawer(k) {
 }
 
 // 用到组件库里的组件：把它的源码一起放进工程，工程就自带了（分享、发布、换台电脑都能打开）
-function bring(p, type, id) {
-  const m = metaOf(type, id);
-  const origin = m ? (m.origin === 'builtin' || m.origin.startsWith('override:') ? null : m.origin) : lib.list().find((e) => e.type === type && e.id === id)?.origin;   // 素材库还没刷新：按组件库找
+const MAX_SOURCES = 24;                                        // 和 normalizeProject 的上限一样：超了会被截掉，所以先拦下
+function addSource(p, origin) {
   if (!origin || p.components.some((c) => c.origin === origin)) return;
   const e = lib.get(origin);
-  if (e) p.components.push({ origin: e.origin, source: e.source });
+  if (!e) return;
+  if (p.components.length >= MAX_SOURCES) {
+    throw Object.assign(new Error(`工程最多带 ${MAX_SOURCES} 段组件代码：先在「工坊 · 我的组件库」最下面把用不到的移出工程`), { userFacing: true });
+  }
+  p.components.push({ origin: e.origin, source: e.source });
+}
+function bring(p, type, id) {
+  const m = metaOf(type, id);
+  addSource(p, m ? (m.origin === 'builtin' || m.origin.startsWith('override:') ? null : m.origin) : lib.list().find((e) => e.type === type && e.id === id)?.origin);   // 素材库还没刷新：按组件库找
 }
 // 等沙盒把新组件编好、发回素材库（最多等 3 秒）
 const nextCatalog = () => new Promise((res) => { const off = S.runner.on('catalog', () => { off(); res(); }); setTimeout(() => { off(); res(); }, 3000); });
@@ -597,8 +606,10 @@ async function loadRepo() {
   if (S.repo) return S.repo;
   try {
     const r = await fetch('components/index.json', { cache: 'no-cache' });
-    S.repo = r.ok ? await r.json() : [];
-  } catch { S.repo = null; throw new Error('工坊没加载出来'); }
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    S.repo = await r.json();
+    if (!Array.isArray(S.repo)) throw new Error('index.json 格式不对');
+  } catch (e) { S.repo = null; throw new Error(`工坊没加载出来（${e.message}）`); }
   return S.repo;
 }
 const repoOrigin = (c) => `repo:${c.file}`;
@@ -612,18 +623,19 @@ async function addFromRepo(c, use = false) {
     await lib.put({ origin: repoOrigin(c), source, from: 'repo', file: c.file, id: c.id, type: c.type, name: c.name, author: c.author, version: c.version, description: c.description });
     toast(`「${c.name}」已经下载到组件库${c.type === 'scene' ? '：在「工坊 · 我的组件库」里点「用上」' : `：在「${KIND[c.type] || c.type}」里就能找到`}`);
     if (use) { await compiled; applyNew(c.type, c.id); }      // 等沙盒编完再用
-  } catch (e) { toast(`没下载下来：${e.message}`); }
+  } catch (e) { toast(`没下载下来：${e.message}`); throw e; }   // 按钮那边吞掉，axo.workshop.add() 能拿到失败
 }
 
 // 真的删掉：组件库（IndexedDB）里删掉这一条；当前工程里用到它的图层一起拿掉（文字只换回默认动画，字留着）
 async function deleteFromLibrary(origin, { confirmFirst = true } = {}) {
   const e = lib.get(origin), st = S.store;
-  const defs = [...S.catalog.values()].flat().filter((m) => m.origin === origin);
+  let defs = [...S.catalog.values()].flat().filter((m) => m.origin === origin);
+  if (!defs.length && e) { const d = lib.describe(e.source); defs = [{ type: e.type || d.type, id: e.id || d.id }]; }   // 编译失败的组件不在素材库里：按组件库里记的类型和 id 找
   const hits = (l) => defs.some((m) => (m.type === l.type || (m.type === 'textanim' && l.type === 'text')) && m.id === l.component);
   const n = st.p.layers.filter(hits).length + (defs.some((m) => m.type === 'skin' && m.id === st.p.skin.component) ? 1 : 0);
   const name = e?.name || origin;
   if (confirmFirst && !await ask(`删除「${name}」`, `会从这台设备浏览器的组件库里彻底删掉${n ? `，当前工程里用到它的 ${n} 处也会一起拿掉` : ''}。工坊里的原件不受影响，想要可以再添加。`, '删除', 'danger')) return false;
-  await lib.remove(origin);
+  // 先改工程（草稿是同步存的），再删组件库：中途关掉页面，最多是组件库里还剩一条，不会出现「删了的组件又回到工程里」
   if (n || st.p.components.some((c) => c.origin === origin)) {
     st.change((p) => {
       p.components = p.components.filter((c) => c.origin !== origin);
@@ -632,13 +644,14 @@ async function deleteFromLibrary(origin, { confirmFirst = true } = {}) {
       if (defs.some((m) => m.type === 'skin' && m.id === p.skin.component)) p.skin = { component: 'lucy', params: {} };
     });
   }
+  await lib.remove(origin);
   toast(`删掉了「${name}」`);
   return true;
 }
 
 function useFromLibrary(e) {
   const d = lib.describe(e.source);
-  S.store.change((p) => { if (!p.components.some((c) => c.origin === e.origin)) p.components.push({ origin: e.origin, source: e.source }); });
+  if (!S.store.change((p) => addSource(p, e.origin))) return;
   applyNew(e.type || d.type, e.id || d.id);
   toast(`用上了「${e.name || d.name || d.id}」`);
 }
@@ -676,8 +689,8 @@ function wsCard(c) {
     el('div', { class: 'st-row' }, added
       ? [btn('用上', '用到当前工程里', () => useFromLibrary(lib.get(repoOrigin(c))), { cls: 'small primary', ico: 'check', ax: 'workshop-use' }),
         btn('删除', '从这台设备的组件库里删掉', () => deleteFromLibrary(repoOrigin(c)), { cls: 'small danger', ico: 'trash', ax: 'workshop-remove' })]
-      : [btn('添加', '下载到这台设备的组件库', () => addFromRepo(c), { cls: 'small primary', ico: 'download', ax: 'workshop-add' }),
-        btn('添加并用上', '下载并马上用到当前工程', () => addFromRepo(c, true), { cls: 'small', ico: 'plus', ax: 'workshop-add-use' })]));
+      : [btn('添加', '下载到这台设备的组件库', () => addFromRepo(c).catch(() => {}), { cls: 'small primary', ico: 'download', ax: 'workshop-add' }),
+        btn('添加并用上', '下载并马上用到当前工程', () => addFromRepo(c, true).catch(() => {}), { cls: 'small', ico: 'plus', ax: 'workshop-add-use' })]));
 }
 
 function renderLibrary(q) {
@@ -1065,7 +1078,7 @@ async function importFile(f) {
     const m = /type:\s*['"](\w+)['"]/.exec(text), n = /name:\s*['"]([^'"]+)['"]/.exec(text);
     lib.put({ origin, name: n ? n[1] : f.name, type: m ? m[1] : '', source: text, from: 'file' });
     S.store.putComponent(origin, text);
-    const s = sniff(text); applyNew(s.type, s.id);
+    const s = lib.describe(text); applyNew(s.type, s.id);
     toast(`载入并用上了「${n ? n[1] : f.name}」（也存进了「我的组件」）`);
     return;
   }
@@ -1240,11 +1253,21 @@ function showKeys() {
 
 // ---------------- 给 AI 助手 / 自动化脚本的接口：window.axo ----------------
 // 浏览器里能执行 JavaScript 的 AI 工具直接调这些，比找按钮、拖滑块稳；每个函数都返回普通的 JSON 数据（或 Promise）。完整说明见 public/llms.txt。
+const LAYER_TYPES = ['motion', 'face', 'prop', 'wear', 'fx', 'text', 'scene'];
 function installApi() {
   const st = S.store;
   const layerInfo = (l) => ({ id: l.id, type: l.type, component: l.component, ...(l.type === 'text' ? { text: l.text, style: l.style } : {}), start: l.start, end: l.end, strength: l.strength, hidden: !!l.hidden, params: l.params || {} });
   const metaInfo = (m) => ({ type: m.type, id: m.id, name: m.name, origin: m.origin, favorite: lib.isFav(favKey(m.type, m.id)), params: m.params || {}, description: m.description || '' });
-  const ready = () => new Promise((res) => { if (S.root.dataset.state === 'ready' && S.catalog.size) res(api); else { const off = S.runner.on('ready', () => { off(); setTimeout(() => res(api), 50); }); } });
+  // 预览沙盒启动、并且第一个工程建好（收到 scene）才算好；沙盒没起来 / 工程建失败就报错，别让调用的一直等
+  const ready = () => new Promise((res, rej) => {
+    if (S.sceneReady) { res(api); return; }
+    if (S.root.dataset.state === 'error') { rej(new Error('预览沙盒没能启动（可能被浏览器扩展拦下了）')); return; }
+    const offs = [];
+    const done = () => offs.forEach((f) => f());
+    offs.push(S.runner.on('scene', () => { done(); res(api); }));
+    offs.push(S.runner.on('boot-failed', () => { done(); rej(new Error('预览沙盒没能启动（可能被浏览器扩展拦下了）')); }));
+    offs.push(S.runner.on('fatal', (m) => { if (!S.sceneReady) { done(); rej(new Error(`工程没建起来：${m.message}`)); } }));
+  });
   const findRepo = async (key) => (await loadRepo()).find((c) => c.file === key || c.id === key || repoOrigin(c) === key);
   const api = {
     version: 2,
@@ -1269,8 +1292,21 @@ function installApi() {
     text: (text, id) => { const l = id ? st.layer(id) : st.first('text'); if (!l) return api.layers.add('text', 'stay', { text }); st.change((p) => { p.layers.find((x) => x.id === l.id).text = String(text); }); return l.id; },
     layers: {
       list: () => st.p.layers.map(layerInfo),
-      add: (type, component, props = {}) => { const id = props.id || newId(type[0]); st.change((p) => { bring(p, type === 'text' ? 'textanim' : type, component); p.layers.push({ ...(type === 'text' ? { text: '美西螈' } : {}), ...props, id, type, component }); }); st.select(id); return id; },
-      update: (id, patch) => { if (!st.layer(id)) throw new Error(`没有图层 ${id}`); st.change((p) => { const l = p.layers.find((x) => x.id === id); if (patch.component) bring(p, l.type === 'text' ? 'textanim' : l.type, patch.component); Object.assign(l, patch, { id }); }); return layerInfo(st.layer(id)); },
+      add: (type, component, props = {}) => {
+        if (type === 'textanim') type = 'text';                   // 文字动画是文字图层的组件
+        if (!LAYER_TYPES.includes(type)) throw new Error(`图层类型只能是 ${LAYER_TYPES.join(' / ')}（文字动画用 text）`);
+        const id = props.id || newId(type[0]);
+        if (!st.change((p) => { bring(p, type === 'text' ? 'textanim' : type, component); p.layers.push({ ...(type === 'text' ? { text: '美西螈' } : {}), ...props, id, type, component }); })) throw new Error('没加上（看页面上的提示）');
+        st.select(id); return id;
+      },
+      update: (id, patch) => {
+        const l0 = st.layer(id);
+        if (!l0) throw new Error(`没有图层 ${id}`);
+        const { type, ...rest } = patch;
+        if (type && type !== l0.type && !(type === 'textanim' && l0.type === 'text')) throw new Error('图层类型不能直接改：删掉这一层再加一层');
+        if (!st.change((p) => { const l = p.layers.find((x) => x.id === id); if (rest.component) bring(p, l.type === 'text' ? 'textanim' : l.type, rest.component); Object.assign(l, rest, { id }); })) throw new Error('没改成（看页面上的提示）');
+        return layerInfo(st.layer(id));
+      },
       remove: (id) => { st.change((p) => { p.layers = p.layers.filter((x) => x.id !== id); }); if (st.selected === id) st.select(null); return true; },
       select: (id = null) => { st.select(id); return id; },
       move: (id, d) => { const i = st.p.layers.findIndex((x) => x.id === id); if (i >= 0) moveLayer(i, d); return api.layers.list().map((l) => l.id); },

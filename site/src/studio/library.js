@@ -29,7 +29,8 @@ export function describe(source) {
   };
 }
 
-export const ready = (async () => {
+// 先把数据库打开、读进来；之后的写入都排在它后面（不然启动时刚新建的组件会被读进来的旧内容盖掉）
+const opened = (async () => {
   try {
     db = await new Promise((res, rej) => {
       const r = indexedDB.open(DB, 1);
@@ -38,10 +39,13 @@ export const ready = (async () => {
     });
     await reload();
   } catch { db = null; }
-  try {                                                         // 第一版存在 localStorage 的「我的组件」搬过来，搬完删掉旧的
+})();
+export const ready = (async () => {
+  await opened;
+  try {                                                         // 第一版存在 localStorage 的「我的组件」搬过来
     const old = JSON.parse(localStorage.getItem(LEGACY) || '[]');
-    for (const m of old) if (m?.origin && m.source && !items.has(m.origin)) await put({ ...describe(m.source), name: m.name, type: m.type || describe(m.source).type, origin: m.origin, source: m.source, from: 'mine' }, false);
-    localStorage.removeItem(LEGACY);
+    for (const m of old) if (m?.origin && m.source && !items.has(m.origin)) await write({ ...describe(m.source), name: m.name, type: m.type || describe(m.source).type, origin: m.origin, source: m.source, from: 'mine' });
+    if (db && old.length) localStorage.removeItem(LEGACY);       // 只有真的存进 IndexedDB 了才删旧的；数据库打不开就留着，下次再搬
   } catch { /* 没有 localStorage */ }
   bc?.addEventListener('message', async () => { await reload(); emit('sync'); });
 })();
@@ -51,17 +55,23 @@ export const get = (origin) => items.get(origin) || null;
 export const has = (origin) => items.has(origin);
 export const onChange = (f) => { listeners.add(f); return () => listeners.delete(f); };
 
-// 放进组件库（同一个 origin 覆盖）。from：repo（工坊）/ mine（自己写的）/ file（从文件载入）
-export async function put(entry, notify = true) {
+async function write(entry) {
   const e = { ...describe(entry.source), ...entry, at: Date.now() };
   items.set(e.origin, e);
   if (db) await req(store('readwrite').put(e));
-  if (notify) { emit('put'); bc?.postMessage('put'); }
+  return e;
+}
+// 放进组件库（同一个 origin 覆盖）。from：repo（工坊）/ mine（自己写的）/ file（从文件载入）
+export async function put(entry) {
+  await opened;
+  const e = await write(entry);
+  emit('put'); bc?.postMessage('put');
   return e;
 }
 
 // 真的删掉：IndexedDB 里这一条没了
 export async function remove(origin) {
+  await opened;
   items.delete(origin);
   if (db) await req(store('readwrite').delete(origin));
   emit('remove'); bc?.postMessage('remove');
@@ -69,10 +79,13 @@ export async function remove(origin) {
 
 // ---------------- 收藏 ----------------
 let favs = new Set();
-try { favs = new Set(JSON.parse(localStorage.getItem(FAVS) || '[]')); } catch { /* 没有 localStorage */ }
+const loadFavs = () => { try { return new Set(JSON.parse(localStorage.getItem(FAVS) || '[]')); } catch { return favs; } };
+favs = loadFavs();
+try { addEventListener('storage', (e) => { if (e.key === FAVS) { favs = loadFavs(); emit('fav'); } }); } catch { /* 没有 window */ }   // 别的标签页改了收藏
 export const isFav = (key) => favs.has(key);
 export const favList = () => [...favs];
 export function toggleFav(key, on = !favs.has(key)) {
+  favs = loadFavs();                                            // 先读最新的再改这一个：两个标签页各收藏一个，谁也不会盖掉谁
   if (on) favs.add(key); else favs.delete(key);
   try { localStorage.setItem(FAVS, JSON.stringify([...favs])); } catch { /* 存不下就只在这次有效 */ }
   emit('fav');

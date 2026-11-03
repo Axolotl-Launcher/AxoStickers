@@ -39,14 +39,21 @@ export class Store {
   emit(why) { this.tell(why); if (!this.foreign) save(DRAFT, this.p); }
 
   // 改工程：fn 直接改 draft；coalesce 用来把拖滑块这种连续操作合成一步撤销
+  // fn 抛错时整个改动作废、工程回到改之前；带 userFacing 的错误（比如组件代码太多了）交给 onError 提示，不往外抛
   change(fn, { coalesce = null } = {}) {
-    const now = performance.now();
-    if (!(coalesce && this.lastKey === coalesce && now - this.lastPush < 800)) { this.past.push(JSON.stringify(this.p)); if (this.past.length > 120) this.past.shift(); }
+    const now = performance.now(), snap = JSON.stringify(this.p);
+    const pushed = !(coalesce && this.lastKey === coalesce && now - this.lastPush < 800);
+    try { fn(this.p); } catch (e) {
+      this.p = normalizeProject(JSON.parse(snap));
+      if (e.userFacing && this.onError) { this.onError(e); return false; }
+      throw e;
+    }
+    if (pushed) { this.past.push(snap); if (this.past.length > 120) this.past.shift(); }
     this.lastKey = coalesce; this.lastPush = now;
     this.future = [];
-    fn(this.p);
     this.p = normalizeProject(this.p);
     this.emit('change');
+    return true;
   }
   replace(p, why = 'load') {
     this.past.push(JSON.stringify(this.p)); this.future = [];
