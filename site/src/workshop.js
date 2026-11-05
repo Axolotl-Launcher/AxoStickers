@@ -1,5 +1,5 @@
 // 工坊作品：workshop/index.json 里的投稿（GitHub Actions 用真引擎出的图），按最新 / 最多赞排。
-import { $, el, encodePath, animated, unobserve, CONTRIBUTE } from './util.js';
+import { $, el, encodePath, animated, unobserve, CONTRIBUTE, gifName, dragOut } from './util.js';
 import { loadFailed, loadOk } from './gallery.js';
 
 export const WS = { entries: [], ready: null, sort: 'new' };
@@ -24,6 +24,7 @@ export function sorted() {
 function card(e) {
   const img = el('img', { class: 'pic', loading: 'lazy', decoding: 'async', width: 400, height: 400, alt: '', src: e.still, 'data-still': e.still, 'data-gif': e.gifUrl, 'data-preview': e.preview });
   img.addEventListener('error', () => { if (img.src.includes('/thumbs/')) { img.dataset.still = e.coverUrl; img.src = e.coverUrl; } }, { once: true });
+  img.addEventListener('dragstart', (ev) => dragOut(ev, e.gifUrl, gifName(e, 'workshop')));
   return animated(el('button', { class: 'card ws-card', type: 'button', onclick: () => { location.hash = `#/w/${e.issue}`; } }, img,
     el('span', { class: 'cap' }, el('b', { text: e.text }), el('span', { class: 'likes', text: `👍 ${e.likes || 0}` }),
       el('span', { class: 'who', text: `@${e.author} · ${e.date.slice(0, 10)}` }))));

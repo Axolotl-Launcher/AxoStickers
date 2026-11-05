@@ -1,6 +1,6 @@
 // 逐帧播放器：大图弹窗里用。拆开 GIF，能暂停、逐帧、拖进度、调速度、看每一帧缩略图、存单帧 PNG。
 import { decodeGif } from './gifdecode.js';
-import { el } from './util.js';
+import { el, dragOut } from './util.js';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 const makeCanvas = (w, h) => (typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(w, h) : Object.assign(document.createElement('canvas'), { width: w, height: h }));
@@ -11,6 +11,9 @@ export class FramePlayer {
     this.canvas = el('canvas', { class: 'player-canvas', width: 400, height: 400, 'aria-label': '动图' });
     this.ctx = this.canvas.getContext('2d');
     this.still = el('img', { class: 'player-still', alt: '' });
+    // 盖在画布上的透明 GIF：画布拖不出去，拖它才是原图（拖进 QQ 是动图）；手机上长按它也能存 GIF
+    this.grab = el('img', { class: 'player-grab', alt: '' });
+    this.grab.addEventListener('dragstart', (e) => dragOut(e, this.grab.src, this.name));
     this.playBtn = el('button', { class: 'pbtn', type: 'button', 'aria-label': '暂停', title: '播放 / 暂停（空格）', onclick: () => this.toggle() }, '❚❚');
     this.prevBtn = el('button', { class: 'pbtn', type: 'button', 'aria-label': '上一帧', title: '上一帧（←）', onclick: () => this.step(-1) }, '◀');
     this.nextBtn = el('button', { class: 'pbtn', type: 'button', 'aria-label': '下一帧', title: '下一帧（→）', onclick: () => this.step(1) }, '▶');
@@ -21,7 +24,7 @@ export class FramePlayer {
     this.saveBtn = el('button', { class: 'pbtn wide', type: 'button', title: '把这一帧存成 PNG', onclick: () => this.saveFrame() }, '存这帧');
     this.strip = el('div', { class: 'filmstrip', role: 'listbox', 'aria-label': '所有帧' });
     root.replaceChildren(
-      el('div', { class: 'player-stage' }, this.still, this.canvas),
+      el('div', { class: 'player-stage' }, this.still, this.canvas, this.grab),
       el('div', { class: 'player-bar' }, this.playBtn, this.prevBtn, this.nextBtn, this.scrub, this.counter, this.speedBtn, this.saveBtn),
       this.strip);
     this.frames = []; this.i = 0; this.playing = true; this.speed = 1; this.token = 0; this.name = 'frame';
@@ -32,10 +35,12 @@ export class FramePlayer {
     this.stop(); const tok = ++this.token;
     this.frames = []; this.name = name || 'frame';
     this.still.src = still || ''; this.still.hidden = false; this.canvas.hidden = true;
+    this.grab.removeAttribute('src');
     this.strip.replaceChildren(); this.counter.textContent = '拆帧中…';
     try {
       const buf = await (await fetch(url)).arrayBuffer();
       if (tok !== this.token) return;
+      this.grab.src = url;                                    // 刚下完，从缓存里拿
       const g = decodeGif(buf);
       this.canvas.width = g.width; this.canvas.height = g.height;
       this.frames = g.frames.map((f) => ({ img: new ImageData(f.data, g.width, g.height), delay: f.delay }));
@@ -46,7 +51,7 @@ export class FramePlayer {
       this.i = 0; this.show(0);
       if (this.playing) this.play();
     } catch (e) {
-      if (tok === this.token) { this.still.src = url; this.counter.textContent = '只能直接看'; }
+      if (tok === this.token) { this.still.src = this.grab.src = url; this.counter.textContent = '只能直接看'; }
     }
   }
 

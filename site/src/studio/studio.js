@@ -1813,10 +1813,12 @@ function showExport() {
       const r = await S.runner.request({ type: 'export', format, size, colors: colors || undefined, maxKb, loops }, (p) => { bar.firstElementChild.style.width = `${Math.round(p * 100)}%`; });
       const blob = new Blob([r.bytes], { type: r.mime }), url = lastUrl = URL.createObjectURL(blob);
       const ext = format === 'gif' ? 'gif' : format === 'png' ? 'png' : format === 'video' ? (r.mime.includes('mp4') ? 'mp4' : 'webm') : 'zip', fname = `${P.name || '美西螈'}.${ext}`;
-      fill(result, 
+      // 结果图用 data: 地址：QQ 收拖进去的图会自己去下图片地址，blob: 地址它下不了，data: 的能收
+      const dataUrl = format === 'gif' || format === 'png' ? await new Promise((ok, no) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = () => no(fr.error); fr.readAsDataURL(blob); }) : null;
+      fill(result,
         format === 'video' ? el('video', { src: url, class: 'st-resultimg', controls: true, loop: true, autoplay: true, muted: true, playsinline: true, 'aria-label': '导出的视频' })
-          : format !== 'png-zip' ? el('img', { src: url, alt: '导出的结果', class: 'st-resultimg' }) : null,
-        el('p', { class: 'st-note', text: `${Math.round(blob.size / 1024)} KB · 电脑上点下载；手机微信里长按图片保存。` }),
+          : dataUrl ? el('img', { src: dataUrl, alt: '导出的结果', class: 'st-resultimg' }) : null,
+        el('p', { class: 'st-note', text: `${Math.round(blob.size / 1024)} KB · 电脑上点下载${dataUrl ? '，或者把图直接拖进 QQ' : ''}；手机微信里长按图片保存。` }),
         el('div', { class: 'st-row' }, el('a', { class: 'btn primary', href: url, download: fname }, '下载'),
           navigator.canShare?.({ files: [new File([blob], fname, { type: r.mime })] }) ? el('button', { class: 'btn', type: 'button', onclick: () => navigator.share({ files: [new File([blob], fname, { type: r.mime })] }).catch(() => {}) }, '分享') : null));
     } catch (e) { fill(result, el('p', { class: 'st-warn', text: '导出失败：' + e.message })); }

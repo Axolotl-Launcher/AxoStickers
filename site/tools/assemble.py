@@ -1,5 +1,5 @@
 """把网站拼起来：python site/tools/assemble.py [--thumbs-only]
-_site/ = site/dist（vite build 的产物）+ out/（GIF、封面、清单）+ workshop/（投稿、index.json）
+_site/ = site/dist（vite build 的产物）+ gif/（表情 GIF，英文文件名）+ out/（封面、清单）+ workshop/（投稿、index.json）
        + thumbs/（240px 静态缩略图 webp）+ previews/（240px 小视频预览 mp4，悬停时播放，要 ffmpeg）。
 缩略图和预览缓存在 site/.thumbs/、site/.previews/（不进 git），源图没变就不重做。"""
 import os, re, sys, json, shutil, subprocess
@@ -54,6 +54,18 @@ def make_thumbs(videos=True):
             v = sum(ex.map(lambda s: preview(s[0], s[2]), src))
         print('previews:', v, 'new')
 
+def site_gifs():
+    """表情 GIF 在网站上的英文地址：gif/001.gif、gif/tornado-1.gif（开发服务器 vite.config.js 里是同一套规则）。
+    QQ 收拖进去的图片时会自己去下图片的地址，地址里有中文就失败；中文名只当文件名（下载按钮的 download、拖出去的 DownloadURL）。
+    返回 (改成新地址的清单, {新文件名: 源文件})。"""
+    data = json.load(open(os.path.join(OUT, 'stickers.json'), encoding='utf-8'))
+    named = [('%03d.gif' % s['id'], s) for s in data['stickers']] + [('%s-%d.gif' % (s['motion'], i + 1), s) for i, s in enumerate(data['specials'])]
+    files = {}
+    for name, s in named:
+        files[name] = os.path.join(ROOT, s['gif'])
+        s['gif'] = 'gif/' + name
+    return data, files
+
 HEADER = re.compile(r'^\s*/\*\s*@axo\s*(\{.*?\})\s*\*/', re.S)
 
 def components(dst):
@@ -101,8 +113,12 @@ def main():
     if not os.path.exists(os.path.join(dist, 'index.html')): raise SystemExit('先在 site/ 里 npm run build')
     if os.path.exists(SITE): shutil.rmtree(SITE)
     shutil.copytree(dist, SITE)
-    copy(OUT, os.path.join(SITE, 'out'), {'.gif', '.png', '.json'})
+    copy(OUT, os.path.join(SITE, 'out'), {'.png', '.json'})
     copy(os.path.join(OUT, '_封面'), os.path.join(SITE, 'out', '_封面'), {'.png'})
+    data, files = site_gifs()                         # 表情 GIF 只放英文名的这一份，站上的清单跟着改
+    os.makedirs(os.path.join(SITE, 'gif'))
+    for name, src in files.items(): shutil.copy2(src, os.path.join(SITE, 'gif', name))
+    json.dump(data, open(os.path.join(SITE, 'out', 'stickers.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     copy(WS, os.path.join(SITE, 'workshop'), {'.json'})
     for d in ('gifs', 'covers', 'projects'):          # projects/：投稿的工程，「在工坊里改一改」载进编辑器
         if os.path.isdir(os.path.join(WS, d)): copy(os.path.join(WS, d), os.path.join(SITE, 'workshop', d), {'.gif', '.png', '.json'})
