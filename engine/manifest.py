@@ -28,8 +28,12 @@ def main():
             hold=s.get('hold') if isinstance(s.get('hold'), (str, type(None))) else s['hold'].get('kind'),
             wear=s.get('wear', []), style=s.get('style', 'pink'), tmode=s.get('tmode', 'stay'),
             gif=f'out/{name}.gif', cover=f'out/_封面/{name}.png'))
-    extra = [dict(id=f'tornado-{k}', text=t, category='special', category_zh='特别篇', motion='tornado', gif=f'out/水龙卷_{k}.gif')
-             for k, t in (('无字', ''), ('我没事', '我没事'), ('转晕了', '转晕了'))]
+    # 不是 specs.py 出的图（没有配方）：初代表情包工具包 examples/ 里的原图，水龙卷特别篇（tornado.py）。
+    # slug 是网站上的英文文件名（gif/<slug>.gif），series 是下载 / 拖出去时文件名的前缀
+    extra = [dict(id=f'初代-{t}', slug=f'og-{s}', series='初代', text=t, category='support', category_zh='群里答疑', motion='original', gif=f'out/初代_{t}.gif')
+             for t, s in (('发日志', 'send-log'), ('请截图', 'screenshot'), ('看文档', 'read-docs'), ('看群公告', 'group-notice'))]
+    extra += [dict(id=f'tornado-{k}', slug=f'tornado-{i}', series='水龙卷', text=t, category='special', category_zh='特别篇', motion='tornado', gif=f'out/水龙卷_{k}.gif')
+              for i, (k, t) in enumerate((('无字', ''), ('我没事', '我没事'), ('转晕了', '转晕了')), 1)]
     data = dict(version=1, size=[400, 400], fps=15, count=len(items), categories=CAT, stickers=items, specials=extra)
     with open(os.path.join(ROOT, 'out', 'stickers.json'), 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=1)

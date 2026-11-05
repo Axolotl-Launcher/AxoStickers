@@ -7,11 +7,11 @@ import { CONTRIBUTE } from './src/flags.js';
 const ROOT = path.resolve(import.meta.dirname, '..');
 const TYPES = { '.gif': 'image/gif', '.png': 'image/png', '.webp': 'image/webp', '.json': 'application/json', '.mp4': 'video/mp4', '.js': 'text/javascript', '.glb': 'model/gltf-binary' };
 
-// 表情 GIF 在网站上的英文地址：gif/001.gif、gif/tornado-1.gif（和 tools/assemble.py 的 site_gifs 是同一套规则）。
+// 表情 GIF 在网站上的英文地址：gif/001.gif；初代、水龙卷用清单里的 slug：gif/og-send-log.gif、gif/tornado-1.gif（和 tools/assemble.py 的 site_gifs 是同一套规则）。
 // QQ 收拖进去的图片时会自己去下图片的地址，地址里有中文就失败；中文名只当文件名。返回改成新地址的清单和 {新文件名: 源文件}。
 function siteGifs() {
   const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'out', 'stickers.json'), 'utf8')), files = new Map();
-  const named = [...data.stickers.map((s) => [`${String(s.id).padStart(3, '0')}.gif`, s]), ...data.specials.map((s, i) => [`${s.motion}-${i + 1}.gif`, s])];
+  const named = [...data.stickers.map((s) => [`${String(s.id).padStart(3, '0')}.gif`, s]), ...data.specials.map((s) => [`${s.slug}.gif`, s])];
   for (const [name, s] of named) { files.set(name, path.join(ROOT, s.gif)); s.gif = `gif/${name}`; }
   return { data, files };
 }

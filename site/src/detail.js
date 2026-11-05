@@ -31,11 +31,12 @@ function fill() {
   const recipe = kind === 'workshop' ? it.recipe : it;
   const meta = kind === 'workshop'
     ? `工坊 #${it.issue} · @${it.author} · ${it.date.slice(0, 10)}`
-    : it.special ? '特别篇 · 水龙卷' : `#${it.key} · ${CAT.categories[it.category] || it.category_zh}`;
+    : it.special ? `${it.category_zh} · ${it.series}` : `#${it.key} · ${CAT.categories[it.category] || it.category_zh}`;
   $('#d-meta').textContent = meta;
   const dl = $('#d-recipe');
   dl.replaceChildren(...(kind === 'workshop' && it.desc ? [el('dt', { text: '说明' }), el('dd', { text: it.desc })] : []),   // 投稿时写的一句话（纯文本）
-    ...(it.special ? [el('dt', { text: '动作' }), el('dd', { text: '水龙卷（转着圈飞上天，又掉回来）' })]
+    ...(it.series === '水龙卷' ? [el('dt', { text: '动作' }), el('dd', { text: '水龙卷（转着圈飞上天，又掉回来）' })]
+    : it.special ? [el('dt', { text: '来源' }), el('dd', { text: '初代表情包工具包里的原图（不是这个引擎出的，没有配方）' })]
     : kind === 'workshop' && !recipe ? summaryRows(it.summary) : rows(recipe)));
   const down = $('#d-download');
   down.href = gif;
@@ -50,8 +51,8 @@ function fill() {
   note.replaceChildren();
   if (kind === 'workshop') note.append('想让它进下一版正式表情包？去 issue 里喊一声。');
   else {
-    if (it.special) note.append('水龙卷用到了原版 Minecraft 材质，没放进工坊，只能本地用引擎出（见 README）。');
-    note.append(it.special ? ' ' : '', '全部 300 张 + 水龙卷打包：', el('a', { href: RELEASE.url, text: `Release zip（${RELEASE.size}）` }));
+    if (it.series === '水龙卷') note.append('水龙卷用到了原版 Minecraft 材质，没放进工坊，只能本地用引擎出（见 README）。 ');
+    note.append('全部 300 张 + 水龙卷打包：', el('a', { href: RELEASE.url, text: `Release zip（${RELEASE.size}）` }));
   }
   const i = list.indexOf(it);
   $('#d-prev').disabled = i <= 0; $('#d-next').disabled = i < 0 || i >= list.length - 1;

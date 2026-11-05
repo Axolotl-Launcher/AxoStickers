@@ -35,7 +35,7 @@ def preview(src, name):
     return 1
 
 def sources():
-    """[(源文件, 封面或首帧, 名字)]：300 张、特别篇、工坊投稿。"""
+    """[(源文件, 封面或首帧, 名字)]：300 张、初代和特别篇、工坊投稿。"""
     data = json.load(open(os.path.join(OUT, 'stickers.json'), encoding='utf-8'))
     out = [(os.path.join(ROOT, s['gif']), os.path.join(ROOT, s['cover']), '%03d' % s['id']) for s in data['stickers']]
     out += [(os.path.join(ROOT, s['gif']), os.path.join(ROOT, s['gif']), s['id']) for s in data['specials']]
@@ -55,11 +55,11 @@ def make_thumbs(videos=True):
         print('previews:', v, 'new')
 
 def site_gifs():
-    """表情 GIF 在网站上的英文地址：gif/001.gif、gif/tornado-1.gif（开发服务器 vite.config.js 里是同一套规则）。
+    """表情 GIF 在网站上的英文地址：gif/001.gif；初代、水龙卷用清单里的 slug：gif/og-send-log.gif、gif/tornado-1.gif（开发服务器 vite.config.js 里是同一套规则）。
     QQ 收拖进去的图片时会自己去下图片的地址，地址里有中文就失败；中文名只当文件名（下载按钮的 download、拖出去的 DownloadURL）。
     返回 (改成新地址的清单, {新文件名: 源文件})。"""
     data = json.load(open(os.path.join(OUT, 'stickers.json'), encoding='utf-8'))
-    named = [('%03d.gif' % s['id'], s) for s in data['stickers']] + [('%s-%d.gif' % (s['motion'], i + 1), s) for i, s in enumerate(data['specials'])]
+    named = [('%03d.gif' % s['id'], s) for s in data['stickers']] + [(s['slug'] + '.gif', s) for s in data['specials']]
     files = {}
     for name, s in named:
         files[name] = os.path.join(ROOT, s['gif'])

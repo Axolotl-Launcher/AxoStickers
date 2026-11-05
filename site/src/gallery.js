@@ -1,4 +1,4 @@
-// 图鉴：300 张 + 水龙卷。分类、搜索、按动作 / 字色筛选；卡片先放缩略图，悬停或滑到才加载 GIF。
+// 图鉴：300 张 + 初代 + 水龙卷。分类、搜索、按动作 / 字色筛选；卡片先放缩略图，悬停或滑到才加载 GIF。
 import { CAT, STYLE_COLORS, $, el, pad3, encodePath, fxLabel, animated, gifName, dragOut } from './util.js';
 
 export const G = { items: [], byKey: new Map(), visible: [], ready: null };
@@ -12,7 +12,7 @@ function normalize(s, special) {
     gif: encodePath(s.gif), cover: s.cover ? encodePath(s.cover) : encodePath(s.gif),
     still: `thumbs/${encodeURIComponent(key)}.webp`, preview: `previews/${encodeURIComponent(key)}.mp4`,
     search: [s.text, CAT.motions[s.motion]?.zh, CAT.faces[s.face], ...(s.fx || []).map(fxLabel), CAT.holds[s.hold],
-      ...(s.wear || []).map((w) => CAT.wears[w]), special ? '水龙卷 特别篇' : ''].filter(Boolean).join(' ').toLowerCase(),
+      ...(s.wear || []).map((w) => CAT.wears[w]), special ? `${s.series} ${s.category_zh}` : ''].filter(Boolean).join(' ').toLowerCase(),
   };
 }
 
@@ -42,8 +42,8 @@ function card(it) {
   img.addEventListener('dragstart', (e) => dragOut(e, it.gif, gifName(it)));     // 拖进 QQ 的是动图
   const c = el('button', { class: 'card', type: 'button', 'data-key': it.key, onclick: () => { location.hash = `#/s/${encodeURIComponent(it.key)}`; } },
     img,
-    it.special ? el('span', { class: 'badge', text: '特别篇' }) : null,
-    el('span', { class: 'cap' }, el('b', { text: it.text || '（无字）' }), el('span', { text: it.special ? '水龙卷' : '#' + it.key })));
+    it.special ? el('span', { class: 'badge', text: it.category === 'special' ? '特别篇' : it.series }) : null,
+    el('span', { class: 'cap' }, el('b', { text: it.text || '（无字）' }), el('span', { text: it.special ? it.series : '#' + it.key })));
   return animated(c);
 }
 
