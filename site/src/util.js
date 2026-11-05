@@ -59,6 +59,20 @@ export function recipeRows(r) {
   return rows;
 }
 
+// ---------------- 拖出浏览器：拖进 QQ、拖到桌面 ----------------
+// 下载和拖出去时的文件名：001_先看日志.gif、水龙卷_我没事.gif、工坊12_下班了.gif
+export const gifName = (it, kind) => (kind === 'workshop' ? `工坊${it.issue}_${it.text}` : `${it.special ? '水龙卷' : it.key}_${it.text || '无字'}`);
+// QQ 收拖进去的图片时会自己去下拖的那个地址：英文地址、data: 地址能收，中文地址、blob: 地址收不了（在 clawd-400 上实测过）。
+// 所以表情 GIF 都是英文地址（gif/001.gif），中文名只放进 DownloadURL：Chrome / Edge 拖到桌面存成「001_先看日志.gif」。
+// 卡片上拖的是静态缩略图，就把拖出去的地址换成 GIF 的，QQ 下到的才是动图；拖的本来就是这张 GIF 时只加 DownloadURL。
+export function dragOut(e, url, name) {
+  const abs = new URL(url, location.href).href, dt = e.dataTransfer;
+  dt.setData('DownloadURL', `image/gif:${name.replace(/[\\/:*?"<>|]/g, '_')}.gif:${abs}`);
+  if (e.target.currentSrc === abs) return;
+  dt.setData('text/uri-list', abs);
+  dt.setData('text/html', `<img src="${abs.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}" alt="">`);
+}
+
 // ---------------- 卡片：先放静态缩略图；悬停（手机上停在屏幕里）就播 240px 的小视频预览（几十 KB，比 1 MB 的 GIF 快得多） ----------------
 // 同时播几个按设备档位来：没有显卡加速的手机不自动播（点开大图照样能看），省流量模式也不自动播
 const touch = matchMedia('(hover: none)').matches;

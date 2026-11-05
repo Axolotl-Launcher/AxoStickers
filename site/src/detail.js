@@ -1,5 +1,5 @@
 // 大图弹窗：图鉴和工坊作品共用。逐帧播放器、配方、下载、在工坊里改一改、上一张 / 下一张。
-import { CAT, REPO, RELEASE, $, el, recipeRows, toast } from './util.js';
+import { CAT, REPO, RELEASE, $, el, recipeRows, toast, gifName } from './util.js';
 import { FramePlayer } from './player.js';
 
 const dlg = $('#detail');
@@ -25,7 +25,7 @@ function summaryRows(s) {
 function fill() {
   const { item: it, kind, list } = cur;
   const gif = kind === 'workshop' ? it.gifUrl : it.gif;
-  const name = kind === 'workshop' ? `工坊${it.issue}_${it.text}` : `${it.special ? '水龙卷' : it.key}_${it.text || '无字'}`;
+  const name = gifName(it, kind);
   player.load(gif, it.still, name);
   $('#d-title').textContent = it.text || '（无字）';
   const recipe = kind === 'workshop' ? it.recipe : it;

@@ -1,5 +1,5 @@
 // 图鉴：300 张 + 水龙卷。分类、搜索、按动作 / 字色筛选；卡片先放缩略图，悬停或滑到才加载 GIF。
-import { CAT, STYLE_COLORS, $, el, pad3, encodePath, fxLabel, animated } from './util.js';
+import { CAT, STYLE_COLORS, $, el, pad3, encodePath, fxLabel, animated, gifName, dragOut } from './util.js';
 
 export const G = { items: [], byKey: new Map(), visible: [], ready: null };
 const state = { cat: '', q: '', motion: '', style: '' };
@@ -39,6 +39,7 @@ function card(it) {
     src: it.still, 'data-still': it.still, 'data-gif': it.gif, 'data-preview': it.preview,
   });
   img.addEventListener('error', () => { if (img.src.includes('/thumbs/')) { img.dataset.still = it.cover; img.src = it.cover; } }, { once: true });
+  img.addEventListener('dragstart', (e) => dragOut(e, it.gif, gifName(it)));     // 拖进 QQ 的是动图
   const c = el('button', { class: 'card', type: 'button', 'data-key': it.key, onclick: () => { location.hash = `#/s/${encodeURIComponent(it.key)}`; } },
     img,
     it.special ? el('span', { class: 'badge', text: '特别篇' }) : null,
