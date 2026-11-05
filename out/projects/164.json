@@ -1,0 +1,46 @@
+{
+ "v": 2,
+ "name": "感动",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1163,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "idle",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "teary"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "tears",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "hearts",
+   "params": {}
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "感动",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": false
+   }
+  }
+ ]
+}

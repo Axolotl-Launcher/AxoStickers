@@ -1,0 +1,40 @@
+{
+ "v": 2,
+ "name": "唉",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1217,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "flop",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "sad"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "dots",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "唉",
+   "style": "gray",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": false
+   }
+  }
+ ]
+}

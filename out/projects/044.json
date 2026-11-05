@@ -1,0 +1,60 @@
+{
+ "v": 2,
+ "name": "私信我",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1043,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.07,
+    "out": 0.82,
+    "look": 22
+   }
+  },
+  {
+   "id": "l1",
+   "type": "motion",
+   "component": "shy",
+   "params": {}
+  },
+  {
+   "id": "l2",
+   "type": "face",
+   "component": "wink"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "say",
+   "params": {
+    "icon": "mail"
+   },
+   "start": 0.42,
+   "end": 0.8
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "twinkle",
+   "start": 0.42,
+   "end": 0.8
+  },
+  {
+   "id": "l5",
+   "type": "text",
+   "text": "私信我",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.22,
+    "out": 0.82,
+    "sparks": true
+   }
+  }
+ ]
+}

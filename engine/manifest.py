@@ -15,8 +15,35 @@ def categories():
         if m: out[m.group(1)] = cur
     return out
 
+# 网页引擎的工程（out/projects/NNN.json，engine/projects.py 生成）：图鉴里「在工坊里改一改」打开它，大图里按它列出做法
+SITE_COMP = os.path.join(ROOT, 'site', 'src', 'components')
+def component_names():
+    names = {}
+    for dp, _, fs in os.walk(SITE_COMP):
+        for f in fs:
+            if not f.endswith('.axo.js'): continue
+            for m in re.finditer(r"id: '([\w-]+)', type: '(\w+)', name: '([^']+)'", open(os.path.join(dp, f), encoding='utf-8').read()):
+                names[(m.group(2), m.group(1))] = m.group(3)
+    return names
+
+def summary(p, names, cat):
+    zh = lambda t, c: names.get((t, c)) or {'face': cat['faces'], 'prop': cat['holds'], 'wear': cat['wears']}.get(t, {}).get(c) or c
+    def fx(l):
+        icon = (l.get('params') or {}).get('icon')
+        if l['component'] == 'toast': return '提示条「%s」' % l['params'].get('text', '')
+        if l['component'] in cat['fxKinds'] and icon: return cat['fxKinds'][l['component']] + ' ' + cat['icons'].get(icon, icon)
+        return cat['fx'].get(l['component']) or zh('fx', l['component'])
+    parts = []
+    for t, label in (('motion', '动作'), ('face', '表情'), ('prop', '道具'), ('wear', '帽子'), ('fx', '特效'), ('text', '文字动画')):
+        ls = [l for l in p['layers'] if l['type'] == t]
+        if not ls: continue
+        vals = [fx(l) if t == 'fx' else zh('textanim' if t == 'text' else t, l['component']) if not (t == 'face' and l.get('face')) else '特制' for l in ls]
+        parts.append(label + ' ' + '、'.join(dict.fromkeys(vals)))
+    return ' · '.join(parts + [f"{p['frames']} 帧", f"{p['fps']} fps"])
+
 def main():
     cats = categories()
+    names, cat = component_names(), json.load(open(os.path.join(ROOT, 'workshop', 'catalog.json'), encoding='utf-8'))
     items = []
     for s in specs.all_specs():
         name = build.fname(s)
@@ -28,6 +55,8 @@ def main():
             hold=s.get('hold') if isinstance(s.get('hold'), (str, type(None))) else s['hold'].get('kind'),
             wear=s.get('wear', []), style=s.get('style', 'pink'), tmode=s.get('tmode', 'stay'),
             gif=f'out/{name}.gif', cover=f'out/_封面/{name}.png'))
+        pj = os.path.join(ROOT, 'out', 'projects', '%03d.json' % s['id'])
+        if os.path.exists(pj): items[-1].update(project='out/projects/%03d.json' % s['id'], summary=summary(json.load(open(pj, encoding='utf-8')), names, cat))
     # 不是 specs.py 出的图（没有配方）：初代表情包工具包 examples/ 里的原图，水龙卷特别篇（tornado.py）。
     # slug 是网站上的英文文件名（gif/<slug>.gif），series 是下载 / 拖出去时文件名的前缀
     # 初代在网站编辑器里有同样做法的工程（workshop/projects/og-*.json，用网页引擎的组件拼出来的），图鉴里「在工坊里改一改」打开它

@@ -1,0 +1,37 @@
+{
+ "v": 2,
+ "name": "来啦",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1112,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "slidein",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "joy"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "sparkles",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "来啦",
+   "style": "pink",
+   "component": "hopat",
+   "params": {
+    "at": 0.5
+   }
+  }
+ ]
+}

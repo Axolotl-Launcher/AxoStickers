@@ -1,0 +1,53 @@
+{
+ "v": 2,
+ "name": "厉害",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1086,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "clap",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "star"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "orbit",
+   "params": {
+    "icon": "star",
+    "n": 3,
+    "rx": 120,
+    "ry": 30,
+    "k": 4
+   }
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "twinkle",
+   "start": 0.3,
+   "end": 0.92
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "厉害",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

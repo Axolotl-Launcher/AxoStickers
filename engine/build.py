@@ -1,5 +1,6 @@
-"""批量出图：python engine/build.py [1-50,77] [--force] [--jobs 6]
-结果在 out/：NNN_文字.gif，封面在 out/_封面/。已存在的跳过（断了可以接着跑）。"""
+"""批量出图（Python 引擎，翻新前的老版本）：python engine/build.py [1-50,77] [--force] [--jobs 6]
+结果在 out/：NNN_文字.gif，封面在 out/_封面/。已存在的跳过（断了可以接着跑）。
+现在 out/ 里的 300 张是网页引擎按 out/projects 出的（engine/projects.py + site/tools/render_stickers.mjs）；--force 会把它们盖回老版本。"""
 import os, sys, time, ctypes, multiprocessing as mp
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 ROOT = os.path.dirname(HERE); OUT = os.path.join(ROOT, 'out')

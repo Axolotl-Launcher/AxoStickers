@@ -1,0 +1,58 @@
+{
+ "v": 2,
+ "name": "+1",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1049,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.07,
+    "out": 0.82,
+    "look": 22
+   }
+  },
+  {
+   "id": "l1",
+   "type": "motion",
+   "component": "hop",
+   "params": {}
+  },
+  {
+   "id": "l2",
+   "type": "face",
+   "component": "smile"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "plus1",
+   "params": {},
+   "start": 0.42,
+   "end": 0.8
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "twinkle",
+   "start": 0.42,
+   "end": 0.8
+  },
+  {
+   "id": "l5",
+   "type": "text",
+   "text": "+1",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.22,
+    "out": 0.82,
+    "sparks": true
+   }
+  }
+ ]
+}

@@ -1,0 +1,39 @@
+{
+ "v": 2,
+ "name": "吃瓜",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1167,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "chomp",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "eat"
+  },
+  {
+   "id": "l2",
+   "type": "prop",
+   "component": "melon"
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "吃瓜",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

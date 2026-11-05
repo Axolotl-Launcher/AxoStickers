@@ -1,0 +1,50 @@
+{
+ "v": 2,
+ "name": "加油",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1085,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "flagwave",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "determined"
+  },
+  {
+   "id": "l2",
+   "type": "prop",
+   "component": "flag"
+  },
+  {
+   "id": "l3",
+   "type": "wear",
+   "component": "band"
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "sparkles",
+   "params": {}
+  },
+  {
+   "id": "l5",
+   "type": "text",
+   "text": "加油",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

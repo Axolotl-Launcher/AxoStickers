@@ -1,0 +1,44 @@
+{
+ "v": 2,
+ "name": "春天来了",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1286,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "sway",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "happy"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "fall",
+   "params": {
+    "icon": "flower",
+    "n": 9,
+    "k": 3
+   }
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "春天来了",
+   "style": "green",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

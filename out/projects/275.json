@@ -1,0 +1,58 @@
+{
+ "v": 2,
+ "name": "没钱了",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1274,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "squish",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "teary"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "float",
+   "params": {
+    "icon": "money",
+    "n": 3,
+    "k": 4
+   }
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "没钱了",
+   "style": "gray",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": false
+   }
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "toast",
+   "params": {
+    "text": "余额不足",
+    "color": "#8a8f99",
+    "check": false,
+    "at": 0.4,
+    "end": 0.88,
+    "stars": false
+   }
+  }
+ ],
+ "cover": 0.52
+}

@@ -1,0 +1,43 @@
+{
+ "v": 2,
+ "name": "心碎",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1133,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "idle",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "sob"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "brokenheart",
+   "params": {},
+   "start": 0.3,
+   "end": 0.92
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "心碎",
+   "style": "blue",
+   "component": "popthen",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": false,
+    "then": "droop"
+   }
+  }
+ ]
+}

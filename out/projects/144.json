@@ -1,0 +1,40 @@
+{
+ "v": 2,
+ "name": "羡慕",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1143,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "lookup",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "star"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "sparkles",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "羡慕",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

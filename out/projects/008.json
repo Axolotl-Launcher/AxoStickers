@@ -1,0 +1,51 @@
+{
+ "v": 2,
+ "name": "复现一下",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1007,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.07,
+    "out": 0.82,
+    "look": 22
+   }
+  },
+  {
+   "id": "l1",
+   "type": "motion",
+   "component": "think",
+   "params": {}
+  },
+  {
+   "id": "l2",
+   "type": "face",
+   "component": "up"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "question",
+   "params": {},
+   "start": 0.42,
+   "end": 0.8
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "复现一下",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.22,
+    "out": 0.82,
+    "sparks": true
+   }
+  }
+ ]
+}

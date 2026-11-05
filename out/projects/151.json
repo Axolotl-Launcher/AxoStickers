@@ -1,0 +1,40 @@
+{
+ "v": 2,
+ "name": "头秃",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1150,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "typing",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "struggle"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "panic",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "头秃",
+   "style": "gray",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": false
+   }
+  }
+ ]
+}

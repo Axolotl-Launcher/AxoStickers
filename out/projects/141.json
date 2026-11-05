@@ -1,0 +1,46 @@
+{
+ "v": 2,
+ "name": "好冷",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1140,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "tremble",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "struggle"
+  },
+  {
+   "id": "l2",
+   "type": "wear",
+   "component": "ice"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "snow",
+   "params": {}
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "好冷",
+   "style": "blue",
+   "component": "popthen",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": false,
+    "then": "shiver"
+   }
+  }
+ ]
+}

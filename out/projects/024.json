@@ -1,0 +1,54 @@
+{
+ "v": 2,
+ "name": "进不去",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1023,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "bonk",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "cry"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "stream",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "进不去",
+   "style": "blue",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": false
+   }
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "toast",
+   "params": {
+    "text": "连接超时",
+    "color": "#e5484d",
+    "check": false,
+    "at": 0.4,
+    "end": 0.88,
+    "stars": false
+   }
+  }
+ ],
+ "cover": 0.52
+}

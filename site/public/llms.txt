@@ -10,7 +10,7 @@
 ## 路由（地址栏 # 后面）
 
 - `#/` 图鉴；`#/s/001` 打开第 1 张的大图（逐帧播放器，空格暂停，←/→ 逐帧）
-- `#/editor` 创意工坊编辑器；`#/editor?s=分享码` 打开分享的工程（完整链接，一直有效）；`#/e/密钥` 1 分钟短链接；`#/editor?w=issue号` 把工坊作品载进编辑器；`#/editor?g=og-send-log` 打开初代的工程（og-send-log / og-screenshot / og-read-docs / og-group-notice）
+- `#/editor` 创意工坊编辑器；`#/editor?s=分享码` 打开分享的工程（完整链接，一直有效）；`#/e/密钥` 1 分钟短链接；`#/editor?w=issue号` 把工坊作品载进编辑器；`#/editor?g=001` 打开图鉴里第 1 张的工程（初代用 slug：og-send-log / og-screenshot / og-read-docs / og-group-notice）
 - `#/workshop` 工坊作品；`#/w/12` 打开第 12 号作品
 
 ## 最稳的用法：window.axo（能在页面里执行 JavaScript 的工具）

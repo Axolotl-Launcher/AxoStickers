@@ -1,0 +1,55 @@
+{
+ "v": 2,
+ "name": "掉岩浆",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1235,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "tantrum",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "shock"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "fire",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "掉岩浆",
+   "style": "red",
+   "component": "popthen",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true,
+    "then": "shake"
+   }
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "toast",
+   "params": {
+    "text": "试图在熔岩里游泳",
+    "color": "#e5484d",
+    "check": false,
+    "at": 0.4,
+    "end": 0.88,
+    "stars": false
+   }
+  }
+ ],
+ "cover": 0.52
+}

@@ -1,0 +1,40 @@
+{
+ "v": 2,
+ "name": "新年快乐",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1282,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "jump",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "joy"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "fireworks",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "新年快乐",
+   "style": "red",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

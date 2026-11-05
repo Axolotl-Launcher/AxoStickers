@@ -1,0 +1,39 @@
+{
+ "v": 2,
+ "name": "打怪",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1229,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "swing",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "angry"
+  },
+  {
+   "id": "l2",
+   "type": "prop",
+   "component": "sword"
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "打怪",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

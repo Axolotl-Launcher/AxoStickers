@@ -1,0 +1,41 @@
+{
+ "v": 2,
+ "name": "看戏",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1168,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "chomp",
+   "params": {
+    "s": 0.9
+   }
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "smug"
+  },
+  {
+   "id": "l2",
+   "type": "prop",
+   "component": "popcorn"
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "看戏",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

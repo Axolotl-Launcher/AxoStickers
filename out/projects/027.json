@@ -1,0 +1,64 @@
+{
+ "v": 2,
+ "name": "开服啦",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1026,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.07,
+    "out": 0.82,
+    "look": 22
+   }
+  },
+  {
+   "id": "l1",
+   "type": "motion",
+   "component": "cheer",
+   "params": {}
+  },
+  {
+   "id": "l2",
+   "type": "face",
+   "component": "joy"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "fireworks",
+   "params": {}
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "开服啦",
+   "style": "gold",
+   "component": "popthen",
+   "params": {
+    "at": 0.22,
+    "out": 0.82,
+    "sparks": true,
+    "then": "bounce"
+   }
+  },
+  {
+   "id": "l5",
+   "type": "fx",
+   "component": "toast",
+   "params": {
+    "text": "服务器已启动",
+    "color": "#07c160",
+    "check": true,
+    "at": 0.46,
+    "end": 0.8,
+    "stars": true
+   }
+  }
+ ],
+ "cover": 0.5800000000000001
+}

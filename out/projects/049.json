@@ -1,0 +1,49 @@
+{
+ "v": 2,
+ "name": "我也是",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1048,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.07,
+    "out": 0.82,
+    "look": 22
+   }
+  },
+  {
+   "id": "l1",
+   "type": "motion",
+   "component": "sway",
+   "params": {}
+  },
+  {
+   "id": "l2",
+   "type": "face",
+   "component": "worried"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "sweat",
+   "params": {}
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "我也是",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.22,
+    "out": 0.82,
+    "sparks": false
+   }
+  }
+ ]
+}
