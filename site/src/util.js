@@ -5,7 +5,7 @@ import CAT from '../../workshop/catalog.json';
 export { CAT };
 export { CONTRIBUTE } from './flags.js';
 export const REPO = 'Axolotl-Launcher/AxoStickers';
-export const RELEASE = { url: `https://github.com/${REPO}/releases/download/v1.0.0/AxoStickers-v1.0.0.zip`, size: '282 MB' };
+export const RELEASE = { url: `https://github.com/${REPO}/releases/download/v1.1.0/AxoStickers-v1.1.0.zip`, size: '260 MB' };
 export const STYLE_COLORS = {          // [浅, 深]：字色色块（engine/axl.py STYLES 的外描边 / 深描边）
   pink: ['#fe3e8c', '#c41660'], blue: ['#4098ff', '#1a62cd'], purple: ['#9e66ff', '#6838cc'], red: ['#ff5434', '#ce1e1e'],
   green: ['#24c66c', '#0c8c48'], gold: ['#ffac1c', '#d86c00'], gray: ['#9698a8', '#606272'], cyan: ['#18c4d6', '#0888a0'],

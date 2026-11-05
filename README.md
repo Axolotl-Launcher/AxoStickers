@@ -39,6 +39,7 @@ python engine/projects.py                # 按 specs.py 生成工程 -> out/proj
 cd site && npm run build                 # 出图用的是构建好的网站（dist/sandbox.html）
 node tools/render_stickers.mjs --channel msedge          # 出全部：out/NNN_文字.gif + out/_封面/；一批 20 张歇 20 秒。只出几张：后面加 12,40-45
 cd .. && python engine/manifest.py       # 更新 out/stickers.json（会带上工程路径和做法摘要）
+python engine/overview.py                # 按新封面重拼 README 顶上的总览图 out/_总览.png
 ```
 
 `--channel msedge` 用本机的 Edge（也可以 `chrome`）；不写就用 Playwright 自己下的 Chromium，没显卡的机器加 `--soft`。
