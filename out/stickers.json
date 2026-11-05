@@ -5131,7 +5131,49 @@
  ],
  "specials": [
   {
+   "id": "初代-发日志",
+   "slug": "og-send-log",
+   "series": "初代",
+   "text": "发日志",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "original",
+   "gif": "out/初代_发日志.gif"
+  },
+  {
+   "id": "初代-请截图",
+   "slug": "og-screenshot",
+   "series": "初代",
+   "text": "请截图",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "original",
+   "gif": "out/初代_请截图.gif"
+  },
+  {
+   "id": "初代-看文档",
+   "slug": "og-read-docs",
+   "series": "初代",
+   "text": "看文档",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "original",
+   "gif": "out/初代_看文档.gif"
+  },
+  {
+   "id": "初代-看群公告",
+   "slug": "og-group-notice",
+   "series": "初代",
+   "text": "看群公告",
+   "category": "support",
+   "category_zh": "群里答疑",
+   "motion": "original",
+   "gif": "out/初代_看群公告.gif"
+  },
+  {
    "id": "tornado-无字",
+   "slug": "tornado-1",
+   "series": "水龙卷",
    "text": "",
    "category": "special",
    "category_zh": "特别篇",
@@ -5140,6 +5182,8 @@
   },
   {
    "id": "tornado-我没事",
+   "slug": "tornado-2",
+   "series": "水龙卷",
    "text": "我没事",
    "category": "special",
    "category_zh": "特别篇",
@@ -5148,6 +5192,8 @@
   },
   {
    "id": "tornado-转晕了",
+   "slug": "tornado-3",
+   "series": "水龙卷",
    "text": "转晕了",
    "category": "special",
    "category_zh": "特别篇",
