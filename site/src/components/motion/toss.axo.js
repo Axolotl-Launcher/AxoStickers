@@ -21,9 +21,9 @@ component({
     if (t < ta) this.hold(a, this.kind(), { ...this.grip(t), legs: hold });
     else for (const leg of ['leg3', 'leg4']) { const r = a.pose[leg].rot || [0, 0, 0]; a.pose[leg].rot = [r[0] - 35 * hold, r[1] * (1 - hold), r[2]]; }
     const tl = t - ta - 0.55;                                   // 落水的小涟漪
-    if (tl > 0 && tl < 0.9) { const r = 12 + tl * 70; this.stage.rings.push([this.p.x, this.stage.waterLevel + 6, r, r * 0.2, 230 * (1 - tl / 0.9) / 255]); }
+    if (tl > 0 && tl < 0.9) { const r = 12 + tl * 70; this.stage.rings.push([this.p.x, this.stage.waterLevel + 6, r, r * 0.2, min(1, this.weight(this.layer, t)) * 230 * (1 - tl / 0.9) / 255]); }
   },
-  // 飞出去的道具：画在美西螈后面，落进水里被水面挡住
+  // 飞出去的道具：画在美西螈后面；落进水里的部分和美西螈一样往水色偏 42%，再被水面前沿挡住
   drawBack(ctx, t) {
     const ta = this.p.at * this.T, k = (t - ta) / 0.55;
     if (k < 0 || k >= 1.15) return;
@@ -34,9 +34,18 @@ component({
     const kk = min(k, 1), sc = 1 - 0.3 * kk;
     const x = lerp(this.from[0], this.p.x, kk), y = lerp(this.from[1], this.stage.waterLevel + 18, kk) - 600 * kk * (1 - kk) + max(0, k - 1) * 200;
     const im = this.flying ||= this.itemImage([{ kind: this.kind(), rz: 18, s: this.p.s }], { yaw: 160, pitch: 28 });
-    ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-    ctx.translate(x, y); ctx.rotate(-kk * 600 * PI / 180); ctx.scale(sc, sc);
-    ctx.drawImage(im, -im.width / 2, -im.height / 2);
-    ctx.restore();
+    const c = this.flyCanvas ||= makeCanvas(W, H), g = c.getContext('2d');
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+    g.translate(x, y); g.rotate(-kk * 600 * PI / 180); g.scale(sc, sc);
+    g.drawImage(im, -im.width / 2, -im.height / 2);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    if (this.stage.water) {
+      const wc = hex(String(this.P.water.color || '#aadeff').replace('#', '').padEnd(6, '0')), under = [];
+      for (let px = -8; px < W + 16; px += 8) under.push([px, this.waterY(px, t)]);
+      g.globalCompositeOperation = 'source-atop';
+      polygon(g, [...under, [W + 8, H + 8], [-8, H + 8]], wc.map((v, i) => round(v * [0.706, 0.856, 1][i])), 0.42);
+      g.globalCompositeOperation = 'source-over';
+    }
+    ctx.drawImage(c, 0, 0);
   },
 });

@@ -51,7 +51,7 @@ component({
 `this.ls(t, n)` / `this.lc(t, n)` 是一圈里来回 n 次的 sin / cos，`this.ph(t, n)` 是 0～1 的相位；
 `this.headPt()` 脑袋在画面上的位置（`this.LAST` 有值以后才能用），`this.splash(t0, x, n)` 在水面溅水花，`this.hold(a, 道具)` / `this.wear(a, 帽子)`；
 `this.stage.poseAt(t)` 别的时刻的姿势（只算不画），`this.stage.projAt(a, 世界坐标)` / `this.stage.itemAt(道具位置, 点, a)` 投到画面上（比如扔出去之前道具在哪儿）；
-动作的 `move` 里往 `this.stage.rings` 推 `[x, y, 横半径, 竖半径, 不透明度]` 就多一圈涟漪，`this.stage.rippleOn = false` 关掉默认的涟漪（只管这一帧）。
+动作的 `move` 里往 `this.stage.rings` 推 `[x, y, 横半径, 竖半径, 不透明度]` 就多一圈涟漪（不透明度乘上 `this.weight(this.layer, t)` 就跟着图层淡入淡出），`this.stage.rippleOn = false` 关掉默认的涟漪（只管这一帧）。
 工程里写 `cover`（0～1）能自己定封面在一圈里的哪儿，不写就是字刚好出全那一帧。
 
 直接能用的函数和常量：`W` `H`（画布 512），`PI` `sin` `cos` `abs` `exp` `sqrt` `min` `max` `atan2` `hypot`…，

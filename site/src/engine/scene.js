@@ -246,11 +246,11 @@ export class Scene {
   eyePts() { return [this.headPt([3.6, 6.5, -10.2]), this.headPt([-3.6, 6.5, -10.2])]; }
   itemPt(idx = 0, p = [0, 0, 0]) { return this.proj(xfPoint(itemXf(this.A.pose, this.A.pose._items[idx]), p)); }
   itemAt(it, p = [0, 0, 0], a = this.A) { return this.projAt(a, xfPoint(itemXf(a.pose, it), p)); }   // 没拿在手上的道具（it 是道具的位置）在这一帧会在哪
-  // 别的时刻：poseAt(t) 是那一刻的姿势（只算不画，也不改这一帧的涟漪），projAt(a, 世界坐标) 投到画布上（投影只看镜头，不用渲染）
+  // 别的时刻：poseAt(t) 是那一刻的姿势（只算不画，也不改这一帧的涟漪、水花），projAt(a, 世界坐标) 投到画布上（投影只看镜头，不用渲染）
   poseAt(t) {
-    const keep = [this.rippleOn, this.rippleDx, this.rings, this.A];
+    const keep = [this.rippleOn, this.rippleDx, this.rings, this.A], drops = this.droplets.length;
     this.rings = [];
-    try { return this.motion(t); } finally { [this.rippleOn, this.rippleDx, this.rings, this.A] = keep; }
+    try { return this.motion(t); } finally { [this.rippleOn, this.rippleDx, this.rings, this.A] = keep; this.droplets.length = drops; }
   }
   projAt(a, p) {
     const zoom = a.zoom * (this.P.camera.zoom ?? 1), persp = this.P.camera.persp ?? K.PERSP, C = camera(a.yaw, a.pitch), an = proj3(C, K.ANCHOR, persp);

@@ -760,7 +760,7 @@ async function renderDrawer() {
       .sort((a, b) => !!b.project - !!a.project);
     S.drawerCount.textContent = `${items.length} 张`;
     const card = (it) => el('div', { class: 'st-item thumb tpl', 'data-ax': 'item', 'data-type': 'template', 'data-id': it.key },
-      el('button', { class: 'st-item-main', type: 'button', title: it.text, 'data-ax': 'use', onclick: (e) => (it.project ? busy(e.currentTarget, openTemplateProject(it)) : S.store.replace(fromRecipe(it))) },
+      el('button', { class: 'st-item-main', type: 'button', title: it.text, 'data-ax': 'use', onclick: (e) => { if (it.project) busy(e.currentTarget, openTemplateProject(it)); else { tplSeq++; S.store.replace(fromRecipe(it)); } } },
         el('img', { src: it.still, alt: '', loading: 'lazy', decoding: 'async', width: 96, height: 96 }), el('span', { class: 'st-item-name', text: it.text })),
       star(`tpl:${it.key}`, it.text));
     const favs = items.filter((it) => lib.isFav(`tpl:${it.key}`)), rest = S.favOnly ? [] : items.filter((it) => !lib.isFav(`tpl:${it.key}`));
@@ -843,10 +843,15 @@ async function renderDrawer() {
   }));
 }
 
-// 初代这种有单独工程文件的模板
+// 初代这种有单独工程文件的模板。等下载的时候又点了别的模板、或者改了工程，这次就作废（不拿旧的盖掉新的）
+let tplSeq = 0;
 async function openTemplateProject(it) {
-  try { const r = await fetch(encodePath(it.project)); if (!r.ok) throw new Error(`HTTP ${r.status}`); S.store.replace(untrusted(await r.json())); }
-  catch (e) { toast(`「${it.text}」的工程没载进来：${e.message}`); }
+  const my = ++tplSeq, before = S.store.p;
+  try {
+    const r = await fetch(encodePath(it.project)); if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const p = await r.json();
+    if (my === tplSeq && S.store.p === before) S.store.replace(untrusted(p));
+  } catch (e) { if (my === tplSeq) toast(`「${it.text}」的工程没载进来：${e.message}`); }
 }
 
 // 刚载入 / 从工坊拿来的组件：直接用上

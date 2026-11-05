@@ -24,13 +24,14 @@ component({
     const st = 1 + 0.1 * bump((t - ti - 0.1) / 0.5);           // 冲出水面那一下：拉长、脚底不动
     a.sy = st; a.sx = 1 / sqrt(st);
     a.dy = (1 - rise) * 300 + 4 * this.wave(t, 4.2) * clamp((t - ti - 0.65) / 0.4) + ex * 310 - 170 * (st - 1);
-    // 涟漪跟着它：浮上来才有，潜下去就散了
-    this.stage.rippleOn = false;
+    // 涟漪跟着它：浮上来才有，潜下去就散了（也跟着图层的强度和淡入淡出）
+    const w = min(1, this.weight(this.layer, t));
+    if (w >= 0.5) this.stage.rippleOn = false;
     for (let k = 0; k < 3; k++) {
       let tt = t - ti - 0.25 - k * 0.45;
       if (tt <= 0) continue;
       tt %= 1.35;
-      const r = 40 + tt * 170, al = 220 * (1 - tt / 1.35) * (1 - clamp((t - to - 0.3) / 0.4)) / 255;
+      const r = 40 + tt * 170, al = w * 220 * (1 - tt / 1.35) * (1 - clamp((t - to - 0.3) / 0.4)) / 255;
       if (al > 0) this.stage.rings.push([W / 2, this.stage.waterLevel + 8, r, r * 0.16, al]);
     }
   },
