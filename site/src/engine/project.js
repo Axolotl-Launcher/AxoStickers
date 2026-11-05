@@ -17,6 +17,7 @@ export function normalizeProject(p = {}) {
     v: 2, name: String(P.name || '').slice(0, 40),
     size: num(P.size, d.size, 64, 800), fps: num(P.fps, d.fps, 5, 30), frames: Math.round(num(P.frames, d.frames, 4, 120)),
     seed: Math.round(num(P.seed, 0, 0, 1e6)),
+    ...(P.cover !== undefined && P.cover !== null && P.cover !== '' && Number.isFinite(Number(P.cover)) ? { cover: num(P.cover, 0, 0, 0.999) } : {}),   // 封面在一圈里的位置（0～1）；没有 = 自动（字刚好出全那一帧）
     background: { ...d.background, ...(P.background || {}) },
     camera: { ...d.camera, ...(P.camera || {}) },
     water: { ...d.water, ...(P.water || {}) },

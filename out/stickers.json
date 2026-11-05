@@ -5138,7 +5138,8 @@
    "category": "support",
    "category_zh": "群里答疑",
    "motion": "original",
-   "gif": "out/初代_发日志.gif"
+   "gif": "out/初代_发日志.gif",
+   "project": "workshop/projects/og-send-log.json"
   },
   {
    "id": "初代-请截图",
@@ -5148,7 +5149,8 @@
    "category": "support",
    "category_zh": "群里答疑",
    "motion": "original",
-   "gif": "out/初代_请截图.gif"
+   "gif": "out/初代_请截图.gif",
+   "project": "workshop/projects/og-screenshot.json"
   },
   {
    "id": "初代-看文档",
@@ -5158,7 +5160,8 @@
    "category": "support",
    "category_zh": "群里答疑",
    "motion": "original",
-   "gif": "out/初代_看文档.gif"
+   "gif": "out/初代_看文档.gif",
+   "project": "workshop/projects/og-read-docs.json"
   },
   {
    "id": "初代-看群公告",
@@ -5168,7 +5171,8 @@
    "category": "support",
    "category_zh": "群里答疑",
    "motion": "original",
-   "gif": "out/初代_看群公告.gif"
+   "gif": "out/初代_看群公告.gif",
+   "project": "workshop/projects/og-group-notice.json"
   },
   {
    "id": "tornado-无字",

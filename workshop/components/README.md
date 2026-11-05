@@ -39,17 +39,25 @@ component({
 | `face` 表情 | 眼睛和嘴 | 数据：`face: {...}`，格式照内置的抄（编辑器里「表情」→ 代码） |
 | `scene` 场景 | 接管整帧（水龙卷就是） | `render(ctx, t)`：用 `this.background(ctx)`、`this.axLayer(a)`、`this.placeAt(a, X, Y)`、`this.itemImage(items)`、`this.drawText(ctx, t)` 自己拼 |
 
-所有类型都可以写 `setup()`（建场景时跑一次，预先算好随机数之类），动作和场景还能写 `drawSky` `drawBack` `drawFront` `drawTop(ctx, t)` 在对应的层上画。
+所有类型都可以写 `setup()`（建场景时跑一次，预先算好随机数之类），动作和场景还能写 `drawSky` `drawBack` `drawFront` `drawTop(ctx, t)` 在对应的层上画；文字动画也能写 `draw(ctx, t, lay)`，在这一行字画完以后画（`lay` 是每个字的 `[字, x, y, 字号]`，比如蹦出来时炸开的小星星）。
+
+几个写在 def 上的开关：动作的 `offscreen: true`（中途离开画面，编辑器里归到「中途离开画面的」）、`holdsItself: true`（自己拿道具，「道具」图层就不再替它拿）；
+道具可以写 `shape(k, …)` 按进度返回 `boxes`（动作里用 `this.propDef(道具)` 拿到它，`this.hold(a, 道具, { boxes, geo: '缓存用的名字' })`，比如日志纸一行行打字）；
+自己用表情字体画字的组件写 `glyphs: '会用到的字'`，它 `type: 'text'` 的参数里的字也会提前下好（不然画出来是系统字体）。
 
 ## 能用的东西
 
 `this` 是这一层的上下文：`this.p` 是参数值，`this.T` 一圈多少秒，`this.N` 多少帧，`this.FPS`，`this.layer` 是图层设置；
 `this.ls(t, n)` / `this.lc(t, n)` 是一圈里来回 n 次的 sin / cos，`this.ph(t, n)` 是 0～1 的相位；
-`this.headPt()` 脑袋在画面上的位置（`this.LAST` 有值以后才能用），`this.splash(t0, x, n)` 在水面溅水花，`this.hold(a, 道具)` / `this.wear(a, 帽子)`。
+`this.headPt()` 脑袋在画面上的位置（`this.LAST` 有值以后才能用），`this.splash(t0, x, n)` 在水面溅水花，`this.hold(a, 道具)` / `this.wear(a, 帽子)`；
+`this.stage.poseAt(t)` 别的时刻的姿势（只算不画），`this.stage.projAt(a, 世界坐标)` / `this.stage.itemAt(道具位置, 点, a)` 投到画面上（比如扔出去之前道具在哪儿）；
+动作的 `move` 里往 `this.stage.rings` 推 `[x, y, 横半径, 竖半径, 不透明度]` 就多一圈涟漪，`this.stage.rippleOn = false` 关掉默认的涟漪（只管这一帧）。
+工程里写 `cover`（0～1）能自己定封面在一圈里的哪儿，不写就是字刚好出全那一帧。
 
 直接能用的函数和常量：`W` `H`（画布 512），`PI` `sin` `cos` `abs` `exp` `sqrt` `min` `max` `atan2` `hypot`…，
 `clamp` `lerp` `mod` `easeIn` `easeOut` `easeIO` `easeOutBack` `elastic` `bump` `win`，`rng(seed)`（`.random()` `.uniform(a, b)` `.choice(list)`），
 画图的 `icon(名字, 大小)` `put(ctx, 图, x, y, 缩放, 旋转)` `star` `sq` `rect` `line` `ellipse` `polygon` `makeCanvas`，
+界面小字和提示条 `label(ctx, 字, x, y, 字号, 颜色, 对齐)` `labelWidth(字, 字号)` `roundRect(ctx, x0, y0, x1, y1, 圆角, 填充, 描边)` `pill(ctx, x, y, 字, { color, sc, check })`（「✓ 已发送」那种），
 骨骼的 `addrot` `legmix` `LEGS` `GILLS` `BONES`，颜色的 `hex` `rgb2hsl` `hsl2rgb` `recolor`。编辑器里打字会自动补全，Ctrl+Enter 运行。
 
 参数（`params`）会自动出现在右边的属性面板：`type` 可以是 `int` `number` `bool` `select`（加 `options`）`color` `icon` `text`，都要写 `default`。

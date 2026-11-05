@@ -1,7 +1,7 @@
 import { W, Scene, builtinRegistry, renderer, loadFont, exportGif } from './engine/index.js';
 import { registerFont, hasFont } from './engine/draw.js';
 import { eachFrame } from './engine/gif.js';
-import { compile, sourceFor } from './engine/components.js';
+import { compile, sourceFor, resolveParams } from './engine/components.js';
 import { makeCanvas, canvasBytes } from './engine/core.js';
 import { zipStore } from './engine/zip.js';
 import { BUILTIN_MODEL } from './engine/core.js';
@@ -103,7 +103,7 @@ export function startCore(env) {
     const out = [];
     for (const e of reg.items.values()) {
       const d = reg.get(e.def.type, e.def.id);
-      const meta = { type: d.type, id: d.id, name: String(d.name || d.id), origin: e.origin, base: d.base || null, entrance: !!d.entrance, holdsItself: !!d.holdsItself, hasCode: !!e.source };
+      const meta = { type: d.type, id: d.id, name: String(d.name || d.id), origin: e.origin, base: d.base || null, entrance: !!d.entrance, holdsItself: !!d.holdsItself, offscreen: !!d.offscreen, hasCode: !!e.source };
       try { meta.params = JSON.parse(JSON.stringify(d.params || {})); } catch { meta.params = {}; }
       if (d.face) meta.face = d.face;
       if (d.sprite) meta.sprite = d.sprite;
@@ -120,8 +120,15 @@ export function startCore(env) {
   // 返回问题说明（空 = 都能用表情字体画）
   async function glyphs(p) {
     const texts = p.layers.filter((l) => l.type === 'text' && !l.hidden), failed = [], absent = [];
-    for (const f of new Set(texts.map((l) => l.font || 'axo'))) {
-      const t = texts.filter((l) => (l.font || 'axo') === f).map((l) => l.text).join('').replace(/[/\s]/g, '');
+    // 组件自己用表情字体画的字（截图框的尺寸、「✓ 已发送」）：def.glyphs 写着会用到的字，再加上它的文字参数
+    const own = p.layers.filter((l) => l.type !== 'text' && !l.hidden).map((l) => {
+      const d = reg.get(l.type, l.component);
+      if (!d || typeof d.glyphs !== 'string') return '';
+      const v = resolveParams(d, l.params || {});
+      return d.glyphs + Object.entries(d.params || {}).filter(([, sp]) => sp.type === 'text').map(([k]) => String(v[k] ?? '')).join('');
+    }).join('');
+    for (const f of new Set([...texts.map((l) => l.font || 'axo'), ...(own ? ['axo'] : [])])) {
+      const t = (texts.filter((l) => (l.font || 'axo') === f).map((l) => l.text).join('') + (f === 'axo' ? own : '')).replace(/[/\s]/g, '');
       const font = hasFont(f) ? f : 'axo';
       if (t && font === 'axo') { const g = await axoGlyphs(t); if (g.failed) failed.push(g.failed); if (g.absent) absent.push(g.absent); }
       if (t && !await loadFont(t, font)) failed.push(t);

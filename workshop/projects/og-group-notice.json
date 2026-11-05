@@ -1,0 +1,44 @@
+{
+ "v": 2,
+ "name": "看群公告",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "layers": [
+  {
+   "id": "m",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.0875,
+    "out": 0.8125,
+    "look": 26
+   }
+  },
+  {
+   "id": "f",
+   "type": "face",
+   "component": "normal",
+   "blink": false
+  },
+  {
+   "id": "x",
+   "type": "fx",
+   "component": "twinkle",
+   "start": 0.425,
+   "end": 0.8125
+  },
+  {
+   "id": "t",
+   "type": "text",
+   "component": "popin",
+   "text": "看群公告",
+   "style": "pink",
+   "params": {
+    "at": 0.2375,
+    "gap": 0.16,
+    "out": 0.8125
+   }
+  }
+ ]
+}

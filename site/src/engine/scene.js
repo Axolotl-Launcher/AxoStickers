@@ -1,7 +1,7 @@
 // 场景：一个「工程」（project JSON）= 画布设置 + 相机 + 水面 + 皮肤 + 一叠图层（动作、表情、道具、帽子、特效、文字、场景）。
 // 每个图层指向一个组件（registry 里的 type:id）和它的参数；动作可以叠加、可以只在一段时间里起作用。
 // 合成顺序和 engine/axl.py 的 Sticker.frame 一样：背景 → 水 → 后层特效 → 美西螈（水下偏色）→ 水面前沿 → 水花 → 前层特效 → 字 → 顶层特效。
-import { E, K, W, H, BOX, mod, rng, strHash, clamp, win, headWorld, itemXf, xfPoint, projectBox, hx, makeCanvas } from './core.js';
+import { E, K, W, H, BOX, mod, rng, strHash, clamp, win, headWorld, itemXf, xfPoint, projectBox, proj3, camera, hx, makeCanvas } from './core.js';
 import { layout, charSprite, star, sq, polygon, line } from './draw.js';
 import { resolveParams, lineOf } from './components.js';
 import { bounded } from './loopguard.js';
@@ -70,7 +70,7 @@ export class Scene {
       x: r.uniform(30, 482), y: r.uniform(200, 330), ph: r.uniform(0, 6.28), r: r.uniform(6, 10),
       c: r.choice([[255, 205, 60], [255, 140, 190], [130, 210, 255]]),
     }));
-    this.droplets = []; this.LAST = null; this.A = null;
+    this.droplets = []; this.rings = []; this.LAST = null; this.A = null;
     this.axCanvas = makeCanvas(W, H); this.lipCanvas = makeCanvas(W, H);   // 别叫 layer：实例上的 this.layer 是图层设置
     const live = P.layers.filter((l) => !l.hidden);
     const of = (t) => live.filter((l) => l.type === t);
@@ -179,6 +179,7 @@ export class Scene {
     return it;
   }
   wear(a, kind, kw = {}) { const it = { kind, ...kw }; (a.pose._items ||= []).push(it); return it; }
+  propDef(kind) { return this.reg?.get('prop', kind) || null; }   // 道具组件（有 shape(k) 的道具能按进度变形，比如日志纸打到第几行）
   newAx() { return new Ax(this.P.camera); }
 
   faceDict(t) {
@@ -227,6 +228,7 @@ export class Scene {
   }
 
   coverTime() {
+    if (typeof this.P.cover === 'number') return this.P.cover * this.T;   // 工程自己定了封面在一圈里的哪儿
     const ent = this.texts.filter((x) => x.anim.def.entrance && x.anim.def.cover);
     if (ent.length) return Math.max(...ent.map((x) => this.guard(x.anim, () => x.anim.def.cover.call(x.anim, x.lay.length)) || 0));
     const m = this.motions.find((x) => x.def.coverK !== undefined && x.def.coverK !== null);
@@ -243,6 +245,19 @@ export class Scene {
   headPt(p = [0, 6.5, -7.5]) { return this.proj(xfPoint(headWorld(this.A.pose), p)); }
   eyePts() { return [this.headPt([3.6, 6.5, -10.2]), this.headPt([-3.6, 6.5, -10.2])]; }
   itemPt(idx = 0, p = [0, 0, 0]) { return this.proj(xfPoint(itemXf(this.A.pose, this.A.pose._items[idx]), p)); }
+  itemAt(it, p = [0, 0, 0], a = this.A) { return this.projAt(a, xfPoint(itemXf(a.pose, it), p)); }   // 没拿在手上的道具（it 是道具的位置）在这一帧会在哪
+  // 别的时刻：poseAt(t) 是那一刻的姿势（只算不画，也不改这一帧的涟漪），projAt(a, 世界坐标) 投到画布上（投影只看镜头，不用渲染）
+  poseAt(t) {
+    const keep = [this.rippleOn, this.rippleDx, this.rings, this.A];
+    this.rings = [];
+    try { return this.motion(t); } finally { [this.rippleOn, this.rippleDx, this.rings, this.A] = keep; }
+  }
+  projAt(a, p) {
+    const zoom = a.zoom * (this.P.camera.zoom ?? 1), persp = this.P.camera.persp ?? K.PERSP, C = camera(a.yaw, a.pitch), an = proj3(C, K.ANCHOR, persp);
+    const [bx, by] = projectBox({ C, persp, center: [an[0] - K.ANCHOR_OFF[0] / zoom, an[1] - K.ANCHOR_OFF[1] / zoom], scale: K.SCL_BOX * zoom }, p);
+    const [m00, m10, m01, m11, ox, oy] = affine(a);
+    return [m00 * bx + m01 * by + ox, m10 * bx + m11 * by + oy];
+  }
 
   hooks(ctx, name, t) {                                  // 动作 / 场景自己画的东西也跟着图层的强度和淡入淡出
     for (const x of [...this.scenes, ...this.motions]) {
@@ -325,6 +340,7 @@ export class Scene {
     ctx.save();
     this.background(ctx);
     this.hooks(ctx, 'drawSky', t);
+    this.rings = [];                                       // 动作自己加的涟漪（[x, y, 横半径, 竖半径, 不透明度]），每帧重来
     const a = this.motion(t); this.A = a;
     let layer = null;
     if (a.show && this.R) {
@@ -363,6 +379,7 @@ export class Scene {
           this.ripples.push([W / 2 + this.rippleDx, this.wl + 8, r, r * 0.16, al]);
         }
       }
+      this.ripples.push(...this.rings);
       this.arcs(ctx, Math.PI, 2 * Math.PI);
     }
     this.hooks(ctx, 'drawBack', t);
@@ -449,6 +466,7 @@ export class Scene {
         if (Math.abs(sc - 1) > 1e-3) ctx.scale(sc, sc);
         ctx.drawImage(spr, -spr.width / 2, -spr.height / 2);
       });
+      if (anim.def.draw) { ctx.setTransform(1, 0, 0, 1, 0, 0); this.guard(anim, () => anim.def.draw.call(anim, ctx, t, lay)); }   // 文字动画自己画的东西（字蹦出来时炸开的小星星）
     }
     ctx.restore();
   }
