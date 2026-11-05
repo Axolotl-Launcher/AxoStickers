@@ -4,8 +4,10 @@ component({
   params: {
     at: { label: '弹出来（一圈里的位置 0～1）', type: 'number', min: 0, max: 1, step: 0.01, default: 0.19 },
     end: { label: '消失（0～1）', type: 'number', min: 0, max: 1, step: 0.01, default: 0.28 },
-    on: { label: '盖在哪', type: 'select', options: [['item', '手里的道具（没拿就在头上）'], ['head', '头上']], default: 'item' },
+    on: { label: '盖在哪', type: 'select', options: [['item', '手里的道具（没拿就在脸上）'], ['face', '脸上'], ['side', '头旁边']], default: 'item' },
     size: { label: '大小', type: 'number', min: 10, max: 120, default: 46 },
+    x: { label: '头旁边：横向', type: 'number', min: -200, max: 200, default: 70 },
+    y: { label: '头旁边：纵向', type: 'number', min: -200, max: 100, default: -95 },
   },
   draw(ctx, t, layer) {
     if (layer !== 'front' || !this.LAST) return;
@@ -14,7 +16,8 @@ component({
     const sc = elastic(k) * (1 - easeIO((t - e + 0.12) / 0.12)), r = this.p.size * sc;
     if (r < 2) return;
     const idx = this.p.on === 'item' ? (this.A.pose._items || []).findIndex((x) => !x.gear) : -1;
-    const [x, y] = idx >= 0 ? this.itemPt(idx, [0, 0, -3]) : this.headPt([0, 6.5, -11]);
+    const hp = this.headPt();
+    const [x, y] = idx >= 0 ? this.itemPt(idx, [0, 0, -3]) : this.p.on === 'side' ? [hp[0] + this.p.x, hp[1] + this.p.y] : this.headPt([0, 6.5, -11]);
     const red = [235, 45, 55], white = [255, 255, 255], d = 0.8 * r * cos(PI / 4);
     ellipse(ctx, x - r - 4, y - r - 4, x + r + 4, y + r + 4, null, white, floor(18 * sc) + 1);
     ellipse(ctx, x - r, y - r, x + r, y + r, null, red, floor(10 * sc) + 1);

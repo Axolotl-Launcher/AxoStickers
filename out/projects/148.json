@@ -1,0 +1,40 @@
+{
+ "v": 2,
+ "name": "思考中",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1147,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "think",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "up"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "dots",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "思考中",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

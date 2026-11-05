@@ -1,0 +1,59 @@
+{
+ "v": 2,
+ "name": "欢迎新人",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1077,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "clap",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "happy"
+  },
+  {
+   "id": "l2",
+   "type": "wear",
+   "component": "party"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "confetti",
+   "params": {}
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "欢迎新人",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  },
+  {
+   "id": "l5",
+   "type": "fx",
+   "component": "toast",
+   "params": {
+    "text": "加入了群聊",
+    "color": "#8a8f99",
+    "check": false,
+    "at": 0.4,
+    "end": 0.88,
+    "stars": false
+   }
+  }
+ ],
+ "cover": 0.52
+}

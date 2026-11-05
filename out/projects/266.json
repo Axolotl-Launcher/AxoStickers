@@ -1,0 +1,45 @@
+{
+ "v": 2,
+ "name": "考试",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1265,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "read",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "worried"
+  },
+  {
+   "id": "l2",
+   "type": "prop",
+   "component": "book"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "sweat",
+   "params": {}
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "考试",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": false
+   }
+  }
+ ]
+}

@@ -1,0 +1,42 @@
+{
+ "v": 2,
+ "name": "哈哈哈",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1090,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "roll",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "xd"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "twinkle",
+   "start": 0.3,
+   "end": 0.92
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "哈哈哈",
+   "style": "pink",
+   "component": "popthen",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true,
+    "then": "bounce"
+   }
+  }
+ ]
+}

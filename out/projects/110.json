@@ -1,0 +1,48 @@
+{
+ "v": 2,
+ "name": "吃了吗",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1109,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "popup",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "smile"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "say",
+   "params": {
+    "icon": "cookie"
+   },
+   "start": 0.3,
+   "end": 0.92
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "twinkle",
+   "start": 0.3,
+   "end": 0.92
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "吃了吗",
+   "style": "pink",
+   "component": "hopat",
+   "params": {
+    "at": 0.5
+   }
+  }
+ ]
+}

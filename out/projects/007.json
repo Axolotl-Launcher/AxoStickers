@@ -1,0 +1,55 @@
+{
+ "v": 2,
+ "name": "已反馈",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1006,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "paperplane",
+   "params": {
+    "send": 0.4,
+    "back": 0.86,
+    "typing": false,
+    "s": 1.0
+   }
+  },
+  {
+   "id": "l1",
+   "type": "prop",
+   "component": "mail"
+  },
+  {
+   "id": "l2",
+   "type": "face",
+   "component": "smile"
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "已反馈",
+   "style": "pink",
+   "component": "hopat",
+   "params": {
+    "at": 0.5
+   }
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "toast",
+   "params": {
+    "text": "已发送",
+    "color": "#07c160",
+    "check": true,
+    "at": 0.54,
+    "end": 0.8,
+    "stars": true
+   }
+  }
+ ],
+ "cover": 0.33
+}

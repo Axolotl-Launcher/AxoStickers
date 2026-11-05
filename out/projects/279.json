@@ -1,0 +1,52 @@
+{
+ "v": 2,
+ "name": "洗澡",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1278,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "shakeoff",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "happy"
+  },
+  {
+   "id": "l2",
+   "type": "wear",
+   "component": "towel"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "bubbles",
+   "params": {}
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "twinkle",
+   "start": 0.3,
+   "end": 0.92
+  },
+  {
+   "id": "l5",
+   "type": "text",
+   "text": "洗澡",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

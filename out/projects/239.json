@@ -1,0 +1,47 @@
+{
+ "v": 2,
+ "name": "天亮了",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1238,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "stretch",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "happy"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "sun",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "twinkle",
+   "start": 0.3,
+   "end": 0.92
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "天亮了",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

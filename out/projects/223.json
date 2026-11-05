@@ -1,0 +1,47 @@
+{
+ "v": 2,
+ "name": "苦力怕",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1222,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "recoil",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "shock"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "stay",
+   "params": {
+    "icon": "creeper",
+    "k": 6,
+    "x": 90,
+    "y": -90
+   },
+   "start": 0.3,
+   "end": 0.92
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "苦力怕",
+   "style": "green",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

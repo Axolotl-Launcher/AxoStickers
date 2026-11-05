@@ -1,0 +1,59 @@
+{
+ "v": 2,
+ "name": "获胜",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1294,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "offer",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "star"
+  },
+  {
+   "id": "l2",
+   "type": "prop",
+   "component": "trophy"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "confetti",
+   "params": {}
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "获胜",
+   "style": "gold",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  },
+  {
+   "id": "l5",
+   "type": "fx",
+   "component": "toast",
+   "params": {
+    "text": "胜利",
+    "color": "#f0a020",
+    "check": true,
+    "at": 0.4,
+    "end": 0.88,
+    "stars": true
+   }
+  }
+ ],
+ "cover": 0.52
+}

@@ -1,0 +1,56 @@
+{
+ "v": 2,
+ "name": "在修了",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1017,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.07,
+    "out": 0.82,
+    "look": 22
+   }
+  },
+  {
+   "id": "l1",
+   "type": "motion",
+   "component": "swing",
+   "params": {
+    "debris": 1
+   }
+  },
+  {
+   "id": "l2",
+   "type": "face",
+   "component": "focus"
+  },
+  {
+   "id": "l3",
+   "type": "prop",
+   "component": "wrench"
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "sweat",
+   "params": {}
+  },
+  {
+   "id": "l5",
+   "type": "text",
+   "text": "在修了",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.22,
+    "out": 0.82,
+    "sparks": true
+   }
+  }
+ ]
+}

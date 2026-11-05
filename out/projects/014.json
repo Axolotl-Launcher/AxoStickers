@@ -1,0 +1,66 @@
+{
+ "v": 2,
+ "name": "看置顶",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1013,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.0875,
+    "out": 0.8125,
+    "look": 20
+   }
+  },
+  {
+   "id": "l1",
+   "type": "motion",
+   "component": "stare",
+   "start": 0.36,
+   "end": 0.78,
+   "strength": 0.7
+  },
+  {
+   "id": "l2",
+   "type": "face",
+   "component": "normal"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "pop",
+   "params": {
+    "icon": "pin",
+    "k": 7,
+    "x": 80,
+    "y": -100,
+    "beats": 4
+   },
+   "start": 0.45,
+   "end": 0.8
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "twinkle",
+   "start": 0.425,
+   "end": 0.8125
+  },
+  {
+   "id": "l5",
+   "type": "text",
+   "text": "看置顶",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.2375,
+    "gap": 0.16,
+    "out": 0.8125
+   }
+  }
+ ]
+}

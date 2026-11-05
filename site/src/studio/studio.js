@@ -757,7 +757,7 @@ async function renderDrawer() {
     await loadGallery();
     if (seq !== S.drawerSeq) return;                           // 等的时候换了分类 / 重画过了
     const items = G.items.filter((it) => (!it.special || it.project) && (!q || it.search.includes(q)) && (!S.favOnly || lib.isFav(`tpl:${it.key}`)))   // 初代有照着做的工程，也能当模板（排最前面）
-      .sort((a, b) => !!b.project - !!a.project);
+      .sort((a, b) => !!b.special - !!a.special);
     S.drawerCount.textContent = `${items.length} 张`;
     const card = (it) => el('div', { class: 'st-item thumb tpl', 'data-ax': 'item', 'data-type': 'template', 'data-id': it.key },
       el('button', { class: 'st-item-main', type: 'button', title: it.text, 'data-ax': 'use', onclick: (e) => { if (it.project) busy(e.currentTarget, openTemplateProject(it)); else { tplSeq++; S.store.replace(fromRecipe(it)); } } },
@@ -1999,8 +1999,8 @@ function installApi() {
 function randomize() {
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
   const ids = (t) => (S.catalog.get(t) || []).filter((m) => m.origin === 'builtin').map((m) => m.id);
-  const mo = pick(ids('motion')), off = CAT.motions[mo]?.offscreen;
-  const anims = ids('textanim').filter((a) => !(off && ['pop', 'type', 'slam'].includes(a)));
+  const mo = pick(ids('motion')), off = CAT.motions[mo]?.offscreen || metaOf('motion', mo)?.offscreen;
+  const anims = ids('textanim').filter((a) => !(off && metaOf('textanim', a)?.entrance));   // 中途离开画面的动作配开头字是空的文字动画，封面会拍不到美西螈
   const layers = [{ id: 'm', type: 'motion', component: mo }, { id: 'f', type: 'face', component: pick(ids('face')) },
     { id: 't', type: 'text', component: Math.random() < 0.4 ? 'stay' : pick(anims), text: pick(LINES), style: pick(Object.keys(CAT.styles)) }];
   if (Math.random() < 0.8) layers.push({ id: 'x', type: 'fx', component: pick(ids('fx')) });

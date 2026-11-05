@@ -1,0 +1,40 @@
+{
+ "v": 2,
+ "name": "下雨了",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1277,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "umbrella",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "worried"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "rain",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "下雨了",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": false
+   }
+  }
+ ]
+}

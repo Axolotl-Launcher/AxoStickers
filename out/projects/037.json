@@ -1,0 +1,50 @@
+{
+ "v": 2,
+ "name": "禁言了",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1036,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "petrify",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "meh"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "cross",
+   "params": {},
+   "start": 0.3,
+   "end": 0.92
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "禁言了",
+   "style": "gray",
+   "component": "slam"
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "toast",
+   "params": {
+    "text": "你已被禁言",
+    "color": "#8a8f99",
+    "check": false,
+    "at": 0.4,
+    "end": 0.88,
+    "stars": false
+   }
+  }
+ ],
+ "cover": 0.52
+}

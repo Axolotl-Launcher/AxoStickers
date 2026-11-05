@@ -105,10 +105,10 @@ async function route() {
         catch { toast('这张的工程没载进来，先打开一个空白草稿'); }
       } else if (e) recipe = e.recipe;
     }
-    if (q.get('g')) {                                          // 图鉴里初代的「改一改」：照着原图做的工程单独存一个文件
+    if (q.get('g')) {                                          // 图鉴里的「改一改」：300 张（按编号）和初代（按 slug）的工程单独存一个文件
       try {
         await loadGallery();
-        const it = G.items.find((x) => x.special && x.slug === q.get('g'));
+        const it = G.items.find((x) => (x.special ? x.slug : x.key) === q.get('g'));
         if (!it?.project) throw new Error('没有工程');
         const r = await fetch(encodePath(it.project)); if (!r.ok) throw new Error(`HTTP ${r.status}`); project = await r.json();
       } catch { toast('这张的工程没载进来，先打开一个空白草稿'); }

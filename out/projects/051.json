@@ -1,0 +1,56 @@
+{
+ "v": 2,
+ "name": "顶",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1050,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.07,
+    "out": 0.82,
+    "look": 22
+   }
+  },
+  {
+   "id": "l1",
+   "type": "motion",
+   "component": "hop",
+   "params": {}
+  },
+  {
+   "id": "l2",
+   "type": "face",
+   "component": "determined"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "pop",
+   "params": {
+    "icon": "arrow",
+    "k": 7,
+    "x": 85,
+    "y": -90
+   },
+   "start": 0.42,
+   "end": 0.8
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "顶",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.22,
+    "out": 0.82,
+    "sparks": true
+   }
+  }
+ ]
+}

@@ -1,0 +1,49 @@
+{
+ "v": 2,
+ "name": "完蛋",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1159,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "tantrum",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "shock"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "panic",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "bolt",
+   "params": {},
+   "start": 0.3,
+   "end": 0.92
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "完蛋",
+   "style": "red",
+   "component": "popthen",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true,
+    "then": "shake"
+   }
+  }
+ ]
+}

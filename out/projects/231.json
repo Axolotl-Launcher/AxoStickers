@@ -1,0 +1,45 @@
+{
+ "v": 2,
+ "name": "屠龙",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1230,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "swing",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "determined"
+  },
+  {
+   "id": "l2",
+   "type": "prop",
+   "component": "sword"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "fire",
+   "params": {}
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "屠龙",
+   "style": "purple",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

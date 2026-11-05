@@ -14,7 +14,8 @@ Axolotl Launcher 的美西螈动画表情包：300 张 + 4 张初代 + 水龙卷
 
 | 路径 | 内容 |
 |---|---|
-| `out/NNN_文字.gif` | 300 张表情 |
+| `out/NNN_文字.gif` | 300 张表情（网页引擎按 `out/projects/` 的工程出的，一圈 4 秒 60 帧） |
+| `out/projects/NNN.json` | 300 张的工程（`engine/projects.py` 按 `specs.py` 的配方翻新生成），图鉴里「在工坊里改一改」打开它 |
 | `out/_封面/` | 每张的静态封面 PNG |
 | `out/初代_*.gif` | 初代表情包工具包 examples/ 里的 4 张原图（发日志 / 请截图 / 看文档 / 看群公告），不是这个引擎出的；照着原图的脚本在网站编辑器里拼了一份工程（`workshop/projects/og-*.json`），图鉴里点开就能「在工坊里改一改」 |
 | `out/水龙卷_*.gif` | 水龙卷特别篇（无字 / 我没事 / 转晕了） |
@@ -30,14 +31,20 @@ Axolotl Launcher 的美西螈动画表情包：300 张 + 4 张初代 + 水龙卷
 
 ## 自己出图
 
-需要 Python 3.9+、`pip install numpy pillow`、ffmpeg（在 PATH 里）。纯 CPU，不需要显卡。
+300 张现在是网页引擎出的（和创意工坊编辑器同一个引擎），照初代那 4 张的路子翻新过：字一个个蹦出来、群里答疑那些从水里浮上来再潜回去、
+一下子的特效等字落定了再出、有一批按意思加了提示条 / 禁止标志 / 纸飞机 / 截图框。规则和按意思加的那批都在 `engine/projects.py` 里。
 
 ```
-python engine/build.py                   # 出全部（已存在的跳过，断了能接着跑）
-python engine/build.py 12,40-45 --force  # 只重出这几张
-python engine/sheet.py 1-30              # 检查用拼图 -> ref/
-python engine/manifest.py                # 更新 out/stickers.json
+python engine/projects.py                # 按 specs.py 生成工程 -> out/projects/（也可以只生成几张：python engine/projects.py 12,40-45）
+cd site && npm run build                 # 出图用的是构建好的网站（dist/sandbox.html）
+node tools/render_stickers.mjs --channel msedge          # 出全部：out/NNN_文字.gif + out/_封面/；一批 20 张歇 20 秒。只出几张：后面加 12,40-45
+cd .. && python engine/manifest.py       # 更新 out/stickers.json（会带上工程路径和做法摘要）
 ```
+
+`--channel msedge` 用本机的 Edge（也可以 `chrome`）；不写就用 Playwright 自己下的 Chromium，没显卡的机器加 `--soft`。
+
+翻新前的版本是 Python 引擎出的（一圈 3.2 秒 48 帧），要对照的话用 Python 3.9+、`pip install numpy pillow`、ffmpeg，纯 CPU：
+`python engine/build.py 12 --force` 会把那张盖回老版本，`python engine/sheet.py 1-30` 出检查用拼图（-> ref/）。
 
 水龙卷要用几张原版 Minecraft 材质（铁头盔、海龟壳、美西螈桶、TNT），仓库里不带。先从你自己电脑上的客户端里取出来：
 
@@ -56,6 +63,7 @@ S('摸鱼', 'flagwave', 'happy', [], hold='fish', s=0.7)
 ```
 
 动作、表情、特效、道具、配色、文字动画的完整列表见 [skill/axolotl-sticker/SKILL.md](skill/axolotl-sticker/SKILL.md)。
+然后 `python engine/projects.py` 生成它的工程（想按意思加提示条、纸飞机这些，在 `projects.py` 的 `SYS` / `OVERRIDES` 里加），再按上面出图。
 
 ## 用 skill 让 Claude 做
 

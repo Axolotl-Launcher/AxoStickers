@@ -114,6 +114,7 @@ def main():
     if os.path.exists(SITE): shutil.rmtree(SITE)
     shutil.copytree(dist, SITE)
     copy(OUT, os.path.join(SITE, 'out'), {'.png', '.json'})
+    copy(os.path.join(OUT, 'projects'), os.path.join(SITE, 'out', 'projects'), {'.json'})   # 300 张的工程：「在工坊里改一改」打开它
     copy(os.path.join(OUT, '_封面'), os.path.join(SITE, 'out', '_封面'), {'.png'})
     data, files = site_gifs()                         # 表情 GIF 只放英文名的这一份，站上的清单跟着改
     os.makedirs(os.path.join(SITE, 'gif'))

@@ -1,0 +1,48 @@
+{
+ "v": 2,
+ "name": "新版来啦",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1030,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "launch",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "star"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "sparkles",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "新版来啦",
+   "style": "pink",
+   "component": "bounce"
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "toast",
+   "params": {
+    "text": "更新完成",
+    "color": "#07c160",
+    "check": true,
+    "at": 0.4,
+    "end": 0.88,
+    "stars": true
+   }
+  }
+ ],
+ "cover": 0.52
+}

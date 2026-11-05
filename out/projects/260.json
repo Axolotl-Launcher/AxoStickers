@@ -1,0 +1,47 @@
+{
+ "v": 2,
+ "name": "干饭",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1259,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "chomp",
+   "params": {
+    "s": 0.9
+   }
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "eat"
+  },
+  {
+   "id": "l2",
+   "type": "prop",
+   "component": "bowl"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "sparkles",
+   "params": {}
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "干饭",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

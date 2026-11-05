@@ -1,0 +1,54 @@
+{
+ "v": 2,
+ "name": "饿了",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1139,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "lookup",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "drool"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "float",
+   "params": {
+    "icon": "apple",
+    "n": 3,
+    "k": 4
+   }
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "float",
+   "params": {
+    "icon": "cookie",
+    "n": 2,
+    "k": 4
+   }
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "饿了",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

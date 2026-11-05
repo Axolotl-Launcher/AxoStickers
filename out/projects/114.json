@@ -1,0 +1,34 @@
+{
+ "v": 2,
+ "name": "我来了",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1113,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "launch",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "determined"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "sparkles",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "我来了",
+   "style": "pink",
+   "component": "bounce"
+  }
+ ]
+}

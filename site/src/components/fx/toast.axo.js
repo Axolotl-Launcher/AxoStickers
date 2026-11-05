@@ -16,7 +16,8 @@ component({
     const k = t - this.p.at * this.T, e = this.p.end * this.T;
     if (k <= 0 || t > e + 0.25) return;
     const sc = elastic(k / 0.45) * (1 - easeIO((t - e) / 0.25));
-    pill(ctx, this.p.x, this.p.y, this.p.text, { color: hex(this.p.color.replace('#', '').padEnd(6, '0')), sc, check: !!this.p.check });
+    const half = (labelWidth(this.p.text, 20) + (this.p.check ? 54 : 32)) / 2, x = clamp(this.p.x, half + 6, W - half - 6);   // 字长了也不出画面
+    pill(ctx, x, this.p.y, this.p.text, { color: hex(this.p.color.replace('#', '').padEnd(6, '0')), sc, check: !!this.p.check });
     if (this.p.stars) for (const s of this.stage.twk) { const a = (0.5 + 0.5 * sin(t * 7 + s.ph)) * sc; if (a > 0.25) star(ctx, s.x, s.y, s.r * a, s.c); }
   },
 });

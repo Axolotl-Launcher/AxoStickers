@@ -1,0 +1,62 @@
+{
+ "v": 2,
+ "name": "不是bug",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1014,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.05,
+    "out": 0.86,
+    "look": 18
+   }
+  },
+  {
+   "id": "l1",
+   "type": "motion",
+   "component": "toss",
+   "params": {
+    "at": 0.5,
+    "shake": 18,
+    "x": 60
+   }
+  },
+  {
+   "id": "l2",
+   "type": "prop",
+   "component": "bug"
+  },
+  {
+   "id": "l3",
+   "type": "face",
+   "component": "smug"
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "ban",
+   "params": {
+    "at": 0.3,
+    "end": 0.5,
+    "on": "item"
+   }
+  },
+  {
+   "id": "l5",
+   "type": "text",
+   "text": "不是bug",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.2,
+    "gap": 0.16,
+    "out": 0.86
+   }
+  }
+ ]
+}

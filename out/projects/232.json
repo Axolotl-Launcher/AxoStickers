@@ -1,0 +1,37 @@
+{
+ "v": 2,
+ "name": "去下界",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1231,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "dash",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "determined"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "fire",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "去下界",
+   "style": "red",
+   "component": "hopat",
+   "params": {
+    "at": 0.5
+   }
+  }
+ ]
+}

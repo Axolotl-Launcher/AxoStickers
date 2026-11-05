@@ -27,7 +27,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/001_先看日志.gif",
-   "cover": "out/_封面/001_先看日志.png"
+   "cover": "out/_封面/001_先看日志.png",
+   "project": "out/projects/001.json",
+   "summary": "动作 浮上来，最后潜回去、张望 · 表情 专注 · 道具 日志纸 · 特效 冒出 感叹号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 2,
@@ -44,7 +46,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/002_重启试试.gif",
-   "cover": "out/_封面/002_重启试试.png"
+   "cover": "out/_封面/002_重启试试.png",
+   "project": "out/projects/002.json",
+   "summary": "动作 转圈 · 表情 微笑 · 特效 转圈圈、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 3,
@@ -61,7 +65,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/003_清下缓存.gif",
-   "cover": "out/_封面/003_清下缓存.png"
+   "cover": "out/_封面/003_清下缓存.png",
+   "project": "out/projects/003.json",
+   "summary": "动作 浮上来，最后潜回去、甩水 · 表情 专注 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 4,
@@ -78,7 +84,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/004_更新一下.gif",
-   "cover": "out/_封面/004_更新一下.png"
+   "cover": "out/_封面/004_更新一下.png",
+   "project": "out/projects/004.json",
+   "summary": "动作 弹弹 · 表情 微笑 · 特效 冒出 箭头、小星星、提示条「发现新版本」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 5,
@@ -93,7 +101,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/005_换个Java.gif",
-   "cover": "out/_封面/005_换个Java.png"
+   "cover": "out/_封面/005_换个Java.png",
+   "project": "out/projects/005.json",
+   "summary": "动作 浮上来，最后潜回去、挥工具 · 表情 专注 · 道具 扳手 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 6,
@@ -110,7 +120,9 @@
    "style": "green",
    "tmode": "stay",
    "gif": "out/006_已修复.gif",
-   "cover": "out/_封面/006_已修复.png"
+   "cover": "out/_封面/006_已修复.png",
+   "project": "out/projects/006.json",
+   "summary": "动作 横跳 · 表情 开心 · 特效 对勾、小星星、提示条「测试通过」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 7,
@@ -127,7 +139,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/007_已反馈.gif",
-   "cover": "out/_封面/007_已反馈.png"
+   "cover": "out/_封面/007_已反馈.png",
+   "project": "out/projects/007.json",
+   "summary": "动作 折纸飞机发出去 · 表情 微笑 · 道具 信 · 特效 提示条「已发送」 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 8,
@@ -144,7 +158,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/008_复现一下.gif",
-   "cover": "out/_封面/008_复现一下.png"
+   "cover": "out/_封面/008_复现一下.png",
+   "project": "out/projects/008.json",
+   "summary": "动作 浮上来，最后潜回去、思考 · 表情 望天 · 特效 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 9,
@@ -159,7 +175,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/009_提issue.gif",
-   "cover": "out/_封面/009_提issue.png"
+   "cover": "out/_封面/009_提issue.png",
+   "project": "out/projects/009.json",
+   "summary": "动作 折纸飞机发出去 · 表情 微笑 · 道具 日志纸 · 特效 提示条「已提交」 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 10,
@@ -176,7 +194,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/010_啥版本.gif",
-   "cover": "out/_封面/010_啥版本.png"
+   "cover": "out/_封面/010_啥版本.png",
+   "project": "out/projects/010.json",
+   "summary": "动作 浮上来，最后潜回去、歪头 · 表情 惊讶 · 特效 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 11,
@@ -193,7 +213,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/011_报错发我.gif",
-   "cover": "out/_封面/011_报错发我.png"
+   "cover": "out/_封面/011_报错发我.png",
+   "project": "out/projects/011.json",
+   "summary": "动作 浮上来，最后潜回去、挥手 · 表情 微笑 · 特效 气泡 信、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 12,
@@ -210,7 +232,9 @@
    "style": "red",
    "tmode": "slam",
    "gif": "out/012_别私聊.gif",
-   "cover": "out/_封面/012_别私聊.png"
+   "cover": "out/_封面/012_别私聊.png",
+   "project": "out/projects/012.json",
+   "summary": "动作 浮上来，最后潜回去、摇头，把道具扔掉 · 表情 无语 · 道具 手机 · 特效 禁止标志 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 13,
@@ -225,7 +249,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/013_先搜一下.gif",
-   "cover": "out/_封面/013_先搜一下.png"
+   "cover": "out/_封面/013_先搜一下.png",
+   "project": "out/projects/013.json",
+   "summary": "动作 浮上来，最后潜回去、拿放大镜找 · 表情 专注 · 道具 放大镜 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 14,
@@ -242,7 +268,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/014_看置顶.gif",
-   "cover": "out/_封面/014_看置顶.png"
+   "cover": "out/_封面/014_看置顶.png",
+   "project": "out/projects/014.json",
+   "summary": "动作 浮上来，最后潜回去、盯 · 表情 原版 · 特效 冒出 图钉、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 15,
@@ -259,7 +287,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/015_不是bug.gif",
-   "cover": "out/_封面/015_不是bug.png"
+   "cover": "out/_封面/015_不是bug.png",
+   "project": "out/projects/015.json",
+   "summary": "动作 浮上来，最后潜回去、摇头，把道具扔掉 · 表情 得意 · 道具 bug · 特效 禁止标志 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 16,
@@ -276,7 +306,9 @@
    "style": "red",
    "tmode": "shake",
    "gif": "out/016_是bug.gif",
-   "cover": "out/_封面/016_是bug.png"
+   "cover": "out/_封面/016_是bug.png",
+   "project": "out/projects/016.json",
+   "summary": "动作 浮上来，最后潜回去、撒泼 · 表情 吓一跳 · 特效 环绕 虫子 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 17,
@@ -294,7 +326,9 @@
    "style": "green",
    "tmode": "bounce",
    "gif": "out/017_修好了.gif",
-   "cover": "out/_封面/017_修好了.png"
+   "cover": "out/_封面/017_修好了.png",
+   "project": "out/projects/017.json",
+   "summary": "动作 跳水 · 表情 开心 · 特效 对勾、彩纸、提示条「构建成功」 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 18,
@@ -311,7 +345,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/018_在修了.gif",
-   "cover": "out/_封面/018_在修了.png"
+   "cover": "out/_封面/018_在修了.png",
+   "project": "out/projects/018.json",
+   "summary": "动作 浮上来，最后潜回去、挥工具 · 表情 专注 · 道具 扳手 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 19,
@@ -328,7 +364,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/019_内存爆了.gif",
-   "cover": "out/_封面/019_内存爆了.png"
+   "cover": "out/_封面/019_内存爆了.png",
+   "project": "out/projects/019.json",
+   "summary": "动作 浮上来，最后潜回去、鼓气 · 表情 用力 · 特效 爆炸 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 20,
@@ -346,7 +384,9 @@
    "style": "red",
    "tmode": "shake",
    "gif": "out/020_模组冲突.gif",
-   "cover": "out/_封面/020_模组冲突.png"
+   "cover": "out/_封面/020_模组冲突.png",
+   "project": "out/projects/020.json",
+   "summary": "动作 浮上来，最后潜回去、暴怒 · 表情 暴怒 · 特效 闪电、怒 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 21,
@@ -363,7 +403,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/021_崩了.gif",
-   "cover": "out/_封面/021_崩了.png"
+   "cover": "out/_封面/021_崩了.png",
+   "project": "out/projects/021.json",
+   "summary": "动作 晕倒 · 表情 寄 · 特效 骷髅、提示条「游戏已崩溃」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 22,
@@ -380,7 +422,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/022_卡加载.gif",
-   "cover": "out/_封面/022_卡加载.png"
+   "cover": "out/_封面/022_卡加载.png",
+   "project": "out/projects/022.json",
+   "summary": "动作 卡了 · 表情 累了 · 特效 转圈圈 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 23,
@@ -397,7 +441,9 @@
    "style": "gray",
    "tmode": "droop",
    "gif": "out/023_下载好慢.gif",
-   "cover": "out/_封面/023_下载好慢.png"
+   "cover": "out/_封面/023_下载好慢.png",
+   "project": "out/projects/023.json",
+   "summary": "动作 瘫着 · 表情 累了 · 特效 挂着 闹钟、提示条「下载中 3%」 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 24,
@@ -414,7 +460,9 @@
    "style": "blue",
    "tmode": "stay",
    "gif": "out/024_进不去.gif",
-   "cover": "out/_封面/024_进不去.png"
+   "cover": "out/_封面/024_进不去.png",
+   "project": "out/projects/024.json",
+   "summary": "动作 撞墙 · 表情 大哭 · 特效 宽面条泪、提示条「连接超时」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 25,
@@ -431,7 +479,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/025_能进了.gif",
-   "cover": "out/_封面/025_能进了.png"
+   "cover": "out/_封面/025_能进了.png",
+   "project": "out/projects/025.json",
+   "summary": "动作 冒出来 · 表情 星星眼 · 特效 彩纸、提示条「已连接」 · 文字动画 弹跳 · 60 帧 · 15 fps"
   },
   {
    "id": 26,
@@ -448,7 +498,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/026_闪退了.gif",
-   "cover": "out/_封面/026_闪退了.png"
+   "cover": "out/_封面/026_闪退了.png",
+   "project": "out/projects/026.json",
+   "summary": "动作 卡了 · 表情 吓一跳 · 特效 速度线、提示条「已停止运行」 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 27,
@@ -465,7 +517,9 @@
    "style": "gold",
    "tmode": "bounce",
    "gif": "out/027_开服啦.gif",
-   "cover": "out/_封面/027_开服啦.png"
+   "cover": "out/_封面/027_开服啦.png",
+   "project": "out/projects/027.json",
+   "summary": "动作 浮上来，最后潜回去、欢呼 · 表情 大笑 · 特效 烟花、提示条「服务器已启动」 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 28,
@@ -482,7 +536,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/028_来联机.gif",
-   "cover": "out/_封面/028_来联机.png"
+   "cover": "out/_封面/028_来联机.png",
+   "project": "out/projects/028.json",
+   "summary": "动作 浮上来，最后潜回去、挥手 · 表情 微笑 · 特效 气泡 手柄、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 29,
@@ -497,7 +553,9 @@
    "style": "pink",
    "tmode": "droop",
    "gif": "out/029_求带.gif",
-   "cover": "out/_封面/029_求带.png"
+   "cover": "out/_封面/029_求带.png",
+   "project": "out/projects/029.json",
+   "summary": "动作 浮上来，最后潜回去、磕头 · 表情 泪汪汪 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 30,
@@ -514,7 +572,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/030_发错群了.gif",
-   "cover": "out/_封面/030_发错群了.png"
+   "cover": "out/_封面/030_发错群了.png",
+   "project": "out/projects/030.json",
+   "summary": "动作 潜水 · 表情 尴尬 · 特效 流汗、提示条「你撤回了一条消息」 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 31,
@@ -531,7 +591,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/031_新版来啦.gif",
-   "cover": "out/_封面/031_新版来啦.png"
+   "cover": "out/_封面/031_新版来啦.png",
+   "project": "out/projects/031.json",
+   "summary": "动作 起飞 · 表情 星星眼 · 特效 闪光、提示条「更新完成」 · 文字动画 弹跳 · 60 帧 · 15 fps"
   },
   {
    "id": 32,
@@ -548,7 +610,9 @@
    "style": "red",
    "tmode": "shake",
    "gif": "out/032_别催了.gif",
-   "cover": "out/_封面/032_别催了.png"
+   "cover": "out/_封面/032_别催了.png",
+   "project": "out/projects/032.json",
+   "summary": "动作 浮上来，最后潜回去、暴怒 · 表情 生气 · 特效 冒烟、禁止标志 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 33,
@@ -563,7 +627,9 @@
    "style": "pink",
    "tmode": "type",
    "gif": "out/033_在写了.gif",
-   "cover": "out/_封面/033_在写了.png"
+   "cover": "out/_封面/033_在写了.png",
+   "project": "out/projects/033.json",
+   "summary": "动作 敲键盘 · 表情 专注 · 文字动画 打字机 · 60 帧 · 15 fps"
   },
   {
    "id": 34,
@@ -580,7 +646,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/034_看教程.gif",
-   "cover": "out/_封面/034_看教程.png"
+   "cover": "out/_封面/034_看教程.png",
+   "project": "out/projects/034.json",
+   "summary": "动作 浮上来，最后潜回去、看书 · 表情 微笑 · 道具 书 · 特效 灵光一闪、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 35,
@@ -597,7 +665,9 @@
    "style": "blue",
    "tmode": "droop",
    "gif": "out/035_存档没了.gif",
-   "cover": "out/_封面/035_存档没了.png"
+   "cover": "out/_封面/035_存档没了.png",
+   "project": "out/projects/035.json",
+   "summary": "动作 浮上来，最后潜回去、发呆 · 表情 抽泣 · 特效 宽面条泪、提示条「存档已损坏」 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 36,
@@ -614,7 +684,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/036_好用.gif",
-   "cover": "out/_封面/036_好用.png"
+   "cover": "out/_封面/036_好用.png",
+   "project": "out/projects/036.json",
+   "summary": "动作 扑过来 · 表情 开心 · 特效 点赞、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 37,
@@ -631,7 +703,9 @@
    "style": "gray",
    "tmode": "slam",
    "gif": "out/037_禁言了.gif",
-   "cover": "out/_封面/037_禁言了.png"
+   "cover": "out/_封面/037_禁言了.png",
+   "project": "out/projects/037.json",
+   "summary": "动作 石化 · 表情 无语 · 特效 叉、提示条「你已被禁言」 · 文字动画 砸下来 · 60 帧 · 15 fps"
   },
   {
    "id": 38,
@@ -648,7 +722,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/038_管理来了.gif",
-   "cover": "out/_封面/038_管理来了.png"
+   "cover": "out/_封面/038_管理来了.png",
+   "project": "out/projects/038.json",
+   "summary": "动作 登场 · 表情 淡定 · 帽子 墨镜 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 39,
@@ -665,7 +741,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/039_别刷屏.gif",
-   "cover": "out/_封面/039_别刷屏.png"
+   "cover": "out/_封面/039_别刷屏.png",
+   "project": "out/projects/039.json",
+   "summary": "动作 浮上来，最后潜回去、拍水 · 表情 生气 · 特效 怒、禁止标志 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 40,
@@ -682,7 +760,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/040_稍等.gif",
-   "cover": "out/_封面/040_稍等.png"
+   "cover": "out/_封面/040_稍等.png",
+   "project": "out/projects/040.json",
+   "summary": "动作 浮上来，最后潜回去、浮浮沉沉 · 表情 微笑 · 特效 转圈圈、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 41,
@@ -699,7 +779,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/041_马上.gif",
-   "cover": "out/_封面/041_马上.png"
+   "cover": "out/_封面/041_马上.png",
+   "project": "out/projects/041.json",
+   "summary": "动作 狂奔 · 表情 坚定 · 特效 速度线 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 42,
@@ -718,7 +800,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/042_搞定.gif",
-   "cover": "out/_封面/042_搞定.png"
+   "cover": "out/_封面/042_搞定.png",
+   "project": "out/projects/042.json",
+   "summary": "动作 跳舞 · 表情 淡定 · 帽子 墨镜 · 特效 闪光、提示条「完成」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 43,
@@ -733,7 +817,9 @@
    "style": "red",
    "tmode": "zoom",
    "gif": "out/043_说重点.gif",
-   "cover": "out/_封面/043_说重点.png"
+   "cover": "out/_封面/043_说重点.png",
+   "project": "out/projects/043.json",
+   "summary": "动作 凑近 · 表情 无语 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 44,
@@ -750,7 +836,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/044_私信我.gif",
-   "cover": "out/_封面/044_私信我.png"
+   "cover": "out/_封面/044_私信我.png",
+   "project": "out/projects/044.json",
+   "summary": "动作 浮上来，最后潜回去、害羞 · 表情 眨眼 · 特效 气泡 信、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 45,
@@ -767,7 +855,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/045_图呢.gif",
-   "cover": "out/_封面/045_图呢.png"
+   "cover": "out/_封面/045_图呢.png",
+   "project": "out/projects/045.json",
+   "summary": "动作 浮上来，最后潜回去、张望 · 表情 斜眼 · 特效 问号、截图框 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 46,
@@ -784,7 +874,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/046_没看懂.gif",
-   "cover": "out/_封面/046_没看懂.png"
+   "cover": "out/_封面/046_没看懂.png",
+   "project": "out/projects/046.json",
+   "summary": "动作 绕圈游 · 表情 晕 · 特效 漩涡 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 47,
@@ -801,7 +893,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/047_懂了.gif",
-   "cover": "out/_封面/047_懂了.png"
+   "cover": "out/_封面/047_懂了.png",
+   "project": "out/projects/047.json",
+   "summary": "动作 浮上来，最后潜回去、抬头 · 表情 星星眼 · 特效 灵光一闪、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 48,
@@ -820,7 +914,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/048_学到了.gif",
-   "cover": "out/_封面/048_学到了.png"
+   "cover": "out/_封面/048_学到了.png",
+   "project": "out/projects/048.json",
+   "summary": "动作 浮上来，最后潜回去、看书 · 表情 星星眼 · 道具 书 · 帽子 眼镜 · 特效 灵光一闪、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 49,
@@ -837,7 +933,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/049_我也是.gif",
-   "cover": "out/_封面/049_我也是.png"
+   "cover": "out/_封面/049_我也是.png",
+   "project": "out/projects/049.json",
+   "summary": "动作 浮上来，最后潜回去、摇摆 · 表情 担心 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 50,
@@ -854,7 +952,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/050_+1.gif",
-   "cover": "out/_封面/050_+1.png"
+   "cover": "out/_封面/050_+1.png",
+   "project": "out/projects/050.json",
+   "summary": "动作 浮上来，最后潜回去、蹦跶 · 表情 微笑 · 特效 +1、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 51,
@@ -871,7 +971,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/051_顶.gif",
-   "cover": "out/_封面/051_顶.png"
+   "cover": "out/_封面/051_顶.png",
+   "project": "out/projects/051.json",
+   "summary": "动作 浮上来，最后潜回去、蹦跶 · 表情 坚定 · 特效 冒出 箭头 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 52,
@@ -888,7 +990,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/052_同问.gif",
-   "cover": "out/_封面/052_同问.png"
+   "cover": "out/_封面/052_同问.png",
+   "project": "out/projects/052.json",
+   "summary": "动作 浮上来，最后潜回去、歪头 · 表情 原版 · 特效 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 53,
@@ -905,7 +1009,9 @@
    "style": "blue",
    "tmode": "stay",
    "gif": "out/053_萌新求助.gif",
-   "cover": "out/_封面/053_萌新求助.png"
+   "cover": "out/_封面/053_萌新求助.png",
+   "project": "out/projects/053.json",
+   "summary": "动作 缩小 · 表情 泪汪汪 · 特效 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 54,
@@ -922,7 +1028,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/054_大佬带带.gif",
-   "cover": "out/_封面/054_大佬带带.png"
+   "cover": "out/_封面/054_大佬带带.png",
+   "project": "out/projects/054.json",
+   "summary": "动作 浮上来，最后潜回去、磕头 · 表情 星星眼 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 55,
@@ -939,7 +1047,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/055_已读.gif",
-   "cover": "out/_封面/055_已读.png"
+   "cover": "out/_封面/055_已读.png",
+   "project": "out/projects/055.json",
+   "summary": "动作 浮上来，最后潜回去、盯 · 表情 无语 · 特效 冒出 对勾 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 56,
@@ -956,7 +1066,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/056_早安.gif",
-   "cover": "out/_封面/056_早安.png"
+   "cover": "out/_封面/056_早安.png",
+   "project": "out/projects/056.json",
+   "summary": "动作 伸懒腰 · 表情 开心 · 特效 太阳、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 57,
@@ -973,7 +1085,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/057_午安.gif",
-   "cover": "out/_封面/057_午安.png"
+   "cover": "out/_封面/057_午安.png",
+   "project": "out/projects/057.json",
+   "summary": "动作 打瞌睡 · 表情 睡着 · 特效 太阳 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 58,
@@ -990,7 +1104,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/058_晚上好.gif",
-   "cover": "out/_封面/058_晚上好.png"
+   "cover": "out/_封面/058_晚上好.png",
+   "project": "out/projects/058.json",
+   "summary": "动作 挥手 · 表情 微笑 · 特效 月亮、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 59,
@@ -1010,7 +1126,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/059_晚安.gif",
-   "cover": "out/_封面/059_晚安.png"
+   "cover": "out/_封面/059_晚安.png",
+   "project": "out/projects/059.json",
+   "summary": "动作 打瞌睡 · 表情 睡着 · 帽子 睡帽 · 特效 呼噜、月亮 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 60,
@@ -1027,7 +1145,9 @@
    "style": "pink",
    "tmode": "pop",
    "gif": "out/060_你好.gif",
-   "cover": "out/_封面/060_你好.png"
+   "cover": "out/_封面/060_你好.png",
+   "project": "out/projects/060.json",
+   "summary": "动作 挥手 · 表情 开心 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 61,
@@ -1044,7 +1164,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/061_哈喽.gif",
-   "cover": "out/_封面/061_哈喽.png"
+   "cover": "out/_封面/061_哈喽.png",
+   "project": "out/projects/061.json",
+   "summary": "动作 挥手 · 表情 大笑 · 特效 音符 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 62,
@@ -1059,7 +1181,9 @@
    "style": "pink",
    "tmode": "wave",
    "gif": "out/062_拜拜.gif",
-   "cover": "out/_封面/062_拜拜.png"
+   "cover": "out/_封面/062_拜拜.png",
+   "project": "out/projects/062.json",
+   "summary": "动作 挥手 · 表情 眨眼 · 特效 小星星 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 63,
@@ -1076,7 +1200,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/063_明天见.gif",
-   "cover": "out/_封面/063_明天见.png"
+   "cover": "out/_封面/063_明天见.png",
+   "project": "out/projects/063.json",
+   "summary": "动作 潜水 · 表情 开心 · 特效 月亮、小星星 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 64,
@@ -1093,7 +1219,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/064_好的.gif",
-   "cover": "out/_封面/064_好的.png"
+   "cover": "out/_封面/064_好的.png",
+   "project": "out/projects/064.json",
+   "summary": "动作 点头 · 表情 微笑 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 65,
@@ -1112,7 +1240,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/065_OK.gif",
-   "cover": "out/_封面/065_OK.png"
+   "cover": "out/_封面/065_OK.png",
+   "project": "out/projects/065.json",
+   "summary": "动作 登场 · 表情 淡定 · 帽子 墨镜 · 特效 点赞、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 66,
@@ -1127,7 +1257,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/066_嗯嗯.gif",
-   "cover": "out/_封面/066_嗯嗯.png"
+   "cover": "out/_封面/066_嗯嗯.png",
+   "project": "out/projects/066.json",
+   "summary": "动作 点头 · 表情 开心 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 67,
@@ -1142,7 +1274,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/067_对对对.gif",
-   "cover": "out/_封面/067_对对对.png"
+   "cover": "out/_封面/067_对对对.png",
+   "project": "out/projects/067.json",
+   "summary": "动作 点头 · 表情 咧嘴 · 特效 小星星 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 68,
@@ -1159,7 +1293,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/068_没问题.gif",
-   "cover": "out/_封面/068_没问题.png"
+   "cover": "out/_封面/068_没问题.png",
+   "project": "out/projects/068.json",
+   "summary": "动作 弹弹 · 表情 坚定 · 特效 点赞 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 69,
@@ -1176,7 +1312,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/069_可以.gif",
-   "cover": "out/_封面/069_可以.png"
+   "cover": "out/_封面/069_可以.png",
+   "project": "out/projects/069.json",
+   "summary": "动作 点头 · 表情 微笑 · 特效 冒出 对勾、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 70,
@@ -1193,7 +1331,9 @@
    "style": "red",
    "tmode": "slam",
    "gif": "out/070_不行.gif",
-   "cover": "out/_封面/070_不行.png"
+   "cover": "out/_封面/070_不行.png",
+   "project": "out/projects/070.json",
+   "summary": "动作 摇头 · 表情 生气 · 特效 禁止标志 · 文字动画 砸下来 · 60 帧 · 15 fps"
   },
   {
    "id": 71,
@@ -1208,7 +1348,9 @@
    "style": "pink",
    "tmode": "droop",
    "gif": "out/071_好吧.gif",
-   "cover": "out/_封面/071_好吧.png"
+   "cover": "out/_封面/071_好吧.png",
+   "project": "out/projects/071.json",
+   "summary": "动作 瘫着 · 表情 无语 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 72,
@@ -1225,7 +1367,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/072_谢谢.gif",
-   "cover": "out/_封面/072_谢谢.png"
+   "cover": "out/_封面/072_谢谢.png",
+   "project": "out/projects/072.json",
+   "summary": "动作 鞠躬 · 表情 开心 · 特效 爱心 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 73,
@@ -1242,7 +1386,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/073_谢谢老板.gif",
-   "cover": "out/_封面/073_谢谢老板.png"
+   "cover": "out/_封面/073_谢谢老板.png",
+   "project": "out/projects/073.json",
+   "summary": "动作 鞠躬 · 表情 钱眼 · 特效 撒钱 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 74,
@@ -1259,7 +1405,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/074_辛苦了.gif",
-   "cover": "out/_封面/074_辛苦了.png"
+   "cover": "out/_封面/074_辛苦了.png",
+   "project": "out/projects/074.json",
+   "summary": "动作 游过来 · 表情 微笑 · 道具 咖啡 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 75,
@@ -1276,7 +1424,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/075_不客气.gif",
-   "cover": "out/_封面/075_不客气.png"
+   "cover": "out/_封面/075_不客气.png",
+   "project": "out/projects/075.json",
+   "summary": "动作 摇尾巴 · 表情 大笑 · 特效 小花 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 76,
@@ -1293,7 +1443,9 @@
    "style": "blue",
    "tmode": "stay",
    "gif": "out/076_对不起.gif",
-   "cover": "out/_封面/076_对不起.png"
+   "cover": "out/_封面/076_对不起.png",
+   "project": "out/projects/076.json",
+   "summary": "动作 鞠躬 · 表情 难过 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 77,
@@ -1310,7 +1462,9 @@
    "style": "pink",
    "tmode": "pop",
    "gif": "out/077_欢迎.gif",
-   "cover": "out/_封面/077_欢迎.png"
+   "cover": "out/_封面/077_欢迎.png",
+   "project": "out/projects/077.json",
+   "summary": "动作 欢呼 · 表情 大笑 · 特效 彩纸 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 78,
@@ -1329,7 +1483,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/078_欢迎新人.gif",
-   "cover": "out/_封面/078_欢迎新人.png"
+   "cover": "out/_封面/078_欢迎新人.png",
+   "project": "out/projects/078.json",
+   "summary": "动作 鼓掌 · 表情 开心 · 帽子 派对帽 · 特效 彩纸、提示条「加入了群聊」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 79,
@@ -1346,7 +1502,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/079_来了来了.gif",
-   "cover": "out/_封面/079_来了来了.png"
+   "cover": "out/_封面/079_来了来了.png",
+   "project": "out/projects/079.json",
+   "summary": "动作 狂奔 · 表情 坚定 · 特效 速度线 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 80,
@@ -1363,7 +1521,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/080_在吗.gif",
-   "cover": "out/_封面/080_在吗.png"
+   "cover": "out/_封面/080_在吗.png",
+   "project": "out/projects/080.json",
+   "summary": "动作 探头 · 表情 原版 · 特效 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 81,
@@ -1380,7 +1540,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/081_人呢.gif",
-   "cover": "out/_封面/081_人呢.png"
+   "cover": "out/_封面/081_人呢.png",
+   "project": "out/projects/081.json",
+   "summary": "动作 张望 · 表情 惊讶 · 特效 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 82,
@@ -1397,7 +1559,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/082_在干嘛.gif",
-   "cover": "out/_封面/082_在干嘛.png"
+   "cover": "out/_封面/082_在干嘛.png",
+   "project": "out/projects/082.json",
+   "summary": "动作 探头 · 表情 望天 · 特效 省略号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 83,
@@ -1414,7 +1578,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/083_好嘞.gif",
-   "cover": "out/_封面/083_好嘞.png"
+   "cover": "out/_封面/083_好嘞.png",
+   "project": "out/projects/083.json",
+   "summary": "动作 蹦跶 · 表情 咧嘴 · 特效 音符 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 84,
@@ -1429,7 +1595,9 @@
    "style": "red",
    "tmode": "zoom",
    "gif": "out/084_冲.gif",
-   "cover": "out/_封面/084_冲.png"
+   "cover": "out/_封面/084_冲.png",
+   "project": "out/projects/084.json",
+   "summary": "动作 起飞 · 表情 坚定 · 文字动画 冲击 · 60 帧 · 15 fps"
   },
   {
    "id": 85,
@@ -1447,7 +1615,9 @@
    "style": "red",
    "tmode": "zoom",
    "gif": "out/085_冲冲冲.gif",
-   "cover": "out/_封面/085_冲冲冲.png"
+   "cover": "out/_封面/085_冲冲冲.png",
+   "project": "out/projects/085.json",
+   "summary": "动作 狂奔 · 表情 坚定 · 特效 速度线、着火 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 86,
@@ -1466,7 +1636,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/086_加油.gif",
-   "cover": "out/_封面/086_加油.png"
+   "cover": "out/_封面/086_加油.png",
+   "project": "out/projects/086.json",
+   "summary": "动作 挥来挥去 · 表情 坚定 · 道具 小旗 · 帽子 头带 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 87,
@@ -1483,7 +1655,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/087_厉害.gif",
-   "cover": "out/_封面/087_厉害.png"
+   "cover": "out/_封面/087_厉害.png",
+   "project": "out/projects/087.json",
+   "summary": "动作 鼓掌 · 表情 星星眼 · 特效 环绕 星星、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 88,
@@ -1500,7 +1674,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/088_太强了.gif",
-   "cover": "out/_封面/088_太强了.png"
+   "cover": "out/_封面/088_太强了.png",
+   "project": "out/projects/088.json",
+   "summary": "动作 变大 · 表情 星星眼 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 89,
@@ -1517,7 +1693,9 @@
    "style": "gold",
    "tmode": "bounce",
    "gif": "out/089_666.gif",
-   "cover": "out/_封面/089_666.png"
+   "cover": "out/_封面/089_666.png",
+   "project": "out/projects/089.json",
+   "summary": "动作 鼓掌 · 表情 咧嘴 · 特效 烟花 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 90,
@@ -1534,7 +1712,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/090_好耶.gif",
-   "cover": "out/_封面/090_好耶.png"
+   "cover": "out/_封面/090_好耶.png",
+   "project": "out/projects/090.json",
+   "summary": "动作 跳水 · 表情 开心 · 特效 彩纸 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 91,
@@ -1549,7 +1729,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/091_哈哈哈.gif",
-   "cover": "out/_封面/091_哈哈哈.png"
+   "cover": "out/_封面/091_哈哈哈.png",
+   "project": "out/projects/091.json",
+   "summary": "动作 打滚 · 表情 笑出泪 · 特效 小星星 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 92,
@@ -1566,7 +1748,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/092_笑死.gif",
-   "cover": "out/_封面/092_笑死.png"
+   "cover": "out/_封面/092_笑死.png",
+   "project": "out/projects/092.json",
+   "summary": "动作 翻个身 · 表情 笑出泪 · 特效 宽面条泪、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 93,
@@ -1581,7 +1765,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/093_嘿嘿.gif",
-   "cover": "out/_封面/093_嘿嘿.png"
+   "cover": "out/_封面/093_嘿嘿.png",
+   "project": "out/projects/093.json",
+   "summary": "动作 摇尾巴 · 表情 得意 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 94,
@@ -1598,7 +1784,9 @@
    "style": "blue",
    "tmode": "droop",
    "gif": "out/094_呜呜.gif",
-   "cover": "out/_封面/094_呜呜.png"
+   "cover": "out/_封面/094_呜呜.png",
+   "project": "out/projects/094.json",
+   "summary": "动作 发呆 · 表情 大哭 · 特效 宽面条泪 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 95,
@@ -1615,7 +1803,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/095_哼.gif",
-   "cover": "out/_封面/095_哼.png"
+   "cover": "out/_封面/095_哼.png",
+   "project": "out/projects/095.json",
+   "summary": "动作 扭头不理 · 表情 嘟嘴 · 特效 怒 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 96,
@@ -1632,7 +1822,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/096_啊这.gif",
-   "cover": "out/_封面/096_啊这.png"
+   "cover": "out/_封面/096_啊这.png",
+   "project": "out/projects/096.json",
+   "summary": "动作 盯 · 表情 尴尬 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 97,
@@ -1649,7 +1841,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/097_啊？.gif",
-   "cover": "out/_封面/097_啊？.png"
+   "cover": "out/_封面/097_啊？.png",
+   "project": "out/projects/097.json",
+   "summary": "动作 凑近 · 表情 惊讶 · 特效 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 98,
@@ -1666,7 +1860,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/098_嗯？.gif",
-   "cover": "out/_封面/098_嗯？.png"
+   "cover": "out/_封面/098_嗯？.png",
+   "project": "out/projects/098.json",
+   "summary": "动作 歪头 · 表情 原版 · 特效 冒出 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 99,
@@ -1683,7 +1879,9 @@
    "style": "pink",
    "tmode": "zoom",
    "gif": "out/099_什么.gif",
-   "cover": "out/_封面/099_什么.png"
+   "cover": "out/_封面/099_什么.png",
+   "project": "out/projects/099.json",
+   "summary": "动作 变大 · 表情 吓一跳 · 特效 感叹号 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 100,
@@ -1700,7 +1898,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/100_真的吗.gif",
-   "cover": "out/_封面/100_真的吗.png"
+   "cover": "out/_封面/100_真的吗.png",
+   "project": "out/projects/100.json",
+   "summary": "动作 游过来 · 表情 星星眼 · 特效 问号、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 101,
@@ -1717,7 +1917,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/101_不会吧.gif",
-   "cover": "out/_封面/101_不会吧.png"
+   "cover": "out/_封面/101_不会吧.png",
+   "project": "out/projects/101.json",
+   "summary": "动作 往后一缩 · 表情 吓一跳 · 特效 震惊 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 102,
@@ -1734,7 +1936,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/102_绝了.gif",
-   "cover": "out/_封面/102_绝了.png"
+   "cover": "out/_封面/102_绝了.png",
+   "project": "out/projects/102.json",
+   "summary": "动作 横跳 · 表情 星星眼 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 103,
@@ -1751,7 +1955,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/103_可爱.gif",
-   "cover": "out/_封面/103_可爱.png"
+   "cover": "out/_封面/103_可爱.png",
+   "project": "out/projects/103.json",
+   "summary": "动作 摇尾巴 · 表情 爱心眼 · 特效 爱心 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 104,
@@ -1768,7 +1974,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/104_爱你.gif",
-   "cover": "out/_封面/104_爱你.png"
+   "cover": "out/_封面/104_爱你.png",
+   "project": "out/projects/104.json",
+   "summary": "动作 递给你 · 表情 爱心眼 · 道具 爱心 · 特效 爱心 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 105,
@@ -1786,7 +1994,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/105_贴贴.gif",
-   "cover": "out/_封面/105_贴贴.png"
+   "cover": "out/_封面/105_贴贴.png",
+   "project": "out/projects/105.json",
+   "summary": "动作 蹭蹭 · 表情 开心 · 特效 爱心、脸红 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 106,
@@ -1803,7 +2013,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/106_抱抱.gif",
-   "cover": "out/_封面/106_抱抱.png"
+   "cover": "out/_封面/106_抱抱.png",
+   "project": "out/projects/106.json",
+   "summary": "动作 欢呼 · 表情 泪汪汪 · 特效 爱心 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 107,
@@ -1820,7 +2032,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/107_摸摸头.gif",
-   "cover": "out/_封面/107_摸摸头.png"
+   "cover": "out/_封面/107_摸摸头.png",
+   "project": "out/projects/107.json",
+   "summary": "动作 蹭蹭 · 表情 开心 · 特效 小花 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 108,
@@ -1837,7 +2051,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/108_比心.gif",
-   "cover": "out/_封面/108_比心.png"
+   "cover": "out/_封面/108_比心.png",
+   "project": "out/projects/108.json",
+   "summary": "动作 果冻抖 · 表情 眨眼 · 道具 爱心 · 特效 飘 爱心、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 109,
@@ -1854,7 +2070,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/109_想你了.gif",
-   "cover": "out/_封面/109_想你了.png"
+   "cover": "out/_封面/109_想你了.png",
+   "project": "out/projects/109.json",
+   "summary": "动作 漂着 · 表情 泪汪汪 · 特效 爱心 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 110,
@@ -1871,7 +2089,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/110_吃了吗.gif",
-   "cover": "out/_封面/110_吃了吗.png"
+   "cover": "out/_封面/110_吃了吗.png",
+   "project": "out/projects/110.json",
+   "summary": "动作 冒出来 · 表情 微笑 · 特效 气泡 曲奇、小星星 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 111,
@@ -1888,7 +2108,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/111_起床.gif",
-   "cover": "out/_封面/111_起床.png"
+   "cover": "out/_封面/111_起床.png",
+   "project": "out/projects/111.json",
+   "summary": "动作 伸懒腰 · 表情 惊讶 · 特效 太阳 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 112,
@@ -1907,7 +2129,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/112_赖床.gif",
-   "cover": "out/_封面/112_赖床.png"
+   "cover": "out/_封面/112_赖床.png",
+   "project": "out/projects/112.json",
+   "summary": "动作 翻肚皮 · 表情 睡着 · 帽子 睡帽 · 特效 呼噜 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 113,
@@ -1924,7 +2148,9 @@
    "style": "pink",
    "tmode": "pop",
    "gif": "out/113_来啦.gif",
-   "cover": "out/_封面/113_来啦.png"
+   "cover": "out/_封面/113_来啦.png",
+   "project": "out/projects/113.json",
+   "summary": "动作 滑进来 · 表情 大笑 · 特效 闪光 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 114,
@@ -1941,7 +2167,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/114_我来了.gif",
-   "cover": "out/_封面/114_我来了.png"
+   "cover": "out/_封面/114_我来了.png",
+   "project": "out/projects/114.json",
+   "summary": "动作 起飞 · 表情 坚定 · 特效 闪光 · 文字动画 弹跳 · 60 帧 · 15 fps"
   },
   {
    "id": 115,
@@ -1958,7 +2186,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/115_给你.gif",
-   "cover": "out/_封面/115_给你.png"
+   "cover": "out/_封面/115_给你.png",
+   "project": "out/projects/115.json",
+   "summary": "动作 递给你 · 表情 开心 · 道具 礼物 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 116,
@@ -1973,7 +2203,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/116_送你.gif",
-   "cover": "out/_封面/116_送你.png"
+   "cover": "out/_封面/116_送你.png",
+   "project": "out/projects/116.json",
+   "summary": "动作 扑过来 · 表情 爱心眼 · 道具 花 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 117,
@@ -1990,7 +2222,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/117_干杯.gif",
-   "cover": "out/_封面/117_干杯.png"
+   "cover": "out/_封面/117_干杯.png",
+   "project": "out/projects/117.json",
+   "summary": "动作 喝 · 表情 大笑 · 道具 咖啡 · 特效 彩纸 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 118,
@@ -2007,7 +2241,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/118_收藏了.gif",
-   "cover": "out/_封面/118_收藏了.png"
+   "cover": "out/_封面/118_收藏了.png",
+   "project": "out/projects/118.json",
+   "summary": "动作 绕圈游 · 表情 星星眼 · 特效 飘 星星、小星星、提示条「已收藏」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 119,
@@ -2024,7 +2260,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/119_借过.gif",
-   "cover": "out/_封面/119_借过.png"
+   "cover": "out/_封面/119_借过.png",
+   "project": "out/projects/119.json",
+   "summary": "动作 溜走 · 表情 斜眼 · 特效 速度线 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 120,
@@ -2041,7 +2279,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/120_前排.gif",
-   "cover": "out/_封面/120_前排.png"
+   "cover": "out/_封面/120_前排.png",
+   "project": "out/projects/120.json",
+   "summary": "动作 蹦跶 · 表情 开心 · 特效 冒出 旗子、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 121,
@@ -2058,7 +2298,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/121_去忙了.gif",
-   "cover": "out/_封面/121_去忙了.png"
+   "cover": "out/_封面/121_去忙了.png",
+   "project": "out/projects/121.json",
+   "summary": "动作 溜走 · 表情 微笑 · 特效 速度线、小星星 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 122,
@@ -2075,7 +2317,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/122_开心.gif",
-   "cover": "out/_封面/122_开心.png"
+   "cover": "out/_封面/122_开心.png",
+   "project": "out/projects/122.json",
+   "summary": "动作 跳舞 · 表情 开心 · 特效 音符 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 123,
@@ -2092,7 +2336,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/123_好开心.gif",
-   "cover": "out/_封面/123_好开心.png"
+   "cover": "out/_封面/123_好开心.png",
+   "project": "out/projects/123.json",
+   "summary": "动作 横跳 · 表情 大笑 · 特效 小花 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 124,
@@ -2109,7 +2355,9 @@
    "style": "blue",
    "tmode": "droop",
    "gif": "out/124_难过.gif",
-   "cover": "out/_封面/124_难过.png"
+   "cover": "out/_封面/124_难过.png",
+   "project": "out/projects/124.json",
+   "summary": "动作 躲起来 · 表情 难过 · 特效 头顶下雨 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 125,
@@ -2127,7 +2375,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/125_emo了.gif",
-   "cover": "out/_封面/125_emo了.png"
+   "cover": "out/_封面/125_emo了.png",
+   "project": "out/projects/125.json",
+   "summary": "动作 漂着 · 表情 难过 · 特效 阴郁、头顶下雨 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 126,
@@ -2144,7 +2394,9 @@
    "style": "blue",
    "tmode": "stay",
    "gif": "out/126_委屈.gif",
-   "cover": "out/_封面/126_委屈.png"
+   "cover": "out/_封面/126_委屈.png",
+   "project": "out/projects/126.json",
+   "summary": "动作 缩小 · 表情 泪汪汪 · 特效 掉眼泪 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 127,
@@ -2162,7 +2414,9 @@
    "style": "red",
    "tmode": "shake",
    "gif": "out/127_生气.gif",
-   "cover": "out/_封面/127_生气.png"
+   "cover": "out/_封面/127_生气.png",
+   "project": "out/projects/127.json",
+   "summary": "动作 暴怒 · 表情 生气 · 特效 怒、冒烟 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 128,
@@ -2180,7 +2434,9 @@
    "style": "red",
    "tmode": "zoom",
    "gif": "out/128_气死了.gif",
-   "cover": "out/_封面/128_气死了.png"
+   "cover": "out/_封面/128_气死了.png",
+   "project": "out/projects/128.json",
+   "summary": "动作 鼓气 · 表情 暴怒 · 特效 冒烟、着火 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 129,
@@ -2198,7 +2454,9 @@
    "style": "pink",
    "tmode": "zoom",
    "gif": "out/129_震惊.gif",
-   "cover": "out/_封面/129_震惊.png"
+   "cover": "out/_封面/129_震惊.png",
+   "project": "out/projects/129.json",
+   "summary": "动作 变大 · 表情 吓一跳 · 特效 震惊、感叹号 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 130,
@@ -2215,7 +2473,9 @@
    "style": "blue",
    "tmode": "shiver",
    "gif": "out/130_害怕.gif",
-   "cover": "out/_封面/130_害怕.png"
+   "cover": "out/_封面/130_害怕.png",
+   "project": "out/projects/130.json",
+   "summary": "动作 发抖 · 表情 担心 · 特效 慌 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 131,
@@ -2232,7 +2492,9 @@
    "style": "pink",
    "tmode": "shiver",
    "gif": "out/131_尴尬.gif",
-   "cover": "out/_封面/131_尴尬.png"
+   "cover": "out/_封面/131_尴尬.png",
+   "project": "out/projects/131.json",
+   "summary": "动作 躲起来 · 表情 尴尬 · 特效 流汗 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 132,
@@ -2249,7 +2511,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/132_无语.gif",
-   "cover": "out/_封面/132_无语.png"
+   "cover": "out/_封面/132_无语.png",
+   "project": "out/projects/132.json",
+   "summary": "动作 盯 · 表情 无语 · 特效 省略号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 133,
@@ -2266,7 +2530,9 @@
    "style": "gray",
    "tmode": "shake",
    "gif": "out/133_裂开.gif",
-   "cover": "out/_封面/133_裂开.png"
+   "cover": "out/_封面/133_裂开.png",
+   "project": "out/projects/133.json",
+   "summary": "动作 石化 · 表情 用力 · 特效 闪电 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 134,
@@ -2283,7 +2549,9 @@
    "style": "blue",
    "tmode": "droop",
    "gif": "out/134_心碎.gif",
-   "cover": "out/_封面/134_心碎.png"
+   "cover": "out/_封面/134_心碎.png",
+   "project": "out/projects/134.json",
+   "summary": "动作 发呆 · 表情 抽泣 · 特效 心碎 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 135,
@@ -2301,7 +2569,9 @@
    "style": "red",
    "tmode": "shake",
    "gif": "out/135_崩溃.gif",
-   "cover": "out/_封面/135_崩溃.png"
+   "cover": "out/_封面/135_崩溃.png",
+   "project": "out/projects/135.json",
+   "summary": "动作 甩头 · 表情 用力 · 特效 闪电、慌 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 136,
@@ -2318,7 +2588,9 @@
    "style": "red",
    "tmode": "shake",
    "gif": "out/136_救命.gif",
-   "cover": "out/_封面/136_救命.png"
+   "cover": "out/_封面/136_救命.png",
+   "project": "out/projects/136.json",
+   "summary": "动作 发抖 · 表情 大哭 · 特效 慌 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 137,
@@ -2335,7 +2607,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/137_晕了.gif",
-   "cover": "out/_封面/137_晕了.png"
+   "cover": "out/_封面/137_晕了.png",
+   "project": "out/projects/137.json",
+   "summary": "动作 绕圈游 · 表情 晕 · 特效 冒金星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 138,
@@ -2352,7 +2626,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/138_困了.gif",
-   "cover": "out/_封面/138_困了.png"
+   "cover": "out/_封面/138_困了.png",
+   "project": "out/projects/138.json",
+   "summary": "动作 打瞌睡 · 表情 犯困 · 特效 呼噜 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 139,
@@ -2369,7 +2645,9 @@
    "style": "gray",
    "tmode": "droop",
    "gif": "out/139_累了.gif",
-   "cover": "out/_封面/139_累了.png"
+   "cover": "out/_封面/139_累了.png",
+   "project": "out/projects/139.json",
+   "summary": "动作 瘫着 · 表情 累了 · 特效 流汗 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 140,
@@ -2387,7 +2665,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/140_饿了.gif",
-   "cover": "out/_封面/140_饿了.png"
+   "cover": "out/_封面/140_饿了.png",
+   "project": "out/projects/140.json",
+   "summary": "动作 抬头 · 表情 流口水 · 特效 飘 苹果、飘 曲奇 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 141,
@@ -2406,7 +2686,9 @@
    "style": "blue",
    "tmode": "shiver",
    "gif": "out/141_好冷.gif",
-   "cover": "out/_封面/141_好冷.png"
+   "cover": "out/_封面/141_好冷.png",
+   "project": "out/projects/141.json",
+   "summary": "动作 发抖 · 表情 用力 · 帽子 冰袋 · 特效 下雪 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 142,
@@ -2424,7 +2706,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/142_好热.gif",
-   "cover": "out/_封面/142_好热.png"
+   "cover": "out/_封面/142_好热.png",
+   "project": "out/projects/142.json",
+   "summary": "动作 化了 · 表情 累了 · 特效 太阳、流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 143,
@@ -2441,7 +2725,9 @@
    "style": "green",
    "tmode": "stay",
    "gif": "out/143_酸了.gif",
-   "cover": "out/_封面/143_酸了.png"
+   "cover": "out/_封面/143_酸了.png",
+   "project": "out/projects/143.json",
+   "summary": "动作 扭头不理 · 表情 斜眼 · 特效 飘 柠檬 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 144,
@@ -2458,7 +2744,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/144_羡慕.gif",
-   "cover": "out/_封面/144_羡慕.png"
+   "cover": "out/_封面/144_羡慕.png",
+   "project": "out/projects/144.json",
+   "summary": "动作 抬头 · 表情 星星眼 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 145,
@@ -2477,7 +2765,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/145_得意.gif",
-   "cover": "out/_封面/145_得意.png"
+   "cover": "out/_封面/145_得意.png",
+   "project": "out/projects/145.json",
+   "summary": "动作 摇尾巴 · 表情 得意 · 帽子 王冠 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 146,
@@ -2494,7 +2784,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/146_害羞.gif",
-   "cover": "out/_封面/146_害羞.png"
+   "cover": "out/_封面/146_害羞.png",
+   "project": "out/projects/146.json",
+   "summary": "动作 害羞 · 表情 害羞 · 特效 脸红 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 147,
@@ -2511,7 +2803,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/147_疑惑.gif",
-   "cover": "out/_封面/147_疑惑.png"
+   "cover": "out/_封面/147_疑惑.png",
+   "project": "out/projects/147.json",
+   "summary": "动作 歪头 · 表情 望天 · 特效 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 148,
@@ -2528,7 +2822,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/148_思考中.gif",
-   "cover": "out/_封面/148_思考中.png"
+   "cover": "out/_封面/148_思考中.png",
+   "project": "out/projects/148.json",
+   "summary": "动作 思考 · 表情 望天 · 特效 省略号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 149,
@@ -2545,7 +2841,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/149_无聊.gif",
-   "cover": "out/_封面/149_无聊.png"
+   "cover": "out/_封面/149_无聊.png",
+   "project": "out/projects/149.json",
+   "summary": "动作 瘫着 · 表情 无语 · 特效 吐泡泡 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 150,
@@ -2562,7 +2860,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/150_好烦.gif",
-   "cover": "out/_封面/150_好烦.png"
+   "cover": "out/_封面/150_好烦.png",
+   "project": "out/projects/150.json",
+   "summary": "动作 拍水 · 表情 生气 · 特效 怒 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 151,
@@ -2579,7 +2879,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/151_头秃.gif",
-   "cover": "out/_封面/151_头秃.png"
+   "cover": "out/_封面/151_头秃.png",
+   "project": "out/projects/151.json",
+   "summary": "动作 敲键盘 · 表情 用力 · 特效 慌 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 152,
@@ -2594,7 +2896,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/152_摆烂.gif",
-   "cover": "out/_封面/152_摆烂.png"
+   "cover": "out/_封面/152_摆烂.png",
+   "project": "out/projects/152.json",
+   "summary": "动作 翻个身 · 表情 无语 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 153,
@@ -2611,7 +2915,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/153_躺平.gif",
-   "cover": "out/_封面/153_躺平.png"
+   "cover": "out/_封面/153_躺平.png",
+   "project": "out/projects/153.json",
+   "summary": "动作 仰泳 · 表情 开心 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 154,
@@ -2626,7 +2932,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/154_摸鱼.gif",
-   "cover": "out/_封面/154_摸鱼.png"
+   "cover": "out/_封面/154_摸鱼.png",
+   "project": "out/projects/154.json",
+   "summary": "动作 挥来挥去 · 表情 开心 · 道具 鱼 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 155,
@@ -2641,7 +2949,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/155_潜水.gif",
-   "cover": "out/_封面/155_潜水.png"
+   "cover": "out/_封面/155_潜水.png",
+   "project": "out/projects/155.json",
+   "summary": "动作 潜水 · 表情 原版 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 156,
@@ -2658,7 +2968,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/156_冒泡.gif",
-   "cover": "out/_封面/156_冒泡.png"
+   "cover": "out/_封面/156_冒泡.png",
+   "project": "out/projects/156.json",
+   "summary": "动作 浮上来，最后潜回去 · 表情 开心 · 特效 吐泡泡、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 157,
@@ -2675,7 +2987,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/157_溜了.gif",
-   "cover": "out/_封面/157_溜了.png"
+   "cover": "out/_封面/157_溜了.png",
+   "project": "out/projects/157.json",
+   "summary": "动作 溜走 · 表情 笑出泪 · 特效 速度线、小星星 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 158,
@@ -2693,7 +3007,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/158_跑路.gif",
-   "cover": "out/_封面/158_跑路.png"
+   "cover": "out/_封面/158_跑路.png",
+   "project": "out/projects/158.json",
+   "summary": "动作 溜走 · 表情 吓一跳 · 特效 速度线、流汗 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 159,
@@ -2710,7 +3026,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/159_寄了.gif",
-   "cover": "out/_封面/159_寄了.png"
+   "cover": "out/_封面/159_寄了.png",
+   "project": "out/projects/159.json",
+   "summary": "动作 晕倒 · 表情 寄 · 特效 灵魂出窍 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 160,
@@ -2728,7 +3046,9 @@
    "style": "red",
    "tmode": "shake",
    "gif": "out/160_完蛋.gif",
-   "cover": "out/_封面/160_完蛋.png"
+   "cover": "out/_封面/160_完蛋.png",
+   "project": "out/projects/160.json",
+   "summary": "动作 撒泼 · 表情 吓一跳 · 特效 慌、闪电 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 161,
@@ -2745,7 +3065,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/161_傻眼.gif",
-   "cover": "out/_封面/161_傻眼.png"
+   "cover": "out/_封面/161_傻眼.png",
+   "project": "out/projects/161.json",
+   "summary": "动作 凑近 · 表情 豆豆眼 · 特效 感叹号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 162,
@@ -2762,7 +3084,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/162_期待.gif",
-   "cover": "out/_封面/162_期待.png"
+   "cover": "out/_封面/162_期待.png",
+   "project": "out/projects/162.json",
+   "summary": "动作 果冻抖 · 表情 闪闪 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 163,
@@ -2780,7 +3104,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/163_兴奋.gif",
-   "cover": "out/_封面/163_兴奋.png"
+   "cover": "out/_封面/163_兴奋.png",
+   "project": "out/projects/163.json",
+   "summary": "动作 跳舞 · 表情 笑出泪 · 特效 音符、闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 164,
@@ -2798,7 +3124,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/164_感动.gif",
-   "cover": "out/_封面/164_感动.png"
+   "cover": "out/_封面/164_感动.png",
+   "project": "out/projects/164.json",
+   "summary": "动作 发呆 · 表情 泪汪汪 · 特效 掉眼泪、爱心 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 165,
@@ -2815,7 +3143,9 @@
    "style": "blue",
    "tmode": "shake",
    "gif": "out/165_大哭.gif",
-   "cover": "out/_封面/165_大哭.png"
+   "cover": "out/_封面/165_大哭.png",
+   "project": "out/projects/165.json",
+   "summary": "动作 发抖 · 表情 大哭 · 特效 宽面条泪 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 166,
@@ -2832,7 +3162,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/166_偷笑.gif",
-   "cover": "out/_封面/166_偷笑.png"
+   "cover": "out/_封面/166_偷笑.png",
+   "project": "out/projects/166.json",
+   "summary": "动作 探头 · 表情 笑出泪 · 特效 脸红、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 167,
@@ -2851,7 +3183,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/167_坏笑.gif",
-   "cover": "out/_封面/167_坏笑.png"
+   "cover": "out/_封面/167_坏笑.png",
+   "project": "out/projects/167.json",
+   "summary": "动作 晃脑袋 · 表情 得意 · 帽子 小恶魔角 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 168,
@@ -2866,7 +3200,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/168_吃瓜.gif",
-   "cover": "out/_封面/168_吃瓜.png"
+   "cover": "out/_封面/168_吃瓜.png",
+   "project": "out/projects/168.json",
+   "summary": "动作 啃 · 表情 干饭 · 道具 西瓜 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 169,
@@ -2881,7 +3217,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/169_看戏.gif",
-   "cover": "out/_封面/169_看戏.png"
+   "cover": "out/_封面/169_看戏.png",
+   "project": "out/projects/169.json",
+   "summary": "动作 啃 · 表情 得意 · 道具 爆米花 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 170,
@@ -2898,7 +3236,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/170_点赞.gif",
-   "cover": "out/_封面/170_点赞.png"
+   "cover": "out/_封面/170_点赞.png",
+   "project": "out/projects/170.json",
+   "summary": "动作 点头 · 表情 开心 · 特效 飘 赞、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 171,
@@ -2915,7 +3255,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/171_鼓掌.gif",
-   "cover": "out/_封面/171_鼓掌.png"
+   "cover": "out/_封面/171_鼓掌.png",
+   "project": "out/projects/171.json",
+   "summary": "动作 鼓掌 · 表情 开心 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 172,
@@ -2932,7 +3274,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/172_撒花.gif",
-   "cover": "out/_封面/172_撒花.png"
+   "cover": "out/_封面/172_撒花.png",
+   "project": "out/projects/172.json",
+   "summary": "动作 欢呼 · 表情 大笑 · 特效 掉落 花 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 173,
@@ -2951,7 +3295,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/173_庆祝.gif",
-   "cover": "out/_封面/173_庆祝.png"
+   "cover": "out/_封面/173_庆祝.png",
+   "project": "out/projects/173.json",
+   "summary": "动作 跳水 · 表情 大笑 · 帽子 派对帽 · 特效 烟花 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 174,
@@ -2968,7 +3314,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/174_恭喜.gif",
-   "cover": "out/_封面/174_恭喜.png"
+   "cover": "out/_封面/174_恭喜.png",
+   "project": "out/projects/174.json",
+   "summary": "动作 鼓掌 · 表情 开心 · 特效 彩纸 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 175,
@@ -2985,7 +3333,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/175_发财.gif",
-   "cover": "out/_封面/175_发财.png"
+   "cover": "out/_封面/175_发财.png",
+   "project": "out/projects/175.json",
+   "summary": "动作 绕圈游 · 表情 钱眼 · 特效 撒钱 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 176,
@@ -3003,7 +3353,9 @@
    "style": "gold",
    "tmode": "bounce",
    "gif": "out/176_暴富.gif",
-   "cover": "out/_封面/176_暴富.png"
+   "cover": "out/_封面/176_暴富.png",
+   "project": "out/projects/176.json",
+   "summary": "动作 转圈 · 表情 钱眼 · 特效 撒钱、飘 钞票 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 177,
@@ -3021,7 +3373,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/177_许愿.gif",
-   "cover": "out/_封面/177_许愿.png"
+   "cover": "out/_封面/177_许愿.png",
+   "project": "out/projects/177.json",
+   "summary": "动作 鞠躬 · 表情 睡着 · 特效 闪光、飘 星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 178,
@@ -3036,7 +3390,9 @@
    "style": "pink",
    "tmode": "droop",
    "gif": "out/178_求求了.gif",
-   "cover": "out/_封面/178_求求了.png"
+   "cover": "out/_封面/178_求求了.png",
+   "project": "out/projects/178.json",
+   "summary": "动作 磕头 · 表情 泪汪汪 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 179,
@@ -3053,7 +3409,9 @@
    "style": "blue",
    "tmode": "stay",
    "gif": "out/179_可怜.gif",
-   "cover": "out/_封面/179_可怜.png"
+   "cover": "out/_封面/179_可怜.png",
+   "project": "out/projects/179.json",
+   "summary": "动作 缩小 · 表情 泪汪汪 · 特效 头顶下雨 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 180,
@@ -3070,7 +3428,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/180_我不听.gif",
-   "cover": "out/_封面/180_我不听.png"
+   "cover": "out/_封面/180_我不听.png",
+   "project": "out/projects/180.json",
+   "summary": "动作 晃脑袋 · 表情 专注 · 特效 音符 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 181,
@@ -3089,7 +3449,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/181_起不来.gif",
-   "cover": "out/_封面/181_起不来.png"
+   "cover": "out/_封面/181_起不来.png",
+   "project": "out/projects/181.json",
+   "summary": "动作 打瞌睡 · 表情 睡着 · 帽子 睡帽 · 特效 呼噜 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 182,
@@ -3106,7 +3468,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/182_再睡会.gif",
-   "cover": "out/_封面/182_再睡会.png"
+   "cover": "out/_封面/182_再睡会.png",
+   "project": "out/projects/182.json",
+   "summary": "动作 仰泳 · 表情 睡着 · 特效 呼噜 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 183,
@@ -3123,7 +3487,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/183_失眠.gif",
-   "cover": "out/_封面/183_失眠.png"
+   "cover": "out/_封面/183_失眠.png",
+   "project": "out/projects/183.json",
+   "summary": "动作 盯 · 表情 累了 · 特效 月亮 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 184,
@@ -3140,7 +3506,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/184_熬夜.gif",
-   "cover": "out/_封面/184_熬夜.png"
+   "cover": "out/_封面/184_熬夜.png",
+   "project": "out/projects/184.json",
+   "summary": "动作 敲键盘 · 表情 累了 · 特效 月亮 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 185,
@@ -3157,7 +3525,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/185_养生.gif",
-   "cover": "out/_封面/185_养生.png"
+   "cover": "out/_封面/185_养生.png",
+   "project": "out/projects/185.json",
+   "summary": "动作 喝 · 表情 微笑 · 道具 咖啡 · 帽子 毛巾 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 186,
@@ -3174,7 +3544,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/186_离谱.gif",
-   "cover": "out/_封面/186_离谱.png"
+   "cover": "out/_封面/186_离谱.png",
+   "project": "out/projects/186.json",
+   "summary": "动作 往后一缩 · 表情 晕 · 特效 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 187,
@@ -3191,7 +3563,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/187_真香.gif",
-   "cover": "out/_封面/187_真香.png"
+   "cover": "out/_封面/187_真香.png",
+   "project": "out/projects/187.json",
+   "summary": "动作 啃 · 表情 流口水 · 道具 苹果 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 188,
@@ -3208,7 +3582,9 @@
    "style": "blue",
    "tmode": "droop",
    "gif": "out/188_我太难了.gif",
-   "cover": "out/_封面/188_我太难了.png"
+   "cover": "out/_封面/188_我太难了.png",
+   "project": "out/projects/188.json",
+   "summary": "动作 化了 · 表情 抽泣 · 特效 头顶下雨 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 189,
@@ -3225,7 +3601,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/189_人麻了.gif",
-   "cover": "out/_封面/189_人麻了.png"
+   "cover": "out/_封面/189_人麻了.png",
+   "project": "out/projects/189.json",
+   "summary": "动作 石化 · 表情 放空 · 特效 闪电 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 190,
@@ -3242,7 +3620,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/190_妙啊.gif",
-   "cover": "out/_封面/190_妙啊.png"
+   "cover": "out/_封面/190_妙啊.png",
+   "project": "out/projects/190.json",
+   "summary": "动作 果冻抖 · 表情 星星眼 · 特效 灵光一闪、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 191,
@@ -3259,7 +3639,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/191_你说得对.gif",
-   "cover": "out/_封面/191_你说得对.png"
+   "cover": "out/_封面/191_你说得对.png",
+   "project": "out/projects/191.json",
+   "summary": "动作 点头 · 表情 微笑 · 特效 对勾、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 192,
@@ -3276,7 +3658,9 @@
    "style": "blue",
    "tmode": "stay",
    "gif": "out/192_我错了.gif",
-   "cover": "out/_封面/192_我错了.png"
+   "cover": "out/_封面/192_我错了.png",
+   "project": "out/projects/192.json",
+   "summary": "动作 躲起来 · 表情 泪汪汪 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 193,
@@ -3294,7 +3678,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/193_等等我.gif",
-   "cover": "out/_封面/193_等等我.png"
+   "cover": "out/_封面/193_等等我.png",
+   "project": "out/projects/193.json",
+   "summary": "动作 狂奔 · 表情 担心 · 特效 速度线、流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 194,
@@ -3311,7 +3697,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/194_慢慢来.gif",
-   "cover": "out/_封面/194_慢慢来.png"
+   "cover": "out/_封面/194_慢慢来.png",
+   "project": "out/projects/194.json",
+   "summary": "动作 漂着 · 表情 微笑 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 195,
@@ -3328,7 +3716,9 @@
    "style": "cyan",
    "tmode": "stay",
    "gif": "out/195_冷静.gif",
-   "cover": "out/_封面/195_冷静.png"
+   "cover": "out/_封面/195_冷静.png",
+   "project": "out/projects/195.json",
+   "summary": "动作 摇摆 · 表情 专注 · 特效 下雪 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 196,
@@ -3345,7 +3735,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/196_淡定.gif",
-   "cover": "out/_封面/196_淡定.png"
+   "cover": "out/_封面/196_淡定.png",
+   "project": "out/projects/196.json",
+   "summary": "动作 喝 · 表情 淡定 · 道具 咖啡 · 帽子 墨镜 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 197,
@@ -3360,7 +3752,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/197_盯.gif",
-   "cover": "out/_封面/197_盯.png"
+   "cover": "out/_封面/197_盯.png",
+   "project": "out/projects/197.json",
+   "summary": "动作 凑近 · 表情 特制 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 198,
@@ -3377,7 +3771,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/198_看我.gif",
-   "cover": "out/_封面/198_看我.png"
+   "cover": "out/_封面/198_看我.png",
+   "project": "out/projects/198.json",
+   "summary": "动作 凑近 · 表情 星星眼 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 199,
@@ -3396,7 +3792,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/199_帅.gif",
-   "cover": "out/_封面/199_帅.png"
+   "cover": "out/_封面/199_帅.png",
+   "project": "out/projects/199.json",
+   "summary": "动作 登场 · 表情 淡定 · 帽子 墨镜 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 200,
@@ -3413,7 +3811,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/200_哇.gif",
-   "cover": "out/_封面/200_哇.png"
+   "cover": "out/_封面/200_哇.png",
+   "project": "out/projects/200.json",
+   "summary": "动作 变大 · 表情 星星眼 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 201,
@@ -3430,7 +3830,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/201_哇哦.gif",
-   "cover": "out/_封面/201_哇哦.png"
+   "cover": "out/_封面/201_哇哦.png",
+   "project": "out/projects/201.json",
+   "summary": "动作 扑过来 · 表情 惊讶 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 202,
@@ -3447,7 +3849,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/202_诶嘿.gif",
-   "cover": "out/_封面/202_诶嘿.png"
+   "cover": "out/_封面/202_诶嘿.png",
+   "project": "out/projects/202.json",
+   "summary": "动作 歪头 · 表情 眨眼 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 203,
@@ -3462,7 +3866,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/203_略略略.gif",
-   "cover": "out/_封面/203_略略略.png"
+   "cover": "out/_封面/203_略略略.png",
+   "project": "out/projects/203.json",
+   "summary": "动作 摇头 · 表情 吐舌头 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 204,
@@ -3479,7 +3885,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/204_才不是.gif",
-   "cover": "out/_封面/204_才不是.png"
+   "cover": "out/_封面/204_才不是.png",
+   "project": "out/projects/204.json",
+   "summary": "动作 扭头不理 · 表情 嘟嘴 · 特效 脸红 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 205,
@@ -3496,7 +3904,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/205_傲娇.gif",
-   "cover": "out/_封面/205_傲娇.png"
+   "cover": "out/_封面/205_傲娇.png",
+   "project": "out/projects/205.json",
+   "summary": "动作 害羞 · 表情 嘟嘴 · 特效 脸红 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 206,
@@ -3513,7 +3923,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/206_哈？.gif",
-   "cover": "out/_封面/206_哈？.png"
+   "cover": "out/_封面/206_哈？.png",
+   "project": "out/projects/206.json",
+   "summary": "动作 凑近 · 表情 无语 · 特效 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 207,
@@ -3528,7 +3940,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/207_服了.gif",
-   "cover": "out/_封面/207_服了.png"
+   "cover": "out/_封面/207_服了.png",
+   "project": "out/projects/207.json",
+   "summary": "动作 被砸扁 · 表情 无语 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 208,
@@ -3546,7 +3960,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/208_绝绝子.gif",
-   "cover": "out/_封面/208_绝绝子.png"
+   "cover": "out/_封面/208_绝绝子.png",
+   "project": "out/projects/208.json",
+   "summary": "动作 跳舞 · 表情 星星眼 · 特效 闪光、音符 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 209,
@@ -3563,7 +3979,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/209_芜湖.gif",
-   "cover": "out/_封面/209_芜湖.png"
+   "cover": "out/_封面/209_芜湖.png",
+   "project": "out/projects/209.json",
+   "summary": "动作 起飞 · 表情 大笑 · 特效 闪光 · 文字动画 弹跳 · 60 帧 · 15 fps"
   },
   {
    "id": 210,
@@ -3580,7 +3998,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/210_冲鸭.gif",
-   "cover": "out/_封面/210_冲鸭.png"
+   "cover": "out/_封面/210_冲鸭.png",
+   "project": "out/projects/210.json",
+   "summary": "动作 狂奔 · 表情 坚定 · 特效 速度线 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 211,
@@ -3599,7 +4019,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/211_稳了.gif",
-   "cover": "out/_封面/211_稳了.png"
+   "cover": "out/_封面/211_稳了.png",
+   "project": "out/projects/211.json",
+   "summary": "动作 浮浮沉沉 · 表情 淡定 · 帽子 墨镜 · 特效 对勾、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 212,
@@ -3616,7 +4038,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/212_悬了.gif",
-   "cover": "out/_封面/212_悬了.png"
+   "cover": "out/_封面/212_悬了.png",
+   "project": "out/projects/212.json",
+   "summary": "动作 浮浮沉沉 · 表情 担心 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 213,
@@ -3633,7 +4057,9 @@
    "style": "pink",
    "tmode": "shake",
    "gif": "out/213_慌了.gif",
-   "cover": "out/_封面/213_慌了.png"
+   "cover": "out/_封面/213_慌了.png",
+   "project": "out/projects/213.json",
+   "summary": "动作 发抖 · 表情 吓一跳 · 特效 慌 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 214,
@@ -3652,7 +4078,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/214_别慌.gif",
-   "cover": "out/_封面/214_别慌.png"
+   "cover": "out/_封面/214_别慌.png",
+   "project": "out/projects/214.json",
+   "summary": "动作 浮浮沉沉 · 表情 淡定 · 帽子 眼镜 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 215,
@@ -3669,7 +4097,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/215_大问题.gif",
-   "cover": "out/_封面/215_大问题.png"
+   "cover": "out/_封面/215_大问题.png",
+   "project": "out/projects/215.json",
+   "summary": "动作 变大 · 表情 吓一跳 · 特效 感叹号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 216,
@@ -3686,7 +4116,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/216_想要.gif",
-   "cover": "out/_封面/216_想要.png"
+   "cover": "out/_封面/216_想要.png",
+   "project": "out/projects/216.json",
+   "summary": "动作 盯 · 表情 闪闪 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 217,
@@ -3705,7 +4137,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/217_冲浪.gif",
-   "cover": "out/_封面/217_冲浪.png"
+   "cover": "out/_封面/217_冲浪.png",
+   "project": "out/projects/217.json",
+   "summary": "动作 漂着 · 表情 淡定 · 帽子 墨镜 · 特效 吐泡泡、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 218,
@@ -3722,7 +4156,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/218_唉.gif",
-   "cover": "out/_封面/218_唉.png"
+   "cover": "out/_封面/218_唉.png",
+   "project": "out/projects/218.json",
+   "summary": "动作 瘫着 · 表情 难过 · 特效 省略号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 219,
@@ -3739,7 +4175,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/219_挖矿.gif",
-   "cover": "out/_封面/219_挖矿.png"
+   "cover": "out/_封面/219_挖矿.png",
+   "project": "out/projects/219.json",
+   "summary": "动作 挥工具 · 表情 专注 · 道具 钻石镐 · 帽子 矿工帽 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 220,
@@ -3756,7 +4194,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/220_挖到钻石.gif",
-   "cover": "out/_封面/220_挖到钻石.png"
+   "cover": "out/_封面/220_挖到钻石.png",
+   "project": "out/projects/220.json",
+   "summary": "动作 空翻 · 表情 星星眼 · 特效 飘 钻石、小星星、提示条「获得钻石！」 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 221,
@@ -3773,7 +4213,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/221_钻石!.gif",
-   "cover": "out/_封面/221_钻石!.png"
+   "cover": "out/_封面/221_钻石!.png",
+   "project": "out/projects/221.json",
+   "summary": "动作 递给你 · 表情 闪闪 · 道具 钻石 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 222,
@@ -3790,7 +4232,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/222_下矿.gif",
-   "cover": "out/_封面/222_下矿.png"
+   "cover": "out/_封面/222_下矿.png",
+   "project": "out/projects/222.json",
+   "summary": "动作 潜水 · 表情 坚定 · 帽子 矿工帽 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 223,
@@ -3807,7 +4251,9 @@
    "style": "green",
    "tmode": "stay",
    "gif": "out/223_苦力怕.gif",
-   "cover": "out/_封面/223_苦力怕.png"
+   "cover": "out/_封面/223_苦力怕.png",
+   "project": "out/projects/223.json",
+   "summary": "动作 往后一缩 · 表情 吓一跳 · 特效 挂着 苦力怕 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 224,
@@ -3825,7 +4271,9 @@
    "style": "green",
    "tmode": "stay",
    "gif": "out/224_嘶嘶嘶.gif",
-   "cover": "out/_封面/224_嘶嘶嘶.png"
+   "cover": "out/_封面/224_嘶嘶嘶.png",
+   "project": "out/projects/224.json",
+   "summary": "动作 扭头不理 · 表情 豆豆眼 · 特效 冒出 苦力怕、闪光灯 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 225,
@@ -3842,7 +4290,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/225_炸了.gif",
-   "cover": "out/_封面/225_炸了.png"
+   "cover": "out/_封面/225_炸了.png",
+   "project": "out/projects/225.json",
+   "summary": "动作 晕倒 · 表情 寄 · 特效 爆炸、提示条「被苦力怕炸死了」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 226,
@@ -3860,7 +4310,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/226_家没了.gif",
-   "cover": "out/_封面/226_家没了.png"
+   "cover": "out/_封面/226_家没了.png",
+   "project": "out/projects/226.json",
+   "summary": "动作 发呆 · 表情 抽泣 · 特效 爆炸、宽面条泪 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 227,
@@ -3877,7 +4329,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/227_建家.gif",
-   "cover": "out/_封面/227_建家.png"
+   "cover": "out/_封面/227_建家.png",
+   "project": "out/projects/227.json",
+   "summary": "动作 横跳 · 表情 开心 · 道具 草方块 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 228,
@@ -3892,7 +4346,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/228_种地.gif",
-   "cover": "out/_封面/228_种地.png"
+   "cover": "out/_封面/228_种地.png",
+   "project": "out/projects/228.json",
+   "summary": "动作 晃脑袋 · 表情 开心 · 道具 胡萝卜 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 229,
@@ -3909,7 +4365,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/229_钓鱼.gif",
-   "cover": "out/_封面/229_钓鱼.png"
+   "cover": "out/_封面/229_钓鱼.png",
+   "project": "out/projects/229.json",
+   "summary": "动作 挥来挥去 · 表情 专注 · 道具 钓竿 · 特效 飘 鱼 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 230,
@@ -3924,7 +4382,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/230_打怪.gif",
-   "cover": "out/_封面/230_打怪.png"
+   "cover": "out/_封面/230_打怪.png",
+   "project": "out/projects/230.json",
+   "summary": "动作 挥工具 · 表情 生气 · 道具 钻石剑 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 231,
@@ -3941,7 +4401,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/231_屠龙.gif",
-   "cover": "out/_封面/231_屠龙.png"
+   "cover": "out/_封面/231_屠龙.png",
+   "project": "out/projects/231.json",
+   "summary": "动作 挥工具 · 表情 坚定 · 道具 钻石剑 · 特效 着火 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 232,
@@ -3958,7 +4420,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/232_去下界.gif",
-   "cover": "out/_封面/232_去下界.png"
+   "cover": "out/_封面/232_去下界.png",
+   "project": "out/projects/232.json",
+   "summary": "动作 溜走 · 表情 坚定 · 特效 着火 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 233,
@@ -3975,7 +4439,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/233_去末地.gif",
-   "cover": "out/_封面/233_去末地.png"
+   "cover": "out/_封面/233_去末地.png",
+   "project": "out/projects/233.json",
+   "summary": "动作 起飞 · 表情 星星眼 · 特效 闪光 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 234,
@@ -3992,7 +4458,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/234_红石.gif",
-   "cover": "out/_封面/234_红石.png"
+   "cover": "out/_封面/234_红石.png",
+   "project": "out/projects/234.json",
+   "summary": "动作 抬头 · 表情 星星眼 · 道具 红石火把 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 235,
@@ -4009,7 +4477,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/235_附魔.gif",
-   "cover": "out/_封面/235_附魔.png"
+   "cover": "out/_封面/235_附魔.png",
+   "project": "out/projects/235.json",
+   "summary": "动作 转圈 · 表情 星星眼 · 道具 书 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 236,
@@ -4026,7 +4496,9 @@
    "style": "red",
    "tmode": "shake",
    "gif": "out/236_掉岩浆.gif",
-   "cover": "out/_封面/236_掉岩浆.png"
+   "cover": "out/_封面/236_掉岩浆.png",
+   "project": "out/projects/236.json",
+   "summary": "动作 撒泼 · 表情 吓一跳 · 特效 着火、提示条「试图在熔岩里游泳」 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 237,
@@ -4043,7 +4515,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/237_迷路了.gif",
-   "cover": "out/_封面/237_迷路了.png"
+   "cover": "out/_封面/237_迷路了.png",
+   "project": "out/projects/237.json",
+   "summary": "动作 张望 · 表情 担心 · 特效 问号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 238,
@@ -4060,7 +4534,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/238_别挖脚下.gif",
-   "cover": "out/_封面/238_别挖脚下.png"
+   "cover": "out/_封面/238_别挖脚下.png",
+   "project": "out/projects/238.json",
+   "summary": "动作 摇头 · 表情 吓一跳 · 特效 挂着 感叹号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 239,
@@ -4077,7 +4553,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/239_天亮了.gif",
-   "cover": "out/_封面/239_天亮了.png"
+   "cover": "out/_封面/239_天亮了.png",
+   "project": "out/projects/239.json",
+   "summary": "动作 伸懒腰 · 表情 开心 · 特效 太阳、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 240,
@@ -4094,7 +4572,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/240_天黑了.gif",
-   "cover": "out/_封面/240_天黑了.png"
+   "cover": "out/_封面/240_天黑了.png",
+   "project": "out/projects/240.json",
+   "summary": "动作 躲起来 · 表情 担心 · 特效 月亮 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 241,
@@ -4111,7 +4591,9 @@
    "style": "green",
    "tmode": "stay",
    "gif": "out/241_复活了.gif",
-   "cover": "out/_封面/241_复活了.png"
+   "cover": "out/_封面/241_复活了.png",
+   "project": "out/projects/241.json",
+   "summary": "动作 冒出来 · 表情 星星眼 · 特效 闪光、提示条「已重生」 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 242,
@@ -4126,7 +4608,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/242_找村庄.gif",
-   "cover": "out/_封面/242_找村庄.png"
+   "cover": "out/_封面/242_找村庄.png",
+   "project": "out/projects/242.json",
+   "summary": "动作 拿放大镜找 · 表情 专注 · 道具 放大镜 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 243,
@@ -4143,7 +4627,9 @@
    "style": "green",
    "tmode": "stay",
    "gif": "out/243_交易.gif",
-   "cover": "out/_封面/243_交易.png"
+   "cover": "out/_封面/243_交易.png",
+   "project": "out/projects/243.json",
+   "summary": "动作 登场 · 表情 钱眼 · 道具 绿宝石 · 特效 闪光、提示条「交易成功」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 244,
@@ -4160,7 +4646,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/244_掉线了.gif",
-   "cover": "out/_封面/244_掉线了.png"
+   "cover": "out/_封面/244_掉线了.png",
+   "project": "out/projects/244.json",
+   "summary": "动作 卡了 · 表情 吓一跳 · 特效 冒出 叉、提示条「连接已丢失」 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 245,
@@ -4178,7 +4666,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/245_开光影.gif",
-   "cover": "out/_封面/245_开光影.png"
+   "cover": "out/_封面/245_开光影.png",
+   "project": "out/projects/245.json",
+   "summary": "动作 转圈 · 表情 星星眼 · 特效 闪光、太阳 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 246,
@@ -4195,7 +4685,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/246_装模组.gif",
-   "cover": "out/_封面/246_装模组.png"
+   "cover": "out/_封面/246_装模组.png",
+   "project": "out/projects/246.json",
+   "summary": "动作 敲键盘 · 表情 星星眼 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 247,
@@ -4210,7 +4702,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/247_整合包.gif",
-   "cover": "out/_封面/247_整合包.png"
+   "cover": "out/_封面/247_整合包.png",
+   "project": "out/projects/247.json",
+   "summary": "动作 冒出来 · 表情 开心 · 道具 礼物 · 特效 小星星 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 248,
@@ -4229,7 +4723,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/248_换皮肤.gif",
-   "cover": "out/_封面/248_换皮肤.png"
+   "cover": "out/_封面/248_换皮肤.png",
+   "project": "out/projects/248.json",
+   "summary": "动作 转圈 · 表情 大笑 · 帽子 蝴蝶结 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 249,
@@ -4246,7 +4742,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/249_一起玩.gif",
-   "cover": "out/_封面/249_一起玩.png"
+   "cover": "out/_封面/249_一起玩.png",
+   "project": "out/projects/249.json",
+   "summary": "动作 欢呼 · 表情 开心 · 特效 飘 手柄、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 250,
@@ -4263,7 +4761,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/250_GG.gif",
-   "cover": "out/_封面/250_GG.png"
+   "cover": "out/_封面/250_GG.png",
+   "project": "out/projects/250.json",
+   "summary": "动作 晕倒 · 表情 寄 · 特效 灵魂出窍、提示条「你死了！」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 251,
@@ -4280,7 +4780,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/251_喝药水.gif",
-   "cover": "out/_封面/251_喝药水.png"
+   "cover": "out/_封面/251_喝药水.png",
+   "project": "out/projects/251.json",
+   "summary": "动作 果冻抖 · 表情 星星眼 · 道具 药水 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 252,
@@ -4297,7 +4799,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/252_有TNT.gif",
-   "cover": "out/_封面/252_有TNT.png"
+   "cover": "out/_封面/252_有TNT.png",
+   "project": "out/projects/252.json",
+   "summary": "动作 发抖 · 表情 吓一跳 · 道具 TNT · 特效 感叹号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 253,
@@ -4312,7 +4816,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/253_上班.gif",
-   "cover": "out/_封面/253_上班.png"
+   "cover": "out/_封面/253_上班.png",
+   "project": "out/projects/253.json",
+   "summary": "动作 化了 · 表情 累了 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 254,
@@ -4329,7 +4835,9 @@
    "style": "green",
    "tmode": "stay",
    "gif": "out/254_下班.gif",
-   "cover": "out/_封面/254_下班.png"
+   "cover": "out/_封面/254_下班.png",
+   "project": "out/projects/254.json",
+   "summary": "动作 起飞 · 表情 大笑 · 特效 闪光 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 255,
@@ -4346,7 +4854,9 @@
    "style": "pink",
    "tmode": "bounce",
    "gif": "out/255_下班啦.gif",
-   "cover": "out/_封面/255_下班啦.png"
+   "cover": "out/_封面/255_下班啦.png",
+   "project": "out/projects/255.json",
+   "summary": "动作 空翻 · 表情 开心 · 特效 彩纸 · 文字动画 蹦回来，再接着… · 60 帧 · 15 fps"
   },
   {
    "id": 256,
@@ -4363,7 +4873,9 @@
    "style": "purple",
    "tmode": "stay",
    "gif": "out/256_加班.gif",
-   "cover": "out/_封面/256_加班.png"
+   "cover": "out/_封面/256_加班.png",
+   "project": "out/projects/256.json",
+   "summary": "动作 敲键盘 · 表情 大哭 · 特效 月亮 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 257,
@@ -4380,7 +4892,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/257_开会.gif",
-   "cover": "out/_封面/257_开会.png"
+   "cover": "out/_封面/257_开会.png",
+   "project": "out/projects/257.json",
+   "summary": "动作 打瞌睡 · 表情 犯困 · 特效 省略号 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 258,
@@ -4397,7 +4911,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/258_打工.gif",
-   "cover": "out/_封面/258_打工.png"
+   "cover": "out/_封面/258_打工.png",
+   "project": "out/projects/258.json",
+   "summary": "动作 挥工具 · 表情 累了 · 道具 钻石镐 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 259,
@@ -4414,7 +4930,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/259_搬砖.gif",
-   "cover": "out/_封面/259_搬砖.png"
+   "cover": "out/_封面/259_搬砖.png",
+   "project": "out/projects/259.json",
+   "summary": "动作 被砸扁 · 表情 用力 · 道具 砖 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 260,
@@ -4431,7 +4949,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/260_干饭.gif",
-   "cover": "out/_封面/260_干饭.png"
+   "cover": "out/_封面/260_干饭.png",
+   "project": "out/projects/260.json",
+   "summary": "动作 啃 · 表情 干饭 · 道具 饭碗 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 261,
@@ -4448,7 +4968,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/261_点外卖.gif",
-   "cover": "out/_封面/261_点外卖.png"
+   "cover": "out/_封面/261_点外卖.png",
+   "project": "out/projects/261.json",
+   "summary": "动作 思考 · 表情 流口水 · 特效 气泡 曲奇、提示条「骑手已接单」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 262,
@@ -4465,7 +4987,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/262_奶茶.gif",
-   "cover": "out/_封面/262_奶茶.png"
+   "cover": "out/_封面/262_奶茶.png",
+   "project": "out/projects/262.json",
+   "summary": "动作 喝 · 表情 开心 · 道具 奶茶 · 特效 爱心 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 263,
@@ -4482,7 +5006,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/263_多喝水.gif",
-   "cover": "out/_封面/263_多喝水.png"
+   "cover": "out/_封面/263_多喝水.png",
+   "project": "out/projects/263.json",
+   "summary": "动作 浮浮沉沉 · 表情 眨眼 · 道具 咖啡 · 特效 吐泡泡、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 264,
@@ -4499,7 +5025,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/264_咖啡续命.gif",
-   "cover": "out/_封面/264_咖啡续命.png"
+   "cover": "out/_封面/264_咖啡续命.png",
+   "project": "out/projects/264.json",
+   "summary": "动作 喝 · 表情 累了 · 道具 咖啡 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 265,
@@ -4516,7 +5044,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/265_学习.gif",
-   "cover": "out/_封面/265_学习.png"
+   "cover": "out/_封面/265_学习.png",
+   "project": "out/projects/265.json",
+   "summary": "动作 看书 · 表情 专注 · 道具 书 · 帽子 眼镜 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 266,
@@ -4533,7 +5063,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/266_考试.gif",
-   "cover": "out/_封面/266_考试.png"
+   "cover": "out/_封面/266_考试.png",
+   "project": "out/projects/266.json",
+   "summary": "动作 看书 · 表情 担心 · 道具 书 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 267,
@@ -4550,7 +5082,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/267_写作业.gif",
-   "cover": "out/_封面/267_写作业.png"
+   "cover": "out/_封面/267_写作业.png",
+   "project": "out/projects/267.json",
+   "summary": "动作 敲键盘 · 表情 大哭 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 268,
@@ -4565,7 +5099,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/268_不想上班.gif",
-   "cover": "out/_封面/268_不想上班.png"
+   "cover": "out/_封面/268_不想上班.png",
+   "project": "out/projects/268.json",
+   "summary": "动作 翻肚皮 · 表情 累了 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 269,
@@ -4583,7 +5119,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/269_周末.gif",
-   "cover": "out/_封面/269_周末.png"
+   "cover": "out/_封面/269_周末.png",
+   "project": "out/projects/269.json",
+   "summary": "动作 跳舞 · 表情 大笑 · 特效 音符、太阳 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 270,
@@ -4600,7 +5138,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/270_放假.gif",
-   "cover": "out/_封面/270_放假.png"
+   "cover": "out/_封面/270_放假.png",
+   "project": "out/projects/270.json",
+   "summary": "动作 跳水 · 表情 星星眼 · 特效 烟花 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 271,
@@ -4619,7 +5159,9 @@
    "style": "blue",
    "tmode": "stay",
    "gif": "out/271_开学.gif",
-   "cover": "out/_封面/271_开学.png"
+   "cover": "out/_封面/271_开学.png",
+   "project": "out/projects/271.json",
+   "summary": "动作 缩小 · 表情 大哭 · 帽子 学士帽 · 特效 头顶下雨 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 272,
@@ -4636,7 +5178,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/272_来活了.gif",
-   "cover": "out/_封面/272_来活了.png"
+   "cover": "out/_封面/272_来活了.png",
+   "project": "out/projects/272.json",
+   "summary": "动作 滑进来 · 表情 坚定 · 特效 感叹号 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 273,
@@ -4653,7 +5197,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/273_请假.gif",
-   "cover": "out/_封面/273_请假.png"
+   "cover": "out/_封面/273_请假.png",
+   "project": "out/projects/273.json",
+   "summary": "动作 折纸飞机发出去 · 表情 难过 · 道具 信 · 特效 提示条「已提交」 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 274,
@@ -4670,7 +5216,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/274_发工资.gif",
-   "cover": "out/_封面/274_发工资.png"
+   "cover": "out/_封面/274_发工资.png",
+   "project": "out/projects/274.json",
+   "summary": "动作 空翻 · 表情 钱眼 · 特效 撒钱、提示条「工资已到账」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 275,
@@ -4687,7 +5235,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/275_没钱了.gif",
-   "cover": "out/_封面/275_没钱了.png"
+   "cover": "out/_封面/275_没钱了.png",
+   "project": "out/projects/275.json",
+   "summary": "动作 被砸扁 · 表情 泪汪汪 · 特效 飘 钞票、提示条「余额不足」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 276,
@@ -4704,7 +5254,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/276_买买买.gif",
-   "cover": "out/_封面/276_买买买.png"
+   "cover": "out/_封面/276_买买买.png",
+   "project": "out/projects/276.json",
+   "summary": "动作 狂奔 · 表情 钱眼 · 特效 撒钱 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 277,
@@ -4721,7 +5273,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/277_快递到了.gif",
-   "cover": "out/_封面/277_快递到了.png"
+   "cover": "out/_封面/277_快递到了.png",
+   "project": "out/projects/277.json",
+   "summary": "动作 冒出来 · 表情 星星眼 · 道具 礼物 · 特效 闪光、提示条「已签收」 · 文字动画 轻晃，到点跳一下 · 60 帧 · 15 fps"
   },
   {
    "id": 278,
@@ -4738,7 +5292,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/278_下雨了.gif",
-   "cover": "out/_封面/278_下雨了.png"
+   "cover": "out/_封面/278_下雨了.png",
+   "project": "out/projects/278.json",
+   "summary": "动作 撑伞 · 表情 担心 · 特效 头顶下雨 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 279,
@@ -4757,7 +5313,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/279_洗澡.gif",
-   "cover": "out/_封面/279_洗澡.png"
+   "cover": "out/_封面/279_洗澡.png",
+   "project": "out/projects/279.json",
+   "summary": "动作 甩水 · 表情 开心 · 帽子 毛巾 · 特效 吐泡泡、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 280,
@@ -4776,7 +5334,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/280_运动.gif",
-   "cover": "out/_封面/280_运动.png"
+   "cover": "out/_封面/280_运动.png",
+   "project": "out/projects/280.json",
+   "summary": "动作 蹦跶 · 表情 坚定 · 帽子 头带 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 281,
@@ -4793,7 +5353,9 @@
    "style": "gray",
    "tmode": "stay",
    "gif": "out/281_吃撑了.gif",
-   "cover": "out/_封面/281_吃撑了.png"
+   "cover": "out/_封面/281_吃撑了.png",
+   "project": "out/projects/281.json",
+   "summary": "动作 打嗝 · 表情 累了 · 特效 流汗 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 282,
@@ -4812,7 +5374,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/282_生日快乐.gif",
-   "cover": "out/_封面/282_生日快乐.png"
+   "cover": "out/_封面/282_生日快乐.png",
+   "project": "out/projects/282.json",
+   "summary": "动作 摇摆 · 表情 开心 · 道具 蛋糕 · 帽子 派对帽 · 特效 彩纸 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 283,
@@ -4829,7 +5393,9 @@
    "style": "red",
    "tmode": "stay",
    "gif": "out/283_新年快乐.gif",
-   "cover": "out/_封面/283_新年快乐.png"
+   "cover": "out/_封面/283_新年快乐.png",
+   "project": "out/projects/283.json",
+   "summary": "动作 跳水 · 表情 大笑 · 特效 烟花 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 284,
@@ -4846,7 +5412,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/284_晒太阳.gif",
-   "cover": "out/_封面/284_晒太阳.png"
+   "cover": "out/_封面/284_晒太阳.png",
+   "project": "out/projects/284.json",
+   "summary": "动作 仰泳 · 表情 开心 · 特效 太阳、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 285,
@@ -4863,7 +5431,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/285_下雪了.gif",
-   "cover": "out/_封面/285_下雪了.png"
+   "cover": "out/_封面/285_下雪了.png",
+   "project": "out/projects/285.json",
+   "summary": "动作 抬头 · 表情 星星眼 · 特效 下雪、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 286,
@@ -4880,7 +5450,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/286_秋天到了.gif",
-   "cover": "out/_封面/286_秋天到了.png"
+   "cover": "out/_封面/286_秋天到了.png",
+   "project": "out/projects/286.json",
+   "summary": "动作 漂着 · 表情 微笑 · 特效 落叶、小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 287,
@@ -4897,7 +5469,9 @@
    "style": "green",
    "tmode": "stay",
    "gif": "out/287_春天来了.gif",
-   "cover": "out/_封面/287_春天来了.png"
+   "cover": "out/_封面/287_春天来了.png",
+   "project": "out/projects/287.json",
+   "summary": "动作 摇摆 · 表情 开心 · 特效 掉落 花 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 288,
@@ -4914,7 +5488,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/288_吐泡泡.gif",
-   "cover": "out/_封面/288_吐泡泡.png"
+   "cover": "out/_封面/288_吐泡泡.png",
+   "project": "out/projects/288.json",
+   "summary": "动作 发呆 · 表情 吐舌头 · 特效 吐泡泡 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 289,
@@ -4933,7 +5509,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/289_当厨师.gif",
-   "cover": "out/_封面/289_当厨师.png"
+   "cover": "out/_封面/289_当厨师.png",
+   "project": "out/projects/289.json",
+   "summary": "动作 横跳 · 表情 开心 · 道具 蛋糕 · 帽子 厨师帽 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 290,
@@ -4952,7 +5530,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/290_毕业了.gif",
-   "cover": "out/_封面/290_毕业了.png"
+   "cover": "out/_封面/290_毕业了.png",
+   "project": "out/projects/290.json",
+   "summary": "动作 绕圈游 · 表情 星星眼 · 帽子 学士帽 · 特效 彩纸 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 291,
@@ -4971,7 +5551,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/291_听歌.gif",
-   "cover": "out/_封面/291_听歌.png"
+   "cover": "out/_封面/291_听歌.png",
+   "project": "out/projects/291.json",
+   "summary": "动作 甩头 · 表情 睡着 · 帽子 耳机 · 特效 音符 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 292,
@@ -4990,7 +5572,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/292_天使.gif",
-   "cover": "out/_封面/292_天使.png"
+   "cover": "out/_封面/292_天使.png",
+   "project": "out/projects/292.json",
+   "summary": "动作 摇尾巴 · 表情 开心 · 帽子 光环 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 293,
@@ -5009,7 +5593,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/293_戴花花.gif",
-   "cover": "out/_封面/293_戴花花.png"
+   "cover": "out/_封面/293_戴花花.png",
+   "project": "out/projects/293.json",
+   "summary": "动作 果冻抖 · 表情 开心 · 帽子 花环 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 294,
@@ -5028,7 +5614,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/294_国王驾到.gif",
-   "cover": "out/_封面/294_国王驾到.png"
+   "cover": "out/_封面/294_国王驾到.png",
+   "project": "out/projects/294.json",
+   "summary": "动作 登场 · 表情 得意 · 帽子 王冠 · 特效 闪光 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 295,
@@ -5045,7 +5633,9 @@
    "style": "gold",
    "tmode": "stay",
    "gif": "out/295_获胜.gif",
-   "cover": "out/_封面/295_获胜.png"
+   "cover": "out/_封面/295_获胜.png",
+   "project": "out/projects/295.json",
+   "summary": "动作 递给你 · 表情 星星眼 · 道具 奖杯 · 特效 彩纸、提示条「胜利」 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 296,
@@ -5062,7 +5652,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/296_出发.gif",
-   "cover": "out/_封面/296_出发.png"
+   "cover": "out/_封面/296_出发.png",
+   "project": "out/projects/296.json",
+   "summary": "动作 挥来挥去 · 表情 坚定 · 道具 小旗 · 特效 速度线 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 297,
@@ -5077,7 +5669,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/297_打游戏.gif",
-   "cover": "out/_封面/297_打游戏.png"
+   "cover": "out/_封面/297_打游戏.png",
+   "project": "out/projects/297.json",
+   "summary": "动作 晃脑袋 · 表情 专注 · 道具 手柄 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 298,
@@ -5092,7 +5686,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/298_刷手机.gif",
-   "cover": "out/_封面/298_刷手机.png"
+   "cover": "out/_封面/298_刷手机.png",
+   "project": "out/projects/298.json",
+   "summary": "动作 发呆 · 表情 微笑 · 道具 手机 · 特效 小星星 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 299,
@@ -5109,7 +5705,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/299_收到信.gif",
-   "cover": "out/_封面/299_收到信.png"
+   "cover": "out/_封面/299_收到信.png",
+   "project": "out/projects/299.json",
+   "summary": "动作 递给你 · 表情 惊讶 · 道具 信 · 特效 爱心 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   },
   {
    "id": 300,
@@ -5126,7 +5724,9 @@
    "style": "pink",
    "tmode": "stay",
    "gif": "out/300_浇花.gif",
-   "cover": "out/_封面/300_浇花.png"
+   "cover": "out/_封面/300_浇花.png",
+   "project": "out/projects/300.json",
+   "summary": "动作 摇摆 · 表情 开心 · 道具 水桶 · 特效 掉落 水滴 · 文字动画 蹦回来（炸小星星） · 60 帧 · 15 fps"
   }
  ],
  "specials": [

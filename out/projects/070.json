@@ -1,0 +1,39 @@
+{
+ "v": 2,
+ "name": "不行",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1069,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "shake",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "angry"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "ban",
+   "params": {
+    "at": 0.32,
+    "end": 0.88,
+    "on": "side",
+    "size": 38
+   }
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "不行",
+   "style": "red",
+   "component": "slam"
+  }
+ ]
+}

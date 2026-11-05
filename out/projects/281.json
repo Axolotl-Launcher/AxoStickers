@@ -1,0 +1,40 @@
+{
+ "v": 2,
+ "name": "吃撑了",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1280,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "hiccup",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "tired"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "sweat",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "吃撑了",
+   "style": "gray",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": false
+   }
+  }
+ ]
+}

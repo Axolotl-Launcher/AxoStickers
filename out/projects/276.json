@@ -1,0 +1,40 @@
+{
+ "v": 2,
+ "name": "买买买",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1275,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "run",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "money"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "coins",
+   "params": {}
+  },
+  {
+   "id": "l3",
+   "type": "text",
+   "text": "买买买",
+   "style": "gold",
+   "component": "popin",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true
+   }
+  }
+ ]
+}

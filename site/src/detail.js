@@ -10,11 +10,12 @@ function rows(r) {
   return recipeRows(r).flatMap(([k, v, code]) => [el('dt', { text: k }), el('dd', {}, v, code && code !== v ? el('code', { text: code }) : null)]);
 }
 
-// 第二版的工坊投稿没有配方，只有机器人写的一行摘要：「动作 蹦跶、点头 · 表情 微笑 · 48 帧 · 15 fps · 自带 1 段组件代码」
+// 第二版的工坊投稿没有配方，只有机器人写的一行摘要：「动作 蹦跶、点头 · 表情 微笑 · 48 帧 · 15 fps · 自带 1 段组件代码」；
+// 300 张翻新以后也是按工程出的图，清单里是同样格式的摘要（engine/manifest.py 按 out/projects 写的）
 function summaryRows(s) {
   const out = [], rest = [];
   for (const part of String(s || '').split(' · ')) {
-    const m = /^(动作|表情|道具|帽子|特效|场景|模型) (.+)$/.exec(part);
+    const m = /^(动作|表情|道具|帽子|特效|文字动画|场景|模型) (.+)$/.exec(part);
     if (m) out.push(el('dt', { text: m[1] }), el('dd', { text: m[2].replaceAll('`', '') }));
     else if (part) rest.push(part);
   }
@@ -38,13 +39,13 @@ function fill() {
     ...(it.series === '水龙卷' ? [el('dt', { text: '动作' }), el('dd', { text: '水龙卷（转着圈飞上天，又掉回来）' })]
     : it.special && it.project ? [el('dt', { text: '来源' }), el('dd', { text: '初代表情包工具包里的原图' }), el('dt', { text: '工程' }), el('dd', { text: '照着原图的脚本在创意工坊里拼了一份（动作、道具、特效、文字动画都是编辑器里的组件），「在工坊里改一改」打开它' })]
     : it.special ? [el('dt', { text: '来源' }), el('dd', { text: '初代表情包工具包里的原图（不是这个引擎出的，没有配方）' })]
-    : kind === 'workshop' && !recipe ? summaryRows(it.summary) : rows(recipe)));
+    : (kind === 'workshop' && !recipe) || (!it.special && it.summary) ? summaryRows(it.summary) : rows(recipe)));
   const down = $('#d-download');
   down.href = gif;
   down.download = `${name}.gif`;
   const remix = $('#d-remix');
   remix.hidden = !!it.special && !it.project;                  // 初代有照着做的工程；水龙卷没有
-  remix.href = kind === 'workshop' ? `#/editor?w=${it.issue}` : it.project ? `#/editor?g=${encodeURIComponent(it.slug)}` : '#/editor?r=' + encodeURIComponent(JSON.stringify(Object.fromEntries(['text', 'motion', 'face', 'fx', 'hold', 'wear', 'style', 'tmode', 'n', 's', 'debris', 'dir', 'flip', 'seed', 'idle', 'params'].filter((k) => it[k] !== undefined).map((k) => [k, it[k]]))));   // 动作参数和种子也带上，改一改时和原图一样
+  remix.href = kind === 'workshop' ? `#/editor?w=${it.issue}` : it.project ? `#/editor?g=${encodeURIComponent(it.special ? it.slug : it.key)}` : '#/editor?r=' + encodeURIComponent(JSON.stringify(Object.fromEntries(['text', 'motion', 'face', 'fx', 'hold', 'wear', 'style', 'tmode', 'n', 's', 'debris', 'dir', 'flip', 'seed', 'idle', 'params'].filter((k) => it[k] !== undefined).map((k) => [k, it[k]]))));   // 动作参数和种子也带上，改一改时和原图一样
   const issue = $('#d-issue');
   issue.hidden = kind !== 'workshop';
   if (kind === 'workshop') { issue.href = `https://github.com/${REPO}/issues/${it.issue}`; issue.textContent = `去 GitHub 点 👍（${it.likes || 0}）`; }

@@ -1,0 +1,66 @@
+{
+ "v": 2,
+ "name": "挖到钻石",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1219,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "flip",
+   "params": {}
+  },
+  {
+   "id": "l1",
+   "type": "face",
+   "component": "star"
+  },
+  {
+   "id": "l2",
+   "type": "fx",
+   "component": "float",
+   "params": {
+    "icon": "diamond",
+    "n": 3,
+    "k": 4
+   }
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "twinkle",
+   "start": 0.3,
+   "end": 0.92
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "挖到钻石",
+   "style": "pink",
+   "component": "popthen",
+   "params": {
+    "at": 0.06,
+    "gap": 0.14,
+    "out": 0.9,
+    "sparks": true,
+    "then": "bounce"
+   }
+  },
+  {
+   "id": "l5",
+   "type": "fx",
+   "component": "toast",
+   "params": {
+    "text": "获得钻石！",
+    "color": "#f0a020",
+    "check": false,
+    "at": 0.4,
+    "end": 0.88,
+    "stars": true
+   }
+  }
+ ],
+ "cover": 0.52
+}

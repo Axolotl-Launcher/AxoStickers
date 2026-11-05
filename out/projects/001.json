@@ -1,0 +1,65 @@
+{
+ "v": 2,
+ "name": "先看日志",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1000,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.06,
+    "out": 0.85,
+    "look": 8
+   }
+  },
+  {
+   "id": "l1",
+   "type": "motion",
+   "component": "look",
+   "strength": 0.45
+  },
+  {
+   "id": "l2",
+   "type": "prop",
+   "component": "logpage",
+   "params": {
+    "s": 1.1
+   }
+  },
+  {
+   "id": "l3",
+   "type": "face",
+   "component": "focus"
+  },
+  {
+   "id": "l4",
+   "type": "fx",
+   "component": "pop",
+   "start": 0.5,
+   "end": 0.78,
+   "params": {
+    "icon": "exclaim",
+    "k": 8,
+    "x": 70,
+    "y": -110,
+    "beats": 4
+   }
+  },
+  {
+   "id": "l5",
+   "type": "text",
+   "text": "先看日志",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.22,
+    "gap": 0.16,
+    "out": 0.85
+   }
+  }
+ ]
+}

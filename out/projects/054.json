@@ -1,0 +1,51 @@
+{
+ "v": 2,
+ "name": "大佬带带",
+ "size": 400,
+ "fps": 15,
+ "frames": 60,
+ "seed": 1053,
+ "layers": [
+  {
+   "id": "l0",
+   "type": "motion",
+   "component": "surface",
+   "params": {
+    "in": 0.07,
+    "out": 0.82,
+    "look": 22
+   }
+  },
+  {
+   "id": "l1",
+   "type": "motion",
+   "component": "kowtow",
+   "params": {
+    "n": 3
+   }
+  },
+  {
+   "id": "l2",
+   "type": "face",
+   "component": "star"
+  },
+  {
+   "id": "l3",
+   "type": "fx",
+   "component": "sparkles",
+   "params": {}
+  },
+  {
+   "id": "l4",
+   "type": "text",
+   "text": "大佬带带",
+   "style": "pink",
+   "component": "popin",
+   "params": {
+    "at": 0.22,
+    "out": 0.82,
+    "sparks": true
+   }
+  }
+ ]
+}
