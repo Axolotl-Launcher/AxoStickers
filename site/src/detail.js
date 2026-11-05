@@ -54,7 +54,7 @@ function fill() {
   if (kind === 'workshop') note.append('想让它进下一版正式表情包？去 issue 里喊一声。');
   else {
     if (it.series === '水龙卷') note.append('水龙卷用到了原版 Minecraft 材质，没放进工坊，只能本地用引擎出（见 README）。 ');
-    note.append('全部 300 张 + 水龙卷打包：', el('a', { href: RELEASE.url, text: `Release zip（${RELEASE.size}）` }));
+    note.append('全部 300 张 + 4 张初代 + 水龙卷打包：', el('a', { href: RELEASE.url, text: `Release zip（${RELEASE.size}）` }));
   }
   const i = list.indexOf(it);
   $('#d-prev').disabled = i <= 0; $('#d-next').disabled = i < 0 || i >= list.length - 1;
