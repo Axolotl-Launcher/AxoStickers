@@ -3,13 +3,13 @@ import {
   E, K, W, H, FPS, YAW, PITCH, clamp, lerp, easeOut, easeIn, easeIO, easeOutBack, elastic, bump, win, mod, rng, strHash,
   rootM, headWorld, xfPoint, hx, rotVec, makeCanvas,
 } from './core.js';
-import { icon, put, star, sq, rect, line, ellipse, polygon } from './draw.js';
+import { icon, put, star, sq, rect, line, ellipse, polygon, label, labelWidth, roundRect, pill } from './draw.js';
 import { Ax } from './ax.js';
 
 export { Ax };
 
 export { W, H, FPS, YAW, PITCH, clamp, lerp, easeOut, easeIn, easeIO, easeOutBack, elastic, bump, win, mod, rng, strHash, rootM, headWorld, xfPoint, rotVec, makeCanvas };
-export { icon, put, star, sq, rect, line, ellipse, polygon };
+export { icon, put, star, sq, rect, line, ellipse, polygon, label, labelWidth, roundRect, pill };
 
 export const PI = Math.PI;
 export const { sin, cos, abs, exp, sqrt, floor, round, min, max, atan2, hypot, sign } = Math;

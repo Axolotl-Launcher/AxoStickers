@@ -36,14 +36,15 @@ function fill() {
   const dl = $('#d-recipe');
   dl.replaceChildren(...(kind === 'workshop' && it.desc ? [el('dt', { text: '说明' }), el('dd', { text: it.desc })] : []),   // 投稿时写的一句话（纯文本）
     ...(it.series === '水龙卷' ? [el('dt', { text: '动作' }), el('dd', { text: '水龙卷（转着圈飞上天，又掉回来）' })]
+    : it.special && it.project ? [el('dt', { text: '来源' }), el('dd', { text: '初代表情包工具包里的原图' }), el('dt', { text: '工程' }), el('dd', { text: '照着原图的脚本在创意工坊里拼了一份（动作、道具、特效、文字动画都是编辑器里的组件），「在工坊里改一改」打开它' })]
     : it.special ? [el('dt', { text: '来源' }), el('dd', { text: '初代表情包工具包里的原图（不是这个引擎出的，没有配方）' })]
     : kind === 'workshop' && !recipe ? summaryRows(it.summary) : rows(recipe)));
   const down = $('#d-download');
   down.href = gif;
   down.download = `${name}.gif`;
   const remix = $('#d-remix');
-  remix.hidden = !!it.special;
-  remix.href = kind === 'workshop' ? `#/editor?w=${it.issue}` : '#/editor?r=' + encodeURIComponent(JSON.stringify(Object.fromEntries(['text', 'motion', 'face', 'fx', 'hold', 'wear', 'style', 'tmode', 'n', 's', 'debris', 'dir', 'flip', 'seed', 'idle', 'params'].filter((k) => it[k] !== undefined).map((k) => [k, it[k]]))));   // 动作参数和种子也带上，改一改时和原图一样
+  remix.hidden = !!it.special && !it.project;                  // 初代有照着做的工程；水龙卷没有
+  remix.href = kind === 'workshop' ? `#/editor?w=${it.issue}` : it.project ? `#/editor?g=${encodeURIComponent(it.slug)}` : '#/editor?r=' + encodeURIComponent(JSON.stringify(Object.fromEntries(['text', 'motion', 'face', 'fx', 'hold', 'wear', 'style', 'tmode', 'n', 's', 'debris', 'dir', 'flip', 'seed', 'idle', 'params'].filter((k) => it[k] !== undefined).map((k) => [k, it[k]]))));   // 动作参数和种子也带上，改一改时和原图一样
   const issue = $('#d-issue');
   issue.hidden = kind !== 'workshop';
   if (kind === 'workshop') { issue.href = `https://github.com/${REPO}/issues/${it.issue}`; issue.textContent = `去 GitHub 点 👍（${it.likes || 0}）`; }

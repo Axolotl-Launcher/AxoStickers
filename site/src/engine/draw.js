@@ -94,6 +94,29 @@ export function polygon(ctx, pts, fill, alpha = 1) {
   ctx.fillStyle = css(fill, alpha); ctx.fill();
 }
 
+// ---------------- 界面小字、圆角框、提示条（截图工具栏、「✓ 已发送」这种） ----------------
+// 用表情字体画：组件要在 def 里写 glyphs（会用到的字），文字参数（type: 'text'）里的字也会提前下好
+export function label(ctx, s, x, y, sz, col, align = 'center', alpha = 1) {
+  ctx.save(); ctx.font = fontCss(sz, 'axo'); ctx.textAlign = align; ctx.textBaseline = 'middle';
+  ctx.fillStyle = css(col, alpha); ctx.fillText(s, x, y); ctx.restore();
+}
+export const labelWidth = (s, sz) => textLength(s, sz, 'axo');
+export function roundRect(ctx, x0, y0, x1, y1, r, fill, outline = null, w = 1, alpha = 1) {
+  const path = () => { ctx.beginPath(); ctx.roundRect(x0, y0, x1 - x0, y1 - y0, Math.max(0, Math.min(r, (x1 - x0) / 2, (y1 - y0) / 2))); };
+  if (fill) { path(); ctx.fillStyle = css(fill, alpha); ctx.fill(); }
+  if (outline) { ctx.save(); path(); ctx.clip(); path(); ctx.strokeStyle = css(outline, alpha); ctx.lineWidth = 2 * w; ctx.stroke(); ctx.restore(); }   // 描边往里画（Pillow 一样）
+}
+// 圆角提示条：(x, y) 是中心，sc 缩放（弹出来用），check 前面画个对勾
+export function pill(ctx, x, y, text, { color = [7, 193, 96], fg = [255, 255, 255], sc = 1, h = 38, sz = 20, check = true, alpha = 1 } = {}) {
+  if (sc <= 0.05 || alpha <= 0.02) return;
+  const tw = labelWidth(text, sz), w = Math.round(tw + (check ? 54 : 32)), tx = check ? 35 : 16;
+  ctx.save(); ctx.translate(x, y); ctx.scale(sc, sc); ctx.translate(-w / 2, -h / 2);
+  roundRect(ctx, 0, 0, w, h, h / 2, color, null, 1, alpha);
+  if (check) { line(ctx, [[13, h / 2], [18, h / 2 + 5], [28, h / 2 - 6]], fg, 3, alpha); }
+  label(ctx, text, tx, h / 2 + 1, sz, fg, 'left', alpha);
+  ctx.restore();
+}
+
 // ---------------- 立体字 ----------------
 const MEASURE = canvas(8, 8).getContext('2d');
 const fontCss = (sz, font) => `900 ${sz}px ${fontFamily(font)}`;

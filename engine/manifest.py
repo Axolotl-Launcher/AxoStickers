@@ -30,7 +30,9 @@ def main():
             gif=f'out/{name}.gif', cover=f'out/_封面/{name}.png'))
     # 不是 specs.py 出的图（没有配方）：初代表情包工具包 examples/ 里的原图，水龙卷特别篇（tornado.py）。
     # slug 是网站上的英文文件名（gif/<slug>.gif），series 是下载 / 拖出去时文件名的前缀
-    extra = [dict(id=f'初代-{t}', slug=f'og-{s}', series='初代', text=t, category='support', category_zh='群里答疑', motion='original', gif=f'out/初代_{t}.gif')
+    # 初代在网站编辑器里有同样做法的工程（workshop/projects/og-*.json，用网页引擎的组件拼出来的），图鉴里「在工坊里改一改」打开它
+    extra = [dict(id=f'初代-{t}', slug=f'og-{s}', series='初代', text=t, category='support', category_zh='群里答疑', motion='original', gif=f'out/初代_{t}.gif',
+                  project=f'workshop/projects/og-{s}.json')
              for t, s in (('发日志', 'send-log'), ('请截图', 'screenshot'), ('看文档', 'read-docs'), ('看群公告', 'group-notice'))]
     extra += [dict(id=f'tornado-{k}', slug=f'tornado-{i}', series='水龙卷', text=t, category='special', category_zh='特别篇', motion='tornado', gif=f'out/水龙卷_{k}.gif')
               for i, (k, t) in enumerate((('无字', ''), ('我没事', '我没事'), ('转晕了', '转晕了')), 1)]

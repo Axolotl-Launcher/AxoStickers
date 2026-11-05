@@ -302,18 +302,21 @@ export class AxoRenderer {
     this.faceMesh.geometry = this.faceGeo.get(key); this.faceMesh.visible = true;
   }
 
+  // 道具可以自带形状（it.boxes，每帧可以不一样，比如一行行打出字的日志纸）：按 kind + it.geo 缓存，缓存太多了整个清掉
   _items(pose) {
     const list = pose._items || [];
     while (this.itemMeshes.length < list.length) {
       const m = new Mesh(new BufferGeometry(), this.matBody);
       m.matrixAutoUpdate = false; m.frustumCulled = false; this.scene.add(m); this.itemMeshes.push(m);
     }
+    if (this.itemGeo.size > 300) { for (const g of this.itemGeo.values()) g.dispose(); this.itemGeo.clear(); }
     this.itemMeshes.forEach((m, k) => {
       const it = list[k];
       m.visible = !!it;
       if (!it) return;
-      if (!this.itemGeo.has(it.kind)) this.itemGeo.set(it.kind, geometry(tinted(itemQuads(it.kind, this.lookup(it.kind)), this.tint, 'item')));
-      m.geometry = this.itemGeo.get(it.kind);
+      const key = it.boxes ? `${it.kind}#${it.geo ?? JSON.stringify(it.boxes)}` : it.kind;
+      if (!this.itemGeo.has(key)) this.itemGeo.set(key, geometry(tinted(itemQuads(it.kind, it.boxes ? { boxes: it.boxes } : this.lookup(it.kind)), this.tint, 'item')));
+      m.geometry = this.itemGeo.get(key);
       m.matrix.copy(itemXf(pose, it));
     });
   }

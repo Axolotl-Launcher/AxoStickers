@@ -1,7 +1,7 @@
 // 入口：路由（#/ 图鉴、#/s/编号 大图、#/editor 创意工坊、#/workshop 工坊作品、#/w/issue 号）。
 import './style.css';
 import { RELEASE, $, encodePath, toast } from './util.js';   // util.js 一载入就开始异步拿字体样式（fontsCss）
-import { G, initGallery } from './gallery.js';
+import { G, initGallery, loadGallery } from './gallery.js';
 import { WS, initWorkshop, sorted } from './workshop.js';
 import { openDetail, closeDetail } from './detail.js';
 import { initHero } from './hero.js';
@@ -105,9 +105,17 @@ async function route() {
         catch { toast('这张的工程没载进来，先打开一个空白草稿'); }
       } else if (e) recipe = e.recipe;
     }
+    if (q.get('g')) {                                          // 图鉴里初代的「改一改」：照着原图做的工程单独存一个文件
+      try {
+        await loadGallery();
+        const it = G.items.find((x) => x.special && x.slug === q.get('g'));
+        if (!it?.project) throw new Error('没有工程');
+        const r = await fetch(encodePath(it.project)); if (!r.ok) throw new Error(`HTTP ${r.status}`); project = await r.json();
+      } catch { toast('这张的工程没载进来，先打开一个空白草稿'); }
+    }
     if (seq !== routeSeq || location.hash !== hash) return;
     await m.openStudio($('#studio-root'), { recipe, project, shared: q.get('s'), short: q.get('k') });
-    if ((q.get('r') || q.get('w') || q.get('s') || q.get('k')) && location.hash === hash) history.replaceState(null, '', '#/editor');
+    if ((q.get('r') || q.get('w') || q.get('g') || q.get('s') || q.get('k')) && location.hash === hash) history.replaceState(null, '', '#/editor');
     return;
   }
   if (head === 'workshop' || head === 'w') {

@@ -126,7 +126,7 @@ def from_recipe(rec):
 # ---------------- 工程（网站编辑器 v2） ----------------
 PROJECT_MAX = 60000              # 整个工程 JSON 的字节数
 LIM = dict(components=8, component=40000, layers=40, texts=4, text=16, frames=96)
-TOP = {'v', 'name', 'size', 'fps', 'frames', 'seed', 'background', 'camera', 'water', 'idle', 'skin', 'model', 'components', 'layers'}
+TOP = {'v', 'name', 'size', 'fps', 'frames', 'seed', 'cover', 'background', 'camera', 'water', 'idle', 'skin', 'model', 'components', 'layers'}
 LAYER_TYPES = {'motion', 'face', 'prop', 'wear', 'fx', 'text', 'scene'}
 LAYER_KEYS = {'id', 'type', 'component', 'params', 'start', 'end', 'strength', 'hidden', 'text', 'style', 'font', 'x', 'y', 'scale', 'face', 'blink'}
 
@@ -167,6 +167,9 @@ def validate_project(p):
         v = p.get(k, d)
         if not number(v, lo, hi): errs.append(f'{k} 要在 {lo}～{int(hi)} 之间：{show(v)}'); v = d
         out[k] = int(v) if k != 'fps' else v
+    if 'cover' in p:                                                 # 封面在一圈里的位置（0～1），没有 = 字刚好出全那一帧
+        if number(p['cover'], 0, 1): out['cover'] = p['cover']
+        else: errs.append(f'cover 要在 0～1 之间：{show(p["cover"])}')
     for k in ('background', 'camera', 'water', 'idle'):
         v = p.get(k, {})
         if not isinstance(v, dict) or len(v) > 16 or not plain(v): errs.append(f'{k} 应该是一个小的 JSON 对象'); v = {}

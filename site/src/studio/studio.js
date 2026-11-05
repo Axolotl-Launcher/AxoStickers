@@ -1,7 +1,7 @@
 // 创意工坊 · 编辑器（v2）：左边素材库，中间舞台 + 播放条 + 时间轴 / 代码，右边属性。
 // 所有组件代码都在沙盒 iframe 里跑（runner.js）；这里只管界面和工程数据（store.js）。
 import CAT from '../../../workshop/catalog.json';
-import { $, el, toast, REPO, STYLE_COLORS, CONTRIBUTE } from '../util.js';
+import { $, el, toast, encodePath, REPO, STYLE_COLORS, CONTRIBUTE } from '../util.js';
 import { fromRecipe, normalizeProject } from '../engine/project.js';
 import { Store, newId, STARTER } from './store.js';
 import { Runner } from './runner.js';
@@ -756,10 +756,11 @@ async function renderDrawer() {
   if (k === 'templates') {
     await loadGallery();
     if (seq !== S.drawerSeq) return;                           // 等的时候换了分类 / 重画过了
-    const items = G.items.filter((it) => !it.special && (!q || it.search.includes(q)) && (!S.favOnly || lib.isFav(`tpl:${it.key}`)));
+    const items = G.items.filter((it) => (!it.special || it.project) && (!q || it.search.includes(q)) && (!S.favOnly || lib.isFav(`tpl:${it.key}`)))   // 初代有照着做的工程，也能当模板（排最前面）
+      .sort((a, b) => !!b.project - !!a.project);
     S.drawerCount.textContent = `${items.length} 张`;
     const card = (it) => el('div', { class: 'st-item thumb tpl', 'data-ax': 'item', 'data-type': 'template', 'data-id': it.key },
-      el('button', { class: 'st-item-main', type: 'button', title: it.text, 'data-ax': 'use', onclick: () => S.store.replace(fromRecipe(it)) },
+      el('button', { class: 'st-item-main', type: 'button', title: it.text, 'data-ax': 'use', onclick: (e) => { if (it.project) busy(e.currentTarget, openTemplateProject(it)); else { tplSeq++; S.store.replace(fromRecipe(it)); } } },
         el('img', { src: it.still, alt: '', loading: 'lazy', decoding: 'async', width: 96, height: 96 }), el('span', { class: 'st-item-name', text: it.text })),
       star(`tpl:${it.key}`, it.text));
     const favs = items.filter((it) => lib.isFav(`tpl:${it.key}`)), rest = S.favOnly ? [] : items.filter((it) => !lib.isFav(`tpl:${it.key}`));
@@ -830,8 +831,8 @@ async function renderDrawer() {
   const thumbKind = k === 'face' || k === 'prop' || k === 'wear' ? k : null;
   const one = (m) => entry(k, m, { thumb: thumbKind, active: u.has(m.id), error: errKeys.has(`${k}:${m.id}`), onUse: () => useComponent(k, m.id), onAdd: k === 'face' ? null : () => useComponent(k, m.id, true) });
   const view = (l) => grid(l.map(one), thumbKind ? 'thumbs' : 'list');
-  const groups = k === 'motion' ? [['身体', (m) => !CAT.motions[m.id]?.prop && !CAT.motions[m.id]?.noHold && !CAT.motions[m.id]?.offscreen],
-    ['拿着道具的', (m) => CAT.motions[m.id]?.prop || CAT.motions[m.id]?.noHold], ['中途离开画面的', (m) => CAT.motions[m.id]?.offscreen]] : [['', () => true]];
+  const off = (m) => CAT.motions[m.id]?.offscreen || m.offscreen, held = (m) => CAT.motions[m.id]?.prop || CAT.motions[m.id]?.noHold || m.holdsItself;   // 不在清单里的（只有网页引擎有的）看组件自己写的
+  const groups = k === 'motion' ? [['身体', (m) => !held(m) && !off(m)], ['拿着道具的', (m) => held(m) && !off(m)], ['中途离开画面的', off]] : [['', () => true]];
   fill(body, ...withFavs(k, list, view, () => {
     const own = list.filter((m) => m.origin !== 'builtin');
     return [
@@ -840,6 +841,17 @@ async function renderDrawer() {
       el('p', { class: 'st-note', text: k === 'motion' ? '点一下换掉当前动作；点「＋」再叠一个动作上去（比如点头 + 摇尾巴），在时间轴上还能让它只动一段。' : k === 'face' ? '点一下换表情；在右边属性里还能左右眼、嘴分开挑。' : '点一下换掉选中的；「＋」再加一个。' }),
     ];
   }));
+}
+
+// 初代这种有单独工程文件的模板。等下载的时候又点了别的模板、或者改了工程，这次就作废（不拿旧的盖掉新的）
+let tplSeq = 0;
+async function openTemplateProject(it) {
+  const my = ++tplSeq, before = S.store.p;
+  try {
+    const r = await fetch(encodePath(it.project)); if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const p = await r.json();
+    if (my === tplSeq && S.store.p === before) S.store.replace(untrusted(p));
+  } catch (e) { if (my === tplSeq) toast(`「${it.text}」的工程没载进来：${e.message}`); }
 }
 
 // 刚载入 / 从工坊拿来的组件：直接用上
@@ -1299,6 +1311,8 @@ function renderProjectInspector() {
       control({ label: '帧率', min: 6, max: 30, type: 'int' }, P.fps, (v) => set((p) => { p.fps = v; }, 'fps'), 'fps'),
       control({ label: '一圈多少帧', min: 8, max: 120, type: 'int' }, P.frames, (v) => set((p) => { p.frames = v; }, 'frames'), 'frames'),
       el('p', { class: 'st-note', text: `一圈 ${(P.frames / P.fps).toFixed(2)} 秒。正式表情是 48 帧 15 fps。` }),
+      control({ type: 'bool', label: '自己定封面（不勾 = 字刚好出全的那一帧）' }, typeof P.cover === 'number' ? 1 : 0, (v) => st.change((p) => { if (v) p.cover = Math.min(0.99, S.frame / p.frames); else delete p.cover; }), 'cover-own'),
+      typeof P.cover === 'number' ? control({ label: '封面在一圈里的位置（0～1）', min: 0, max: 0.99, step: 0.01 }, P.cover, (v) => set((p) => { p.cover = v; }, 'cover'), 'cover') : null,
       el('label', { class: 'st-field' }, el('span', { text: '背景' }), bgSel),
       P.background.mode === 'color' || P.background.mode === 'gradient' ? control({ label: P.background.mode === 'gradient' ? '上面的颜色' : '背景色', type: 'color' }, P.background.color, (v) => set((p) => { p.background.color = v; }, 'bgc'), 'bgc') : null,
       P.background.mode === 'gradient' ? control({ label: '下面的颜色', type: 'color' }, P.background.color2 || '#ffe3f0', (v) => set((p) => { p.background.color2 = v; }, 'bgc2'), 'bgc2') : null),

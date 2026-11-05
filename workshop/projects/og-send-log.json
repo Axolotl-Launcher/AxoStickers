@@ -1,0 +1,53 @@
+{
+ "v": 2,
+ "name": "发日志",
+ "size": 400,
+ "fps": 13,
+ "frames": 52,
+ "cover": 0.375,
+ "layers": [
+  {
+   "id": "m",
+   "type": "motion",
+   "component": "paperplane",
+   "params": {
+    "send": 0.45,
+    "back": 0.8875,
+    "t0": 0.0375,
+    "t1": 0.3625,
+    "s": 1.15
+   }
+  },
+  {
+   "id": "p",
+   "type": "prop",
+   "component": "logpage"
+  },
+  {
+   "id": "f",
+   "type": "face",
+   "component": "normal",
+   "blink": false
+  },
+  {
+   "id": "t",
+   "type": "text",
+   "component": "hopat",
+   "text": "发日志",
+   "style": "pink",
+   "params": {
+    "at": 0.55
+   }
+  },
+  {
+   "id": "x",
+   "type": "fx",
+   "component": "toast",
+   "params": {
+    "text": "已发送",
+    "at": 0.5875,
+    "end": 0.85
+   }
+  }
+ ]
+}
