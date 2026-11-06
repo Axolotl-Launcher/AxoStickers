@@ -11,6 +11,7 @@ import * as lib from './library.js';
 import { detectPerf } from '../perf.js';
 import { FONT_LIST } from '../engine/fonts.js';
 import { createShort, openShort, dropShort, TTL as SHORT_TTL } from './share.js';
+import { uiSelect, openMenu, menuOpenFor, closePopups, syncRange } from '../ui.js';
 import './studio.css';
 
 const ZH = { motion: '动作', face: '表情', prop: '道具', wear: '帽子', fx: '特效', text: '文字', textanim: '文字动画', skin: '皮肤', scene: '场景' };
@@ -22,6 +23,11 @@ const RAIL = [
 ];
 // 工坊里的分类：多种效果拼起来、代码很多的整帧场景（比如水龙卷）才叫「组件」，别的按它是什么归到对应的一类
 const KIND = { scene: '组件', motion: '动作', face: '表情', fx: '特效', textanim: '文字', prop: '道具', wear: '帽子', skin: '皮肤', model: '模型' };
+// 顶栏的菜单，和舞台上方的预览设置（视图菜单里也有一份，两边同步）
+const MENUS = [['file', '文件'], ['edit', '编辑'], ['view', '视图'], ['help', '帮助']];
+const ZOOMS = [['fit', '适应'], ['1', '100%'], ['2', '200%'], ['0.6', '60%（实际大小）']];
+const BGS = [['white', '白底'], ['checker', '棋盘格'], ['chat', '聊天 · 浅色'], ['chatdark', '聊天 · 深色']];
+const QUALS = [['auto', '自动'], ['smooth', '流畅'], ['sharp', '清晰']];
 const LINES = ['收到', '已阅', '在摸了', '下次一定', '你说得对', '啊对对对', '也不是不行', '先这样吧', '关我啥事', '好家伙', '绷不住了', '急了', '已老实', '睡了', '开摆', '稳住', '收工', '就这'];
 const TEMPLATES = {
   motion: `// 我的动作。a 是美西螈这一帧的状态：a.dx / a.dy 平移（像素），a.sx / a.sy 缩放，a.roll 整体歪（度），
@@ -173,34 +179,34 @@ function build(root) {
     drawer: 'motion', dock: 'timeline', zoom: 'fit', bg: 'white', active: true, stageVisible: true, thumbCache: new Map(),
     models: new Map(), fontsSent: new Set(), perf, quality, favOnly: false, wsTab: 'browse', wsFilter: 'all', repo: null };   // models：送进沙盒的模型 id -> { name, bytes }；fontsSent：送进沙盒的导入字体
 
-  // 顶栏：左边回首页、工程名、自动保存的状态；然后撤销重做、文件（新建 打开 保存 我的工程）、随机；右边是往外拿的：帮助、分享、发布、导出
-  const name = el('input', { class: 'st-name', value: store.p.name, placeholder: '给它起个名', maxlength: 40, 'aria-label': '工程名', 'data-ax': 'project-name' });
+  // 顶栏（照剪辑软件的样子分三块）：左边返回 + 菜单栏（文件 编辑 视图 帮助）+ 常用工具（撤销 重做 随机）；中间工程名和保存状态；右边往外拿的：分享、发布、导出
+  const name = el('input', { class: 'st-name', value: store.p.name, placeholder: '未命名', maxlength: 40, 'aria-label': '工程名', 'data-ax': 'project-name' });
   name.addEventListener('change', () => store.change((p) => { p.name = name.value.trim(); }));
   S.undoBtn = btn('撤销', '撤销（Ctrl+Z）', () => store.undo(), { ico: 'undo', ax: 'undo', hideLabel: true });
   S.redoBtn = btn('重做', '重做（Ctrl+Shift+Z）', () => store.redo(), { ico: 'redo', ax: 'redo', hideLabel: true });
-  S.saved = el('span', { class: 'st-saved', role: 'status', 'data-ax': 'save-state', title: '草稿一改就自动存在这台设备的浏览器里；想长期留着就「存到我的工程」或者「保存」成文件' }, icon('check', 'tiny'), el('span', { text: '已自动保存' }));
+  S.saved = el('span', { class: 'st-saved', role: 'status', 'data-ax': 'save-state', title: '草稿自动保存在本机浏览器' }, icon('check', 'tiny'), el('span', { text: '已保存' }));
+  S.menubar = el('nav', { class: 'st-menubar', role: 'menubar', 'aria-label': '菜单' }, ...MENUS.map(([k, label]) =>
+    el('button', { class: 'st-menubtn', type: 'button', role: 'menuitem', 'aria-haspopup': 'menu', 'aria-expanded': 'false', 'data-ax': `menu:${k}`, 'data-menu': k }, label)));
+  const menuAll = el('button', { class: 'st-menubtn st-menuall', type: 'button', 'aria-haspopup': 'menu', 'aria-expanded': 'false', 'aria-label': '菜单', title: '菜单', 'data-ax': 'menu:all', 'data-menu': 'all' }, icon('menu'));
+  menubar(S.menubar, menuAll);
   const top = el('header', { class: 'st-top', 'aria-label': '工程' },
-    el('a', { class: 'st-back', href: '#/', title: '回图鉴（首页）', 'aria-label': '回图鉴', 'data-ax': 'back' }, icon('home')), name, S.saved,
-    el('div', { class: 'st-group-btns st-histbtns' }, S.undoBtn, S.redoBtn),
-    el('span', { class: 'st-sep' }),
-    el('div', { class: 'st-group-btns st-filebtns', role: 'group', 'aria-label': '文件' },
-      btn('新建', '新建一个空工程', async () => { if (await ask('新建工程', '新建会替换掉当前的工程（可以先「存到我的工程」或者「保存」成文件），接着？', '新建')) { store.replace(STARTER()); S.projectKey = null; } }, { ico: 'file', ax: 'new' }),
-      btn('打开', '打开 .axo.json 工程文件、.axo.js 组件、模型或字体文件', () => pickFile(), { ico: 'open', ax: 'open' }),
-      btn('保存', '把工程存成 .axo.json 文件（Ctrl+S）', () => saveProjectFile(), { ico: 'save', ax: 'save' }),
-      btn('我的工程', '存在这台设备浏览器里的工程：存一份、打开、删除', () => showProjects(), { ico: 'folder', ax: 'projects' })),
-    btn('随机', '随便拼一张（动作、表情、字都随机）', () => randomize(), { ico: 'dice', ax: 'random', cls: 'st-random' }),
-    el('span', { class: 'st-grow' }),
-    btn('帮助', '快捷键和给 AI 助手的说明（?）', () => showKeys(), { ico: 'help', ax: 'help', hideLabel: true }),
-    btn('分享', '分享链接：完整链接，或者 1 分钟就失效的短链接', () => shareLink(), { ico: 'share', ax: 'share', cls: 'st-share' }),
-    CONTRIBUTE ? btn('发布到工坊', '写好标题和说明，用 GitHub issue 发布，真引擎重新出图', () => publish(), { cls: 'water', ico: 'publish', ax: 'publish' }) : null,   // 投稿入口：见 flags.js
-    btn('导出', '导出 GIF / 逐帧 PNG', () => showExport(), { cls: 'primary', ico: 'download', ax: 'export' }));
+    el('div', { class: 'st-top-l' },
+      el('a', { class: 'st-back', href: '#/', title: '返回图鉴', 'aria-label': '返回图鉴', 'data-ax': 'back' }, icon('back')),
+      el('span', { class: 'st-vsep' }), S.menubar, menuAll, el('span', { class: 'st-vsep' }),
+      el('div', { class: 'st-tools', role: 'toolbar', 'aria-label': '常用' }, S.undoBtn, S.redoBtn,
+        btn('随机', '随机拼一张', () => randomize(), { ico: 'dice', ax: 'random', hideLabel: true }))),
+    el('div', { class: 'st-top-c' }, name, S.saved),
+    el('div', { class: 'st-top-r' },
+      btn('分享', '分享链接', () => shareLink(), { ico: 'share', ax: 'share', cls: 'st-share' }),
+      CONTRIBUTE ? btn('发布到工坊', '用 GitHub issue 投稿', () => publish(), { cls: 'water', ico: 'publish', ax: 'publish' }) : null,   // 投稿入口：见 flags.js
+      btn('导出', '导出 GIF / 视频 / PNG', () => showExport(), { cls: 'primary', ico: 'download', ax: 'export' })));
 
   // 左：素材栏 + 抽屉
   const rail = el('nav', { class: 'st-rail', 'aria-label': '素材分类' }, ...RAIL.map(([k, label, ico]) =>
     el('button', { class: 'st-railbtn', type: 'button', 'data-k': k, 'data-ax': `drawer:${k}`, 'aria-pressed': String(k === S.drawer), 'aria-label': label, title: label, onclick: () => openDrawer(k) }, icon(ico), el('span', { text: label }))));
   S.drawerTitle = el('h3', { id: 'st-drawer-title' });
   S.drawerCount = el('small', { class: 'st-count' });
-  S.search = el('input', { class: 'input st-search', type: 'search', placeholder: '搜一下名字', 'aria-label': '搜索素材', 'data-ax': 'search' });
+  S.search = el('input', { class: 'input st-search', type: 'search', placeholder: '搜索', 'aria-label': '搜索素材', 'data-ax': 'search' });
   S.search.addEventListener('input', () => renderDrawer());
   S.favBtn = el('button', { class: 'st-favfilter', type: 'button', 'aria-pressed': 'false', 'aria-label': '只看收藏', title: '只看收藏', 'data-ax': 'fav-only', onclick: () => { S.favOnly = !S.favOnly; S.favBtn.setAttribute('aria-pressed', String(S.favOnly)); renderDrawer(); } }, icon('star'));
   S.drawerBody = el('div', { class: 'st-drawer-body', role: 'region', 'aria-labelledby': 'st-drawer-title' });
@@ -215,21 +221,16 @@ function build(root) {
   S.stageBox.append(S.guides);
   S.stageHint = el('div', { class: 'st-stagehint', 'aria-hidden': 'true' });
   const stage = el('div', { class: 'st-stage' }, S.stageBox, S.errBadge, S.bootMsg, S.stageHint);
-  const sel = (title, ax, opts, value, on) => el('select', { class: 'st-mini-select', title, 'aria-label': title, 'data-ax': ax, onchange: (e) => on(e.target.value) },
-    ...opts.map(([v, t]) => el('option', { value: v, text: t, selected: v === value ? true : null })));
-  const zoomSel = sel('缩放', 'zoom', [['fit', '适应'], ['1', '100%'], ['2', '200%'], ['0.6', '60%（表情实际大小）']], 'fit', (v) => { S.zoom = v; layoutStage(); });
-  const bgSel = sel('舞台背景（只影响预览）', 'stage-bg', [['white', '白底'], ['checker', '棋盘格'], ['chat', '聊天气泡·浅'], ['chatdark', '聊天气泡·深']], 'white', (v) => { S.bg = v; S.stageBox.className = `st-stage-box bg-${v}`; });
-  const qSel = sel('预览画质（导出总是全画质）', 'quality', [['auto', '画质：自动'], ['smooth', '画质：流畅'], ['sharp', '画质：清晰']], quality, (v) => {
-    S.quality = v; try { localStorage.setItem('axo-quality', v); } catch { /* 存不下就只这次 */ }
-    S.runner.post({ type: 'quality', choice: v });
-  });
+  // 舞台上方：像监视器面板的标题栏，左边面板名，右边缩放、预览背景、画质、参考线（视图菜单里也能改）
+  S.zoomSel = uiSelect({ options: ZOOMS, value: 'fit', label: '缩放', prefix: '缩放', ax: 'zoom', cls: 'sm', onChange: setZoom });
+  S.bgSel = uiSelect({ options: BGS, value: 'white', label: '预览背景（不影响导出）', prefix: '背景', ax: 'stage-bg', cls: 'sm', onChange: setBg });
+  S.qSel = uiSelect({ options: QUALS, value: quality, label: '预览画质（导出总是全画质）', prefix: '画质', ax: 'quality', cls: 'sm', onChange: setQuality });
   S.perfTag = el('span', { class: 'st-hint st-perf', title: perf.renderer || '' });
   let guidesOn = false;
   try { guidesOn = localStorage.getItem('axo-guides') === '1'; } catch { /* 没有 localStorage */ }
-  const guidesBtn = btn('参考线', '显示中心线和表情的安全边距（只在预览里，不会导出）', () => setGuides(!S.guides.hidden ? false : true), { cls: 'small', ico: 'guides', ax: 'guides' });
-  const setGuides = (on) => { S.guides.hidden = !on; guidesBtn.setAttribute('aria-pressed', String(on)); try { localStorage.setItem('axo-guides', on ? '1' : '0'); } catch { /* 存不下 */ } };
+  S.guidesBtn = btn('参考线', '中心线和安全边距（不会导出）', () => setGuides(S.guides.hidden), { cls: 'small', ico: 'guides', ax: 'guides', hideLabel: true });
   setGuides(guidesOn);
-  const stagebar = el('div', { class: 'st-stagebar' }, zoomSel, bgSel, qSel, guidesBtn, el('span', { class: 'st-grow' }), S.perfTag);
+  const stagebar = el('div', { class: 'st-stagebar' }, el('span', { class: 'st-paneltitle' }, '预览'), el('span', { class: 'st-grow' }), S.perfTag, S.zoomSel, S.bgSel, S.qSel, S.guidesBtn);
 
   // 播放条
   S.playBtn = btn('暂停', '播放 / 暂停（空格）', () => setPlaying(!S.playing), { cls: 'play', ico: 'pause', ax: 'play', hideLabel: true });
@@ -253,7 +254,7 @@ function build(root) {
   S.dockTabs = el('div', { class: 'st-docktabs' },
     el('div', { class: 'st-tablist', role: 'tablist', 'aria-label': '时间轴和代码' }, tab('timeline', '时间轴', 'layers'), tab('code', '代码', 'code')),
     el('span', { class: 'st-grow' }),
-    btn('加图层', '加一层', (e) => addMenu(e.currentTarget), { cls: 'small', ico: 'plus', ax: 'add-layer-menu' }));
+    btn('加图层', '加一层', (e) => addMenu(e.currentTarget, e.detail === 0), { cls: 'small', ico: 'plus', ax: 'add-layer-menu' }));
   S.timeline = el('div', { class: 'st-timeline', role: 'region', 'aria-label': '时间轴' });
   S.codePane = el('div', { class: 'st-code', role: 'region', 'aria-label': '代码' });
   const dock = el('section', { class: 'st-dock' }, S.dockTabs, S.timeline, S.codePane);
@@ -296,15 +297,15 @@ function build(root) {
     const restart = (sandboxed) => { bootTries = 1; S.runner.sandboxed = sandboxed; S.root.dataset.state = 'booting'; bootLoader(); S.runner.start(); };
     fill(S.bootMsg, icon('warn', 'big'), el('b', { text: '预览沙盒没能启动' }),
       el('p', { text: `${m?.reason || '没有回应'}。` }),
-      el('p', { class: 'st-note', text: '组件代码只在一个不透明来源的沙盒框里跑，拦截类浏览器扩展（广告 / 隐私拦截）有时会把它的请求当成可疑的拦下来：给这个网站关掉它们再重试，或者换个浏览器。' }),
+      el('p', { class: 'st-note', text: '广告 / 隐私拦截扩展可能会拦下预览沙盒。对本站关闭后重试，或换个浏览器。' }),
       el('div', { class: 'st-row' }, el('button', { class: 'btn primary', type: 'button', 'data-ax': 'boot-retry', onclick: () => restart(S.runner.sandboxed) }, icon('undo'), '重试'),
-        local ? el('button', { class: 'btn', type: 'button', 'data-ax': 'boot-nosandbox', onclick: () => restart(false) }, '不用沙盒直接运行（只在本机）') : null));
+        local ? el('button', { class: 'btn', type: 'button', 'data-ax': 'boot-nosandbox', onclick: () => restart(false) }, '不用沙盒运行（仅本机）') : null));
     S.bootMsg.hidden = false;
   });
-  S.runner.watch(() => { toast('沙盒没响应了，重开一次'); S.runner.start(); });
+  S.runner.watch(() => { toast('预览无响应，正在重启'); S.runner.start(); });
 
   store.on((why) => {
-    if (why === 'foreign') { setSaved('foreign'); toast('这份草稿在另一个标签页里改过了：这边的改动不再自动保存（想接着用那边的就刷新页面；这边的可以「保存」成文件）'); return; }
+    if (why === 'foreign') { setSaved('foreign'); toast('草稿在另一个标签页被改过：这里不再自动保存（刷新可载入那边的版本）'); return; }
     if (why !== 'select' && store.foreign) setSaved('foreign');
     if (why === 'load') { S.projectKey = null; S.projectDirty = false; }   // 换成了别的工程（文件、模板、分享…）：不再对应「我的工程」里那一份，存的话另存一份
     else if (why === 'change' || why === 'history') S.projectDirty = true;
@@ -338,7 +339,7 @@ function build(root) {
 const clampN = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 function stageHint() {
   const l = S.store.layer();
-  S.stageHint.textContent = l?.type === 'text' ? `拖动：挪「${l.text || '这行字'}」 · 滚轮：缩放` : '拖动：挪模型 · 滚轮：缩放（选中文字就挪文字）';
+  S.stageHint.textContent = l?.type === 'text' ? `拖动移动「${l.text || '文字'}」 · 滚轮缩放` : '拖动移动模型 · 滚轮缩放';
 }
 function stageInteract() {
   const box = S.stageBox, pts = new Map();
@@ -428,17 +429,17 @@ function stageInteract() {
 
 // 启动中的动画：一只在水里上下浮的小美西螈 + 三个点
 function bootLoader() {
-  fill(S.bootMsg, el('div', { class: 'st-loader', 'aria-hidden': 'true' }, el('i'), el('i'), el('i')), el('span', { text: '正在启动预览…' }));
+  fill(S.bootMsg, el('div', { class: 'st-loader', 'aria-hidden': 'true' }, el('i'), el('i'), el('i')), el('span', { text: '启动预览…' }));
   S.bootMsg.hidden = false;
 }
 // 顶栏的「已自动保存」：每次改动闪一下；另一个标签页接手了草稿、或者浏览器存储满了存不上，就变成提醒
 function setSaved(state) {
   const ok = state === 'ok';
   S.saved.classList.toggle('warn', !ok);
-  S.saved.title = ok ? '草稿一改就自动存在这台设备的浏览器里；想长期留着就「存到我的工程」或者「保存」成文件'
-    : state === 'full' ? '浏览器的存储空间满了，草稿没存上：赶紧「保存」成文件，或者在「工坊 · 我的组件库」里删掉用不到的模型、字体'
-      : '另一个标签页改过这份草稿，这边的改动不再自动保存：要留着就「保存」成文件';
-  fill(S.saved, icon(ok ? 'check' : 'warn', 'tiny'), el('span', { text: ok ? '已自动保存' : state === 'full' ? '没存上（存储满了）' : '没在自动保存' }));
+  S.saved.title = ok ? '草稿自动保存在本机浏览器'
+    : state === 'full' ? '浏览器存储已满，草稿没存上。请保存为文件，或在「工坊 · 我的组件库」删掉不用的模型、字体'
+      : '草稿在另一个标签页被改过，这里不再自动保存。需要的话请保存为文件';
+  fill(S.saved, icon(ok ? 'check' : 'warn', 'tiny'), el('span', { text: ok ? '已保存' : state === 'full' ? '存储已满' : '未自动保存' }));
   S.saved.animate?.([{ opacity: 0.35 }, { opacity: 1 }], { duration: 400 });   // 闪一下（Web Animations：不用为了重播动画强制重排）
 }
 function sendVisibility() { S.runner?.post({ type: 'transport', visible: S.active && S.stageVisible }); }
@@ -530,8 +531,8 @@ function fontRow() {
     el('div', { class: 'chips', role: 'group', 'aria-label': '字体' }, ...FONT_LIST.map((f) => chip(f.id, f.name, fontDesc(f))), ...libFonts().map((e) => chip(e.id, e.name, `导入的字体 · ${e.kb || '?'} KB（只在这台设备上）`))),
     el('div', { class: 'st-row' },
       btn('导入字体', '导入 .ttf / .otf / .woff / .woff2 字体文件（存在这台设备上）', () => pickFile('.ttf,.otf,.woff,.woff2'), { cls: 'small', ico: 'open', ax: 'import-font' }),
-      btn('所有文字都用它', '把所有文字图层换成这个字体', () => applyFont(cur, true), { cls: 'small', ax: 'font-all' })),
-    cur !== 'axo' ? el('p', { class: 'st-note', text: CONTRIBUTE ? '工坊出图只认「Axo 黑体」：换了字体导出 GIF 没问题，发布到工坊前要换回来。系统字体在别的设备上可能长得不一样。' : '换了字体导出 GIF 没问题；系统字体在别的设备上可能长得不一样。' }) : null);
+      btn('应用到全部文字', '把所有文字图层换成这个字体', () => applyFont(cur, true), { cls: 'small', ax: 'font-all' })),
+    cur !== 'axo' ? el('p', { class: 'st-note', text: CONTRIBUTE ? '工坊出图只支持 Axo 黑体。系统字体在其他设备上可能不同。' : '系统字体在其他设备上可能不同。' }) : null);
 }
 async function importFont(f) {
   if (f.size > 40 << 20) { toast(`${f.name} 太大了（字体最多 40 MB）`); return; }
@@ -581,7 +582,7 @@ function seek(f) {
 }
 function updateCounter() {
   S.counter.textContent = `${S.frame + 1} / ${S.N} · ${(S.frame / S.fps).toFixed(2)}s`;
-  S.scrub.value = S.frame;
+  S.scrub.value = S.frame; syncRange(S.scrub);
   const x = (S.frame + 0.5) / S.N * 100;
   S.timeline.style.setProperty('--play', `${x}%`);
   S.filmCanvases?.forEach((c, i) => c.classList.toggle('on', i === S.frame));
@@ -595,6 +596,89 @@ function layoutStage() {
   stage.scrollTo?.({ left: (box.offsetWidth - stage.clientWidth) / 2, top: 0 });
 }
 function updateHistory() { S.undoBtn.disabled = !S.store.past.length; S.redoBtn.disabled = !S.store.future.length; }
+
+// ---------------- 预览设置（舞台上方的下拉框和视图菜单共用） ----------------
+function setZoom(v) { S.zoom = v; S.zoomSel.value = v; layoutStage(); }
+function setBg(v) {
+  S.bg = v; S.bgSel.value = v;
+  for (const [b] of BGS) S.stageBox.classList.toggle(`bg-${b}`, b === v);   // 只换背景那个类：适应窗口的 fit 类留着
+}
+function setQuality(v) {
+  S.quality = v; S.qSel.value = v;
+  try { localStorage.setItem('axo-quality', v); } catch { /* 存不下就只这次 */ }
+  S.runner?.post({ type: 'quality', choice: v });
+}
+function setGuides(on) {
+  S.guides.hidden = !on; S.guidesBtn.setAttribute('aria-pressed', String(on));
+  try { localStorage.setItem('axo-guides', on ? '1' : '0'); } catch { /* 存不下 */ }
+}
+
+// ---------------- 顶栏菜单 ----------------
+async function newProject() {
+  if (await ask('新建工程', '当前工程会被替换。没存的话，先「保存」或存到「我的工程」。', '新建')) { S.store.replace(STARTER()); S.projectKey = null; }
+}
+function removeLayer(id) { S.store.change((p) => { p.layers = p.layers.filter((l) => l.id !== id); }); S.store.select(null); }
+function menuItems(k) {
+  const st = S.store, l = st.layer(), i = l ? st.p.layers.indexOf(l) : -1;
+  if (k === 'file') return [
+    { label: '新建', ax: 'new', on: newProject },
+    { label: '打开文件…', ax: 'open', on: () => pickFile() },
+    { label: '保存为文件', kbd: 'Ctrl+S', ax: 'save', on: saveProjectFile },
+    { label: '我的工程…', ax: 'projects', on: showProjects },
+    '-',
+    { label: '分享链接…', on: shareLink },
+    CONTRIBUTE ? { label: '发布到工坊…', on: publish } : null,
+    { label: '导出…', on: showExport },
+  ];
+  if (k === 'edit') return [
+    { label: '撤销', kbd: 'Ctrl+Z', disabled: !st.past.length, on: () => st.undo() },
+    { label: '重做', kbd: 'Ctrl+Shift+Z', disabled: !st.future.length, on: () => st.redo() },
+    '-',
+    { label: '拷贝图层', kbd: 'Ctrl+C', disabled: !l, on: () => { S.clip = structuredClone(l); toast('已拷贝图层'); } },
+    { label: '粘贴图层', kbd: 'Ctrl+V', disabled: !S.clip, on: () => pasteLayer(S.clip) },
+    { label: '复制图层', kbd: 'Ctrl+D', disabled: !l, on: () => duplicateLayer(l) },
+    { label: '上移一层', kbd: '[', disabled: i <= 0, on: () => moveLayer(i, -1) },
+    { label: '下移一层', kbd: ']', disabled: i < 0 || i >= st.p.layers.length - 1, on: () => moveLayer(i, 1) },
+    { label: '删除图层', kbd: 'Delete', disabled: !l, danger: true, on: () => removeLayer(l.id) },
+    { label: '取消选中', kbd: 'Esc', disabled: !l, on: () => st.select(null) },
+    '-',
+    { label: '随机一张', ax: 'random', on: randomize },
+  ];
+  if (k === 'view') return [
+    { heading: '缩放' }, ...ZOOMS.map(([v, t]) => ({ label: t, radio: true, checked: S.zoom === v, on: () => setZoom(v) })),
+    { heading: '预览背景' }, ...BGS.map(([v, t]) => ({ label: t, radio: true, checked: S.bg === v, on: () => setBg(v) })),
+    { heading: '预览画质' }, ...QUALS.map(([v, t]) => ({ label: t, radio: true, checked: S.quality === v, on: () => setQuality(v) })),
+    '-',
+    { label: '参考线', checked: !S.guides.hidden, on: () => setGuides(S.guides.hidden) },
+    { label: '洋葱皮', kbd: 'O', checked: S.onion, on: () => S.onionBtn.click() },
+    '-',
+    { label: '时间轴', radio: true, checked: S.dock === 'timeline', on: () => setDock('timeline') },
+    { label: '代码', radio: true, checked: S.dock === 'code', on: () => setDock('code') },
+  ];
+  if (k === 'help') return [
+    { label: '快捷键', kbd: '?', ax: 'help', on: showKeys },
+    { label: 'AI 助手接口（llms.txt）', on: () => window.open('llms.txt', '_blank', 'noopener') },
+    '-',
+    { label: 'GitHub 仓库', on: () => window.open(`https://github.com/${REPO}`, '_blank', 'noopener') },
+  ];
+  // 窄屏：菜单栏收成一个按钮，四个菜单拼在一起（缩放这些舞台上方就有，不再列）
+  const view = menuItems('view').filter((x) => x !== '-' && !x.radio && !x.heading);
+  return [{ heading: '文件' }, ...menuItems('file'), '-', { heading: '编辑' }, ...menuItems('edit'), '-', { heading: '视图' }, ...view, '-', { heading: '帮助' }, ...menuItems('help')];
+}
+// 菜单栏：点开一个；开着的时候鼠标划到旁边那个就换过去；键盘左右键在几个菜单之间走
+function menubar(bar, all) {
+  const btns = [...bar.children];
+  const open = (b, focus) => openMenu(b, menuItems(b.dataset.menu), { label: b.dataset.menu === 'all' ? '菜单' : b.textContent, focus,
+    onKey: b === all ? null : (key) => { const j = (btns.indexOf(b) + (key === 'ArrowRight' ? 1 : -1) + btns.length) % btns.length; btns[j].focus(); open(btns[j], true); } });
+  for (const b of [...btns, all]) {
+    b.addEventListener('click', (e) => { if (menuOpenFor(b)) closePopups(); else open(b, e.detail === 0); });   // detail 0：键盘点的，焦点进菜单
+    b.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') { open(b, true); e.preventDefault(); e.stopPropagation(); }
+      else if (b !== all && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { btns[(btns.indexOf(b) + (e.key === 'ArrowRight' ? 1 : -1) + btns.length) % btns.length].focus(); e.preventDefault(); }
+    });
+  }
+  for (const b of btns) b.addEventListener('pointerenter', () => { if (btns.some((x) => x !== b && menuOpenFor(x))) open(b, false); });
+}
 
 let filmTimer, filmSeq = 0;
 function scheduleFilmstrip() {
@@ -741,7 +825,7 @@ function withFavs(type, list, render, rest) {
   const out = [];
   if (fav.length) out.push(el('h4', {}, icon('star', 'tiny'), '收藏'), render(fav));
   if (!S.favOnly) out.push(...rest());
-  else if (!fav.length) out.push(el('p', { class: 'st-empty', text: '这一类还没有收藏。点素材右上角的星星收藏。' }));
+  else if (!fav.length) out.push(el('p', { class: 'st-empty', text: '还没有收藏' }));
   return out;
 }
 const grid = (items, cls = 'list') => el('div', { class: `st-grid ${cls}` }, ...items);
@@ -766,11 +850,10 @@ async function renderDrawer() {
     const favs = items.filter((it) => lib.isFav(`tpl:${it.key}`)), rest = S.favOnly ? [] : items.filter((it) => !lib.isFav(`tpl:${it.key}`));
     fill(body,
       el('div', { class: 'st-row' }, btn('空白开始', '从一个空白工程开始', () => S.store.replace(STARTER()), { cls: 'small', ico: 'file', ax: 'blank' }), btn('随机', '随机拼一张', randomize, { cls: 'small', ico: 'dice', ax: 'random' })),
-      el('p', { class: 'st-note', text: '正式表情都能当模板：点一下就打开它的配方，改哪儿都行。' }),
       favs.length ? [el('h4', {}, icon('star', 'tiny'), '收藏'), grid(favs.map(card), 'thumbs')] : null,
       rest.length ? grid(rest.slice(0, 120).map(card), 'thumbs') : null,
-      rest.length > 120 ? el('p', { class: 'st-note', text: '还有更多，搜一下文字。' }) : null,
-      S.favOnly && !favs.length ? el('p', { class: 'st-empty', text: '还没有收藏的模板。' }) : null);
+      rest.length > 120 ? el('p', { class: 'st-note', text: '只显示前 120 张，搜索查看更多' }) : null,
+      S.favOnly && !favs.length ? el('p', { class: 'st-empty', text: '还没有收藏' }) : null);
     return;
   }
   if (k === 'text') {
@@ -786,7 +869,7 @@ async function renderDrawer() {
         return el('div', { class: 'st-textrow' }, inp, btn('删掉这行字', '删掉这行字', () => st.change((p) => { p.layers = p.layers.filter((x) => x.id !== l.id); }), { ico: 'trash', ax: 'remove-text', hideLabel: true }));
       }),
       btn('再加一行字', '再加一行字', () => { const nid = newId('t'); st.change((p) => p.layers.push({ id: nid, type: 'text', component: 'stay', text: '再来一行', y: 200 + 60 * texts.length, scale: 0.7 })); st.select(nid); }, { cls: 'small', ico: 'plus', ax: 'add-text' }),
-      el('p', { class: 'st-note', text: '「/」可以手动换行。选中一行字后，下面的颜色和动画会用在它身上。' }),
+      el('p', { class: 'st-note', text: '输入 / 换行' }),
       el('h4', { text: '字色' }), styleRow(),
       el('h4', { text: '字体' }), fontRow(),
       el('h4', { text: `文字动画（${anims.length}）` }),
@@ -799,8 +882,7 @@ async function renderDrawer() {
   if (k === 'skin') {
     const skins = S.catalog.get('skin') || [];
     const sk = (m) => entry('skin', m, { thumb: 'skin', active: st.p.skin.component === m.id, error: errKeys.has(`skin:${m.id}`), onUse: () => useComponent('skin', m.id) });
-    fill(body, ...withFavs('skin', skins, (l) => grid(l.map(sk), 'thumbs'), () => [grid(skins.map(sk), 'thumbs')]),
-      el('p', { class: 'st-note', text: '皮肤的颜色可以在右边属性里调；想要更花的效果，去「工坊」新建一个皮肤写 tint。' }));
+    fill(body, ...withFavs('skin', skins, (l) => grid(l.map(sk), 'thumbs'), () => [grid(skins.map(sk), 'thumbs')]));
     return;
   }
   if (k === 'workshop') { renderWorkshop(body, q); return; }
@@ -813,16 +895,16 @@ async function renderDrawer() {
     face.addEventListener('change', () => st.change((p) => { p.model.face = face.checked; }));
     S.drawerCount.textContent = `${mine.length + 1} 个`;
     fill(body,
-      tile('axolotl', '原版体素', '内置 · 表情包用的那只：逐像素的方块，鳃和尾巴是 1 像素的薄片'),
-      ...mine.map((e) => tile(e.id, e.name, `${e.from === 'repo' ? (CONTRIBUTE ? '工坊 · 能发布' : '工坊') : '载入的文件 · 只在这台设备上'}${e.kb ? ` · ${e.kb} KB` : ''}`,
+      tile('axolotl', '原版体素', '内置'),
+      ...mine.map((e) => tile(e.id, e.name, `${e.from === 'repo' ? '工坊' : '本地文件'}${e.kb ? ` · ${e.kb} KB` : ''}`,
         btn('删除', `从这台设备上删掉模型「${e.name}」`, () => deleteFromLibrary(e.origin), { cls: 'small danger', ico: 'trash', ax: 'model-remove', hideLabel: true }))),
-      cur !== 'axolotl' && !mine.some((e) => e.id === cur) ? tile(cur, S.models.get(cur)?.name || cur.replace(/^file:/, ''), '这个工程用的（不在你的库里）') : null,
+      cur !== 'axolotl' && !mine.some((e) => e.id === cur) ? tile(cur, S.models.get(cur)?.name || cur.replace(/^file:/, ''), '当前工程使用（不在库里）') : null,
       el('div', { class: 'st-row' },
         btn('去工坊找模型', '工坊里的全部模型', () => { S.wsTab = 'browse'; S.wsFilter = 'model'; openDrawer('workshop'); }, { cls: 'small primary', ico: 'bag', ax: 'models-workshop' }),
         btn('载入模型文件', '载入 .glb / .gltf 模型文件（存在这台设备上）', () => pickFile('.glb,.gltf'), { cls: 'small', ico: 'open', ax: 'load-model' })),
-      el('label', { class: 'st-field check' }, face, el('span', { text: '在头的正面画表情（别的模型脸不在那儿的话关掉）' })),
-      el('h4', {}, icon('move', 'tiny'), '大小和位置'), modelControls('drawer'),
-      el('p', { class: 'st-note', text: (CONTRIBUTE ? '工坊里的模型「添加」后存在这台设备的库里，用了也能发布到工坊；' : '工坊里的模型「添加」后存在这台设备的库里，分享出去别人也能打开；') + '自己载入的模型文件也存在库里，但只在这台设备上能用。能用 Blockbench 做的方块模型：节点名叫 head、body、tail、leg1～leg4、top_gills、left_gills、right_gills 的会跟着动作动，其他的跟着身体走。只支持贴图和数据都内嵌在文件里的 .glb / .gltf，模型会自动缩放到和原版差不多大。' }));
+      el('label', { class: 'st-field check' }, face, el('span', { text: '在头部正面画表情' })),
+      el('h4', {}, icon('move', 'tiny'), '变换'), modelControls('drawer'),
+      el('p', { class: 'st-note', text: '支持贴图内嵌的 .glb / .gltf（如 Blockbench 导出）。名为 head、body、tail、leg1–leg4、top_gills、left_gills、right_gills 的节点会跟着动作动。' }));
     return;
   }
   const list = (S.catalog.get(k) || []).filter((m) => match(m, q));
@@ -838,7 +920,7 @@ async function renderDrawer() {
     return [
       own.length ? el('h4', { text: '工坊下载 / 自己写的' }) : null, own.length ? view(own) : null,
       ...groups.flatMap(([title, f]) => { const g = list.filter((m) => m.origin === 'builtin' && f(m)); return g.length ? [title ? el('h4', { text: title }) : null, view(g)] : []; }),
-      el('p', { class: 'st-note', text: k === 'motion' ? '点一下换掉当前动作；点「＋」再叠一个动作上去（比如点头 + 摇尾巴），在时间轴上还能让它只动一段。' : k === 'face' ? '点一下换表情；在右边属性里还能左右眼、嘴分开挑。' : '点一下换掉选中的；「＋」再加一个。' }),
+      el('p', { class: 'st-note', text: k === 'face' ? '点击替换' : '点击替换 · ＋ 叠加一层' }),
     ];
   }));
 }
@@ -884,8 +966,7 @@ function modelControls(panel) {
     control({ label: '上下（像素）', min: -256, max: 256, type: 'int' }, M.y, (v) => set((m) => { m.y = v; }, 'y'), 'model-y'),
     control({ label: '旋转（度）', min: -180, max: 180, type: 'int' }, M.rot, (v) => set((m) => { m.rot = v; }, 'rot'), 'model-rot'),
     el('div', { class: 'st-row' }, flip,
-      btn('复位', '大小、位置、角度、镜像都回到默认', () => st.change((p) => { Object.assign(p.model, { x: 0, y: 0, scale: 1, rot: 0, flip: false }); }), { cls: 'small', ico: 'reset', ax: 'model-reset' })),
-    el('p', { class: 'st-note', text: '也可以直接在预览上拖（没选中文字的时候拖的是模型），滚轮或者双指捏合缩放。叠在动作上面：动作照样动，只是整体挪了位置。' }));
+      btn('复位', '大小、位置、角度、镜像都回到默认', () => st.change((p) => { Object.assign(p.model, { x: 0, y: 0, scale: 1, rot: 0, flip: false }); }), { cls: 'small', ico: 'reset', ax: 'model-reset' })));
 }
 
 function styleRow() {
@@ -999,7 +1080,7 @@ function useFromLibrary(e) {
 }
 
 function renderWorkshop(body, q) {
-  const tabs = el('div', { class: 'st-seg', role: 'tablist', 'aria-label': '工坊' }, ...[['browse', '工坊里的全部'], ['mine', '我的组件库']].map(([k, t]) =>
+  const tabs = el('div', { class: 'st-seg', role: 'tablist', 'aria-label': '工坊' }, ...[['browse', '全部'], ['mine', '我的组件库']].map(([k, t]) =>
     el('button', { type: 'button', role: 'tab', 'aria-selected': String(S.wsTab === k), 'data-ax': `workshop-tab:${k}`, onclick: () => { S.wsTab = k; renderDrawer(); } }, t)));
   if (S.wsTab === 'mine') { fill(body, tabs, ...renderLibrary(q)); return; }
   const kinds = ['all', 'fav', 'added', 'scene', 'model', 'motion', 'fx', 'textanim', 'face', 'prop', 'wear', 'skin'];
@@ -1016,9 +1097,8 @@ function renderWorkshop(body, q) {
       && (!S.favOnly || lib.isFav(favKey(c.type, c.id))));
     S.drawerCount.textContent = `${items.length} / ${repo.length} 个`;
     listBox.removeAttribute('aria-busy');
-    fill(listBox, items.length ? el('div', { class: 'st-wslist', role: 'list', 'aria-label': '工坊里的组件和模型' }, ...items.map(wsCard)) : el('p', { class: 'st-empty', text: repo.length ? '没有符合条件的。' : '工坊里还没有组件。' }),
-      el('p', { class: 'st-note' }, CONTRIBUTE ? '工坊就是仓库里的 workshop/components（组件）和 workshop/models（模型）文件夹，大家用 PR 往里加。自己写的组件在代码面板里「提交到工坊」就能开 PR。' : '工坊就是仓库里的 workshop/components（组件）和 workshop/models（模型）文件夹。'));
-  }).catch(() => { listBox.removeAttribute('aria-busy'); fill(listBox, el('p', { class: 'st-empty', text: '工坊没加载出来，过会儿再试。' }), btn('重试', '重新加载', () => { S.repo = null; renderDrawer(); }, { cls: 'small', ax: 'retry' })); });
+    fill(listBox, items.length ? el('div', { class: 'st-wslist', role: 'list', 'aria-label': '工坊里的组件和模型' }, ...items.map(wsCard)) : el('p', { class: 'st-empty', text: repo.length ? '没有符合条件的' : '工坊里还没有组件' }));
+  }).catch(() => { listBox.removeAttribute('aria-busy'); fill(listBox, el('p', { class: 'st-empty', text: '工坊加载失败' }), btn('重试', '重新加载', () => { S.repo = null; renderDrawer(); }, { cls: 'small', ax: 'retry' })); });
 }
 
 function wsCard(c) {
@@ -1052,8 +1132,8 @@ function renderLibrary(q) {
       e.kind === 'model' ? btn('换上', '换成这个模型', (ev) => chooseModel(e.id, ev.currentTarget), { cls: 'small primary', ico: 'check', ax: 'library-use' })
         : btn('用上', '用到选中的文字', () => applyFont(e.id), { cls: 'small primary', ico: 'check', ax: 'library-use' }),
       btn('删除', '从这台设备上彻底删掉', () => deleteFromLibrary(e.origin), { cls: 'small danger', ico: 'trash', ax: 'library-remove', hideLabel: true })));
-  const newSel = el('select', { class: 'select', 'aria-label': '新建组件', 'data-ax': 'new-component', onchange: (e) => { if (e.target.value) newComponent(e.target.value); e.target.value = ''; } },
-    el('option', { value: '', text: '＋ 新建组件…' }), ...Object.keys(TEMPLATES).map((t) => el('option', { value: t, text: `新建${ZH[t]}` })));
+  const newSel = btn('新建组件', '从模板新建一个组件', (e) => menuOpenFor(e.currentTarget) ? closePopups() : openMenu(e.currentTarget, Object.keys(TEMPLATES).map((t) => ({ label: ZH[t], ax: `new-component:${t}`, on: () => newComponent(t) })), { label: '新建组件', focus: e.detail === 0 }), { cls: 'small', ico: 'plus', ax: 'new-component' });
+  newSel.setAttribute('aria-haspopup', 'menu');
   const byKind = new Map();
   for (const e of items) { const k = e.type === 'scene' ? 'scene' : e.type || 'other'; if (!byKind.has(k)) byKind.set(k, []); byKind.get(k).push(e); }
   const row = (e) => el('div', { class: 'st-libitem', 'data-ax': 'library-item', 'data-origin': e.origin, 'data-type': e.type, 'data-id': e.id },
@@ -1071,35 +1151,21 @@ function renderLibrary(q) {
     btn('移出工程', '从这个工程里拿掉这段代码', () => st.dropComponent(c.origin), { cls: 'small', ax: 'project-component-drop' })));
   const order = ['scene', 'motion', 'fx', 'textanim', 'face', 'prop', 'wear', 'skin'];
   return [
-    el('div', { class: 'st-row' }, btn('载入组件文件…', '载入 .axo.js 组件文件', () => pickFile('.js,.axo.js,text/javascript'), { cls: 'small primary', ico: 'open', ax: 'load-component' }), newSel),
-    el('p', { class: 'st-note', text: '这里是存在这台设备浏览器里的组件：从工坊下载的、自己写的、从文件载入的。下载的动作 / 特效 / 文字动画会出现在对应的那一类里；整帧的场景组件（比如水龙卷）在这里点「用上」。' }),
+    el('div', { class: 'st-row' }, btn('载入文件…', '载入 .axo.js 组件文件', () => pickFile('.js,.axo.js,text/javascript'), { cls: 'small primary', ico: 'open', ax: 'load-component' }), newSel),
     ...[...byKind.keys()].sort((a, b) => order.indexOf(a) - order.indexOf(b)).flatMap((k) => [el('h4', { text: `${KIND[k] || '其他'}（${byKind.get(k).length}）` }), el('div', { class: 'st-wslist' }, ...byKind.get(k).map(row))]),
-    items.length ? null : el('p', { class: 'st-empty', text: S.favOnly ? '组件库里没有收藏的。' : '组件库是空的：去「工坊里的全部」添加，或者新建一个。' }),
+    items.length ? null : el('p', { class: 'st-empty', text: S.favOnly ? '没有收藏的组件' : '组件库是空的' }),
     assets.length && !S.favOnly ? [el('h4', { text: `模型和字体（${assets.length}）` }), el('div', { class: 'st-wslist' }, ...assets.map(assetRow))] : null,
-    inProject.length ? [el('h4', { text: '这个工程自带、但不在组件库里的代码' }), el('ul', { class: 'st-list' }, ...inProject)] : null,
+    inProject.length ? [el('h4', { text: '工程自带的代码' }), el('ul', { class: 'st-list' }, ...inProject)] : null,
   ];
 }
 
 // ---------------- 图层菜单 ----------------
-function addMenu(anchor) {
-  const menu = el('div', { class: 'st-menu', role: 'menu' }, ...['motion', 'fx', 'text', 'prop', 'wear'].map((t) => el('button', { type: 'button', role: 'menuitem', onclick: () => {
-    menu.remove();
+function addMenu(anchor, focus) {
+  if (menuOpenFor(anchor)) { closePopups(); return; }
+  openMenu(anchor, ['motion', 'fx', 'text', 'prop', 'wear'].map((t) => ({ label: ZH[t], ax: `add:${t}`, on: () => {
     if (t === 'text') { const nid = newId('t'); S.store.change((p) => p.layers.push({ id: nid, type: 'text', component: 'stay', text: '新的一行', y: 300, scale: 0.7 })); S.store.select(nid); return; }
-    openDrawer(t); toast(`在左边「${ZH[t]}」里点「＋」加一层`);
-  } }, `＋ ${ZH[t]}`)));
-  document.body.append(menu);
-  const r = anchor.getBoundingClientRect();
-  menu.style.left = `${Math.min(r.left, innerWidth - 180)}px`; menu.style.top = `${r.bottom + 4 + scrollY}px`;
-  anchor.setAttribute('aria-expanded', 'true');
-  const close = () => { menu.remove(); anchor.setAttribute('aria-expanded', 'false'); document.removeEventListener('click', off); };
-  const off = (e) => { if (!menu.contains(e.target)) close(); };
-  menu.addEventListener('keydown', (e) => {                    // Esc 关掉、上下键挑
-    const items = [...menu.querySelectorAll('button')], i = items.indexOf(document.activeElement);
-    if (e.key === 'Escape') { close(); anchor.focus(); e.preventDefault(); }
-    else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { items[(i + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length]?.focus(); e.preventDefault(); }
-  });
-  menu.querySelector('button')?.focus();
-  setTimeout(() => document.addEventListener('click', off));
+    openDrawer(t); toast(`在左侧「${ZH[t]}」里点 ＋ 添加`);
+  } })), { label: '加图层', side: 'end', focus });
 }
 
 // ---------------- 时间轴 ----------------
@@ -1130,7 +1196,7 @@ function renderTimeline() {
     el('div', { class: 'tl-row tl-head' }, el('span'), el('span', { class: 'tl-label static', text: `${S.N} 帧 · ${S.fps} fps` }), S.filmStrip ||= el('div', { class: 'tl-film' })),
     el('div', { class: 'tl-row tl-head' }, el('span'), el('span', { class: 'tl-label static', text: '' }), ruler),
     ...rows,
-    rows.length ? null : el('p', { class: 'st-note', text: '还没有图层，从左边素材里点一个。' }));
+    rows.length ? null : el('p', { class: 'st-note', text: '还没有图层' }));
   updateCounter();
 }
 function dragBar(bar, track, l) {
@@ -1169,20 +1235,15 @@ function control(spec, value, onInput, key) {
     c.addEventListener('change', () => onInput(c.checked ? 1 : 0));
     return el('label', { class: 'st-field check' }, c, el('span', { text: spec.label || key }));
   }
-  if (t === 'select') {
-    const s = el('select', { class: 'select', 'data-ax': ax }, ...(spec.options || []).map(([v, l]) => el('option', { value: JSON.stringify(v), text: l, selected: JSON.stringify(v) === JSON.stringify(value) ? true : null })));
-    s.addEventListener('change', () => onInput(JSON.parse(s.value)));
-    return el('label', { class: 'st-field' }, el('span', { text: spec.label || key }), s);
+  if (t === 'select' || t === 'icon') {
+    const options = t === 'icon' ? iconList().map((k) => [k, CAT.icons[k] || CAT.holds[k] || k, k]) : (spec.options || []).map(([v, l]) => [v, l]);
+    return field(spec.label || key, uiSelect({ options, value, label: spec.label || key, ax, onChange: onInput }));
   }
   if (t === 'color') {
-    const c = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(value) ? value : '#ffffff', 'data-ax': ax });
-    c.addEventListener('input', () => onInput(c.value));
-    return el('label', { class: 'st-field row' }, el('span', { text: spec.label || key }), c);
-  }
-  if (t === 'icon') {
-    const s = el('select', { class: 'select', 'data-ax': ax }, ...iconList().map((k) => el('option', { value: k, text: `${CAT.icons[k] || CAT.holds[k] || k}（${k}）`, selected: k === value ? true : null })));
-    s.addEventListener('change', () => onInput(s.value));
-    return el('label', { class: 'st-field' }, el('span', { text: spec.label || key }), s);
+    const ok = /^#[0-9a-f]{6}$/i.test(value), c = el('input', { type: 'color', value: ok ? value : '#ffffff', 'data-ax': ax, 'aria-label': spec.label || key });
+    const hex = el('code', { class: 'st-hex', text: c.value.toUpperCase() });
+    c.addEventListener('input', () => { hex.textContent = c.value.toUpperCase(); onInput(c.value); });
+    return el('label', { class: 'st-field row' }, el('span', { text: spec.label || key }), el('span', { class: 'st-color' }, hex, c));
   }
   if (t === 'text') {
     const i = el('input', { class: 'input', value: value ?? '', 'data-ax': ax });
@@ -1192,8 +1253,9 @@ function control(spec, value, onInput, key) {
   const min = spec.min ?? 0, max = spec.max ?? 100, step = t === 'int' ? 1 : spec.step ?? (max - min > 20 ? 1 : 0.01);
   const r = el('input', { type: 'range', min, max, step, value: value ?? spec.default ?? min, class: 'st-range', 'aria-label': spec.label || key, 'data-ax': `${ax}:range` });
   const n = el('input', { type: 'number', min, max, step, value: value ?? spec.default ?? min, class: 'st-num', 'aria-label': `${spec.label || key}（数值）`, 'data-ax': ax });
+  syncRange(r);
   r.addEventListener('input', () => { n.value = r.value; onInput(Number(r.value)); });
-  n.addEventListener('change', () => { r.value = n.value; onInput(Number(n.value)); });
+  n.addEventListener('change', () => { r.value = n.value; syncRange(r); onInput(Number(n.value)); });
   return el('label', { class: 'st-field' }, el('span', { text: spec.label || key }), el('div', { class: 'st-rangebox' }, r, n));
 }
 function iconList() {
@@ -1201,6 +1263,8 @@ function iconList() {
   return [...new Set(['heart', 'star', 'flower', 'note', 'mail', 'money', 'diamond', 'question', 'exclaim', 'check', 'cross', 'thumb', 'plus1', 'bulb', 'snow', 'leaf', 'flame', 'drop', 'clock', 'bug', 'skull', 'ghost', 'swirl', 'z', 'cloud', 'dark', 'moon', 'sun', 'creeper', 'lemon', 'pin', 'arrow', 'brokenheart', ...props])];
 }
 const group = (title, ...kids) => el('section', { class: 'st-group' }, el('h3', { text: title }), ...kids);
+// 带小标题的一格（下拉框是按钮，不放进 <label>：点标题会把它打开）
+const field = (label, control) => el('div', { class: 'st-field' }, el('span', { text: label }), control);
 
 function renderInspector() {
   if (!S.inspector) return;
@@ -1210,8 +1274,8 @@ function renderInspector() {
   const idx = st.p.layers.indexOf(l);
   const metas = l.type === 'text' ? (S.catalog.get('textanim') || []) : (S.catalog.get(l.type) || []);
   const meta = metaOf(l.type === 'text' ? 'textanim' : l.type, l.component);
-  const comp = el('select', { class: 'select', 'data-ax': 'field:component' }, ...metas.map((m) => el('option', { value: m.id, text: m.name, selected: m.id === l.component ? true : null })));
-  comp.addEventListener('change', () => st.change((p) => { bring(p, l.type === 'text' ? 'textanim' : l.type, comp.value); const x = p.layers.find((y) => y.id === l.id); x.component = comp.value; x.params = {}; }));
+  const comp = uiSelect({ options: metas.map((m) => [m.id, m.name]), value: l.component, label: l.type === 'text' ? '动画' : l.type === 'face' ? '预设' : '组件', ax: 'field:component',
+    onChange: (v) => st.change((p) => { bring(p, l.type === 'text' ? 'textanim' : l.type, v); const x = p.layers.find((y) => y.id === l.id); x.component = v; x.params = {}; }) });
   const kids = [
     el('div', { class: 'st-insphead', 'data-ax': 'inspector', 'data-layer': l.id }, el('i', { class: 'tl-dot', style: `background:${TCOLOR[l.type]}` }), el('b', { text: ZH[l.type] }),
       el('span', { class: 'st-grow' }),
@@ -1224,36 +1288,32 @@ function renderInspector() {
   if (l.type === 'text') {
     const inp = el('input', { class: 'input st-textinput', value: l.text, maxlength: 24, 'aria-label': '文字', 'data-ax': 'inspector-text' });
     inp.addEventListener('input', () => set((x) => { x.text = inp.value; }, 'text'));
-    kids.push(group('文字', inp, el('p', { class: 'st-note', text: '「/」手动换行。' }), styleRow(),
+    kids.push(group('文字', inp, styleRow(),
       el('div', { class: 'st-field' }, el('span', { text: '字体' }), fontRow()),
-      el('label', { class: 'st-field' }, el('span', { text: '动画' }), comp),
+      field('动画', comp),
       control({ label: '上下位置', min: 0, max: 512, type: 'int' }, l.y, (v) => set((x) => { x.y = v; }, 'y'), 'y'),
       control({ label: '左右位置', min: -256, max: 256, type: 'int' }, l.x, (v) => set((x) => { x.x = v; }, 'x'), 'x'),
       control({ label: '大小', min: 0.3, max: 2, step: 0.05 }, l.scale, (v) => set((x) => { x.scale = v; }, 'scale'), 'scale')));
   } else if (l.type === 'face') {
     const f = l.face || metaOf('face', l.component)?.face || {};
-    const part = (key, label, options) => {
-      const s = el('select', { class: 'select', 'data-ax': `field:${key}` }, ...options.map(([v, t]) => el('option', { value: v, text: t, selected: (f[key] || options[0][0]) === v ? true : null })));
-      s.addEventListener('change', () => set((x) => { x.face = { ...(x.face || f), [key]: s.value }; }, key));
-      return el('label', { class: 'st-field' }, el('span', { text: label }), s);
-    };
+    const part = (key, label, options) => field(label, uiSelect({ options, value: f[key] || options[0][0], label, ax: `field:${key}`,
+      onChange: (v) => st.change((p) => { const x = p.layers.find((y) => y.id === l.id); x.face = { ...(x.face || f), [key]: v }; }) }));
     const EYE = { open: '睁眼', closed: '闭眼', happy: '眯眼笑', squeeze: '使劲闭', star: '星星眼', big: '大眼', tiny: '小眼', angry: '生气', sad: '难过', heart: '爱心眼', cry: '哭', teary: '泪汪汪', meh: '无语', flat: '一条线', sleep: '睡着', up: '往上看', side: '斜眼', money: '钱眼', x: '叉叉眼', dizzy: '转圈眼', wink: '眨一只' };
     const MOUTH = { normal: '普通', smile: '微笑', o: '张嘴 O', flat: '一字', frown: '撇嘴', wavy: '波浪嘴', shout: '大喊', w: 'w 嘴', tongue: '吐舌', grin: '咧嘴笑', drool: '流口水', eat: '吃东西', none: '没有嘴' };
-    const eyes = Object.entries(EYE).map(([v, t]) => [v, `${t}（${v}）`]);
-    const mouths = Object.entries(MOUTH).map(([v, t]) => [v, `${t}（${v}）`]);
+    const eyes = Object.entries(EYE).map(([v, t]) => [v, t, v]);
+    const mouths = Object.entries(MOUTH).map(([v, t]) => [v, t, v]);
     const blush = el('input', { type: 'checkbox', checked: f.blush ? true : null, 'data-ax': 'field:blush' });
     blush.addEventListener('change', () => set((x) => { x.face = { ...(x.face || f), blush: blush.checked }; }, 'blush'));
     const blink = el('input', { type: 'checkbox', checked: l.blink !== false ? true : null, 'data-ax': 'field:blink' });
     blink.addEventListener('change', () => set((x) => { x.blink = blink.checked; }, 'blink'));
-    kids.push(group('表情', el('label', { class: 'st-field' }, el('span', { text: '预设' }), comp),
-      el('p', { class: 'st-note', text: '下面可以拆开拼：左眼、右眼、嘴各挑各的。' }),
-      part('L', '左眼（画面右边）', eyes), part('R', '右眼（画面左边）', eyes), part('mouth', '嘴', mouths),
-      el('label', { class: 'st-field check' }, blush, el('span', { text: '腮红' })), el('label', { class: 'st-field check' }, blink, el('span', { text: '会眨眼（只有睁眼时）' })),
+    kids.push(group('表情', field('预设', comp),
+      el('div', { class: 'two' }, part('L', '左眼（画面右）', eyes), part('R', '右眼（画面左）', eyes)), part('mouth', '嘴', mouths),
+      el('label', { class: 'st-field check' }, blush, el('span', { text: '腮红' })), el('label', { class: 'st-field check' }, blink, el('span', { text: '眨眼（睁眼时）' })),
       l.face ? el('button', { class: 'st-btn small', type: 'button', onclick: () => set((x) => { x.face = null; }, 'reset') }, '回到预设') : null));
   } else {
-    kids.push(group(nameOf(l.type, l.component), el('label', { class: 'st-field' }, el('span', { text: '组件' }), comp),
+    kids.push(group(nameOf(l.type, l.component), field('组件', comp),
       meta?.description ? el('p', { class: 'st-note', text: meta.description }) : null,
-      el('div', { class: 'st-row' }, el('button', { class: 'st-btn small', type: 'button', onclick: () => setDock('code') }, '看 / 改代码'))));
+      el('div', { class: 'st-row' }, btn('编辑代码', '在代码面板里打开', () => setDock('code'), { cls: 'small', ico: 'code', ax: 'edit-code' }))));
   }
   if (l.type === 'wear') {                                     // 帽子默认戴在它本来的位置；这里可以挪、缩放、转
     const q = l.params || {}, def = { gx: 0, gy: 0, gz: 0, gs: 1, rx: 0, ry: 0, rz: 0 };
@@ -1261,7 +1321,7 @@ function renderInspector() {
     const rg = { gx: [-12, 12], gy: [-8, 14], gz: [-14, 14], gs: [0.3, 2.5], rx: [-90, 90], ry: [-180, 180], rz: [-90, 90] };
     kids.push(group('戴在哪', ...Object.keys(def).map((k) => control({ label: lab[k], min: rg[k][0], max: rg[k][1], step: k === 'gs' ? 0.02 : 0.5 }, q[k] ?? def[k], (v) => set((x) => { x.params = { ...x.params, [k]: v }; }, k), k)),
       el('div', { class: 'st-row' }, btn('复位', '回到帽子本来的位置', () => set((x) => { x.params = {}; }, 'reset'), { cls: 'small', ico: 'reset', ax: 'wear-reset' })),
-      el('p', { class: 'st-note', text: '单位是模型像素（头大约 8 像素宽）。默认就是帽子本来戴的位置。' })));
+      el('p', { class: 'st-note', text: '单位：模型像素' })));
   }
   if (l.type === 'prop') {
     const q = l.params || {}, sprite = !!metaOf('prop', l.component)?.sprite;
@@ -1269,7 +1329,7 @@ function renderInspector() {
     const lab = { x: '左右', y: '上下', z: '前后', rx: '前后翻', ry: '左右转', rz: '歪', s: '大小' };
     const rng = { x: [-12, 12], y: [-4, 16], z: [-22, 4], rx: [-180, 180], ry: [-180, 180], rz: [-180, 180], s: [0.2, 2] };
     kids.push(group('拿在哪', ...Object.keys(def).map((k) => control({ label: lab[k], min: rng[k][0], max: rng[k][1], step: k === 's' ? 0.02 : 0.1 }, q[k] ?? def[k], (v) => set((x) => { x.params = { ...x.params, [k]: v }; }, k), k)),
-      el('p', { class: 'st-note', text: '单位是模型像素，脸在 z = -10，头顶 y = 9。动作是「挥工具」「看书」这类时，道具由动作自己拿。' })));
+      el('p', { class: 'st-note', text: '单位：模型像素（脸 z = -10，头顶 y = 9）' })));
   }
   if (meta?.params && Object.keys(meta.params).length && l.type !== 'prop') {
     kids.push(group('参数', ...Object.entries(meta.params).filter(([, sp]) => !sp.hidden).map(([k, sp]) =>
@@ -1277,10 +1337,10 @@ function renderInspector() {
   }
   if (TIMED.has(l.type)) {
     kids.push(group('时间和强度',
-      control({ label: l.type === 'motion' ? '强度（0 = 不动，2 = 加倍）' : '不透明度', min: 0, max: l.type === 'motion' ? 2 : 1, step: 0.05 }, l.strength, (v) => set((x) => { x.strength = v; }, 'strength'), 'strength'),
-      control({ label: '从第几帧开始', min: 0, max: S.N - 1, type: 'int' }, Math.round(l.start * S.N), (v) => set((x) => { x.start = Math.min(v / S.N, x.end - 1 / S.N); }, 'start'), 'start'),
-      control({ label: '到第几帧结束', min: 1, max: S.N, type: 'int' }, Math.round(l.end * S.N), (v) => set((x) => { x.end = Math.max(v / S.N, x.start + 1 / S.N); }, 'end'), 'end'),
-      el('p', { class: 'st-note', text: '时间轴上也能直接拖条的两头。只动一段的动作，两头会自然过渡。' })));
+      control({ label: l.type === 'motion' ? '强度' : '不透明度', min: 0, max: l.type === 'motion' ? 2 : 1, step: 0.05 }, l.strength, (v) => set((x) => { x.strength = v; }, 'strength'), 'strength'),
+      control({ label: '起始帧', min: 0, max: S.N - 1, type: 'int' }, Math.round(l.start * S.N), (v) => set((x) => { x.start = Math.min(v / S.N, x.end - 1 / S.N); }, 'start'), 'start'),
+      control({ label: '结束帧', min: 1, max: S.N, type: 'int' }, Math.round(l.end * S.N), (v) => set((x) => { x.end = Math.max(v / S.N, x.start + 1 / S.N); }, 'end'), 'end'),
+    ));
   }
   fill(S.inspector, ...kids);
 }
@@ -1300,23 +1360,23 @@ function renderProjectInspector() {
   const st = S.store, P = st.p;
   const set = (fn, key) => quietly('inspector', () => st.change(fn, { coalesce: `proj:${key}` }));
   const skinMeta = metaOf('skin', P.skin.component);
-  const skinSel = el('select', { class: 'select' }, ...(S.catalog.get('skin') || []).map((m) => el('option', { value: m.id, text: m.name, selected: m.id === P.skin.component ? true : null })));
-  skinSel.addEventListener('change', () => st.change((p) => { p.skin = { component: skinSel.value, params: {} }; }));
-  const bgSel = el('select', { class: 'select', 'data-ax': 'field:background' }, ...[['white', '白色'], ['transparent', '透明（GIF 背景透明）'], ['color', '纯色'], ['gradient', '上下渐变']].map(([v, t]) => el('option', { value: v, text: t, selected: v === P.background.mode ? true : null })));
-  bgSel.addEventListener('change', () => st.change((p) => { p.background.mode = bgSel.value; }));
+  const skinSel = uiSelect({ options: (S.catalog.get('skin') || []).map((m) => [m.id, m.name]), value: P.skin.component, label: '皮肤', ax: 'field:skin',
+    onChange: (v) => st.change((p) => { p.skin = { component: v, params: {} }; }) });
+  const bgSel = uiSelect({ options: [['white', '白色'], ['transparent', '透明'], ['color', '纯色'], ['gradient', '上下渐变']], value: P.background.mode, label: '背景', ax: 'field:background',
+    onChange: (v) => st.change((p) => { p.background.mode = v; }) });
   fill(S.inspector, 
-    el('div', { class: 'st-insphead' }, el('b', { text: '工程设置' }), el('span', { class: 'st-grow' }), el('small', { class: 'st-note', text: '选中图层看它的属性' })),
+    el('div', { class: 'st-insphead' }, el('b', { text: '工程设置' })),
     group('画面',
       control({ label: '导出尺寸（像素）', min: 120, max: 800, type: 'int' }, P.size, (v) => set((p) => { p.size = v; }, 'size'), 'size'),
       control({ label: '帧率', min: 6, max: 30, type: 'int' }, P.fps, (v) => set((p) => { p.fps = v; }, 'fps'), 'fps'),
       control({ label: '一圈多少帧', min: 8, max: 120, type: 'int' }, P.frames, (v) => set((p) => { p.frames = v; }, 'frames'), 'frames'),
-      el('p', { class: 'st-note', text: `一圈 ${(P.frames / P.fps).toFixed(2)} 秒。正式表情是 48 帧 15 fps。` }),
-      control({ type: 'bool', label: '自己定封面（不勾 = 字刚好出全的那一帧）' }, typeof P.cover === 'number' ? 1 : 0, (v) => st.change((p) => { if (v) p.cover = Math.min(0.99, S.frame / p.frames); else delete p.cover; }), 'cover-own'),
-      typeof P.cover === 'number' ? control({ label: '封面在一圈里的位置（0～1）', min: 0, max: 0.99, step: 0.01 }, P.cover, (v) => set((p) => { p.cover = v; }, 'cover'), 'cover') : null,
-      el('label', { class: 'st-field' }, el('span', { text: '背景' }), bgSel),
+      el('p', { class: 'st-note', text: `时长 ${(P.frames / P.fps).toFixed(2)} s` }),
+      control({ type: 'bool', label: '自定封面帧' }, typeof P.cover === 'number' ? 1 : 0, (v) => st.change((p) => { if (v) p.cover = Math.min(0.99, S.frame / p.frames); else delete p.cover; }), 'cover-own'),
+      typeof P.cover === 'number' ? control({ label: '封面位置', min: 0, max: 0.99, step: 0.01 }, P.cover, (v) => set((p) => { p.cover = v; }, 'cover'), 'cover') : null,
+      field('背景', bgSel),
       P.background.mode === 'color' || P.background.mode === 'gradient' ? control({ label: P.background.mode === 'gradient' ? '上面的颜色' : '背景色', type: 'color' }, P.background.color, (v) => set((p) => { p.background.color = v; }, 'bgc'), 'bgc') : null,
       P.background.mode === 'gradient' ? control({ label: '下面的颜色', type: 'color' }, P.background.color2 || '#ffe3f0', (v) => set((p) => { p.background.color2 = v; }, 'bgc2'), 'bgc2') : null),
-    group('皮肤', el('label', { class: 'st-field' }, el('span', { text: '皮肤' }), skinSel),
+    group('皮肤', skinSel,
       ...Object.entries(skinMeta?.params || {}).map(([k, sp]) => control(sp, P.skin.params?.[k] ?? sp.default, (v) => set((p) => { p.skin.params = { ...p.skin.params, [k]: v }; }, `skin:${k}`), k))),
     group('镜头',
       control({ label: '朝向（度）', min: -180, max: 540, type: 'int' }, P.camera.yaw, (v) => set((p) => { p.camera.yaw = v; }, 'yaw'), 'yaw'),
@@ -1330,14 +1390,14 @@ function renderProjectInspector() {
       control({ type: 'color', label: '水的颜色' }, P.water.color, (v) => set((p) => { p.water.color = v; }, 'wc'), 'wc'),
       control({ type: 'bool', label: '气泡' }, P.water.bubbles ? 1 : 0, (v) => set((p) => { p.water.bubbles = !!v; }, 'wb'), 'wb'),
       control({ type: 'bool', label: '波纹' }, P.water.ripples ? 1 : 0, (v) => set((p) => { p.water.ripples = !!v; }, 'wr'), 'wr')),
-    group('待机（每个动作底下都有它）',
+    group('待机动作',
       control({ label: '抬头', min: -30, max: 50, type: 'int' }, P.idle.look, (v) => set((p) => { p.idle.look = v; }, 'look'), 'look'),
       control({ label: '鳃扇动', min: 0, max: 3, step: 0.05 }, P.idle.gill, (v) => set((p) => { p.idle.gill = v; }, 'gill'), 'gill'),
       control({ label: '尾巴摆', min: 0, max: 3, step: 0.05 }, P.idle.tail, (v) => set((p) => { p.idle.tail = v; }, 'tail'), 'tail'),
       control({ label: '划水', min: 0, max: 3, step: 0.05 }, P.idle.paddle, (v) => set((p) => { p.idle.paddle = v; }, 'paddle'), 'paddle'),
       control({ label: '上下浮', min: 0, max: 20, step: 0.5 }, P.idle.bob, (v) => set((p) => { p.idle.bob = v; }, 'bob'), 'bob')),
-    group('模型的大小和位置', modelControls('inspector')),
-    group('随机', control({ label: '随机种子（气泡、星星的位置）', min: 0, max: 999, type: 'int' }, P.seed, (v) => set((p) => { p.seed = v; }, 'seed'), 'seed')));
+    group('模型', modelControls('inspector')),
+    group('随机', control({ label: '随机种子', min: 0, max: 999, type: 'int' }, P.seed, (v) => set((p) => { p.seed = v; }, 'seed'), 'seed')));
 }
 
 // ---------------- 代码面板 ----------------
@@ -1764,7 +1824,7 @@ function proposeComponent(src, id) {
   ]);
 }
 
-function dialog(title, body, actions, { closeLabel = '关掉', onClose } = {}) {
+function dialog(title, body, actions, { closeLabel = '关闭', onClose } = {}) {
   const d = el('dialog', { class: 'st-dialog', 'aria-label': title, 'data-ax': 'dialog' });
   d.append(el('h2', { text: title }), ...body.flat().filter(Boolean),
     el('div', { class: 'st-dlgactions' }, ...actions.map(([t, f, cls, ax]) => el('button', { class: `btn ${cls || ''}`, type: 'button', 'data-ax': ax || 'dialog-action', onclick: async (e) => {
@@ -1794,19 +1854,19 @@ function askText(title, fields) {
 function showExport() {
   const P = S.store.p;
   let format = 'gif', size = P.size, colors = 0, maxKb = 1000, loops = 3;
-  const presets = [['原尺寸', P.size, 1000], ['微信表情 240', 240, 500], ['高清 800', 800, 4000]];
+  const presets = [['原尺寸', P.size, 1000], ['微信', 240, 500], ['高清', 800, 4000]];
   const presetBox = el('div', { class: 'chips' }, ...presets.map(([t, s, kb], i) => el('button', { class: 'chip', type: 'button', 'aria-pressed': String(i === 0), onclick: (e) => {
     size = s; maxKb = kb; sizeIn.value = s; kbIn.value = kb;
     for (const c of presetBox.children) c.setAttribute('aria-pressed', String(c === e.currentTarget));
   } }, `${t}（${s}px）`)));
-  const fmt = el('select', { class: 'select', 'data-ax': 'export-format' }, ...[['gif', 'GIF 动图'], ['video', '视频（MP4 / WebM，发朋友圈、短视频用）'], ['png-zip', '逐帧 PNG（zip）'], ['png', '当前这一帧 PNG']].map(([v, t]) => el('option', { value: v, text: t })));
+  const fmt = uiSelect({ options: [['gif', 'GIF 动图'], ['video', '视频（MP4 / WebM）'], ['png-zip', '逐帧 PNG（zip）'], ['png', '当前帧 PNG']], value: 'gif', label: '格式', ax: 'export-format' });
   const loopIn = el('input', { class: 'input', type: 'number', min: 1, max: 10, value: loops, 'data-ax': 'export-loops' });
   loopIn.addEventListener('change', () => { loops = Math.max(1, Math.min(10, Math.round(+loopIn.value) || 3)); loopIn.value = loops; });
-  const loopRow = el('label', { class: 'st-field', hidden: true }, el('span', { text: '视频里循环几遍（录的时候按真实时间走，别切走这个标签页）' }), loopIn);
+  const loopRow = el('label', { class: 'st-field', hidden: true, title: '按实际时长录制，录制时请停留在本页' }, el('span', { text: '循环次数' }), loopIn);
   fmt.addEventListener('change', () => { format = fmt.value; loopRow.hidden = format !== 'video'; });
   const sizeIn = el('input', { class: 'input', type: 'number', min: 64, max: 800, value: size, 'data-ax': 'export-size' });
   sizeIn.addEventListener('change', () => { size = Math.max(64, Math.min(800, Math.round(+sizeIn.value) || 400)); sizeIn.value = size; });   // 写回真正会用的值
-  const colSel = el('select', { class: 'select', 'data-ax': 'export-colors' }, ...[[0, '自动（64 色起，超大小就降）'], [256, '256 色'], [128, '128'], [64, '64'], [32, '32'], [16, '16']].map(([v, t]) => el('option', { value: v, text: t })));
+  const colSel = uiSelect({ options: [[0, '自动'], [256, '256 色'], [128, '128 色'], [64, '64 色'], [32, '32 色'], [16, '16 色']], value: 0, label: '颜色数', ax: 'export-colors' });
   colSel.addEventListener('change', () => { colors = +colSel.value; });
   const kbIn = el('input', { class: 'input', type: 'number', min: 100, max: 8000, value: maxKb, 'data-ax': 'export-maxkb' });
   kbIn.addEventListener('change', () => { maxKb = Math.max(100, Math.min(8000, Math.round(+kbIn.value) || 1000)); kbIn.value = maxKb; });
@@ -1815,13 +1875,13 @@ function showExport() {
   const result = el('div', { class: 'st-result' });
   dialog('导出', [
     el('h4', { text: '预设' }), presetBox,
-    el('div', { class: 'two' }, el('label', { class: 'st-field' }, el('span', { text: '格式' }), fmt), el('label', { class: 'st-field' }, el('span', { text: '边长（像素）' }), sizeIn)),
-    el('div', { class: 'two' }, el('label', { class: 'st-field' }, el('span', { text: '颜色数' }), colSel), el('label', { class: 'st-field' }, el('span', { text: '大小上限（KB）' }), kbIn)),
+    el('div', { class: 'two' }, field('格式', fmt), el('label', { class: 'st-field' }, el('span', { text: '边长（像素）' }), sizeIn)),
+    el('div', { class: 'two' }, field('颜色数', colSel), el('label', { class: 'st-field' }, el('span', { text: '大小上限（KB）' }), kbIn)),
     loopRow,
-    el('p', { class: 'st-note', text: `${P.frames} 帧 · ${P.fps} fps · 第一帧是封面${P.background.mode === 'transparent' ? ' · 透明背景' : ''}` }),
+    el('p', { class: 'st-note', text: `${P.frames} 帧 · ${P.fps} fps${P.background.mode === 'transparent' ? ' · 透明背景' : ''}` }),
     bar, result,
   ], [['开始导出', async () => {
-    bar.hidden = false; bar.firstElementChild.style.width = '0%'; fill(result, el('p', { class: 'st-note', text: '一帧一帧地画…' }));
+    bar.hidden = false; bar.firstElementChild.style.width = '0%'; fill(result, el('p', { class: 'st-note', text: '渲染中…' }));
     if (lastUrl) { URL.revokeObjectURL(lastUrl); lastUrl = null; }
     try {
       const r = await S.runner.request({ type: 'export', format, size, colors: colors || undefined, maxKb, loops }, (p) => { bar.firstElementChild.style.width = `${Math.round(p * 100)}%`; });
@@ -1832,7 +1892,7 @@ function showExport() {
       fill(result,
         format === 'video' ? el('video', { src: url, class: 'st-resultimg', controls: true, loop: true, autoplay: true, muted: true, playsinline: true, 'aria-label': '导出的视频' })
           : dataUrl ? el('img', { src: dataUrl, alt: '导出的结果', class: 'st-resultimg' }) : null,
-        el('p', { class: 'st-note', text: `${Math.round(blob.size / 1024)} KB · 电脑上点下载${dataUrl ? '，或者把图直接拖进 QQ' : ''}；手机微信里长按图片保存。` }),
+        el('p', { class: 'st-note', text: `${Math.round(blob.size / 1024)} KB${dataUrl ? ' · 可直接拖进 QQ' : ''}` }),
         el('div', { class: 'st-row' }, el('a', { class: 'btn primary', href: url, download: fname }, '下载'),
           navigator.canShare?.({ files: [new File([blob], fname, { type: r.mime })] }) ? el('button', { class: 'btn', type: 'button', onclick: () => navigator.share({ files: [new File([blob], fname, { type: r.mime })] }).catch(() => {}) }, '分享') : null));
     } catch (e) { fill(result, el('p', { class: 'st-warn', text: '导出失败：' + e.message })); }
@@ -1842,15 +1902,15 @@ function showExport() {
 }
 
 function showKeys() {
-  dialog('快捷键和自动化', [el('table', { class: 'st-keys' }, ...[
+  dialog('快捷键', [el('table', { class: 'st-keys' }, ...[
     ['空格', '播放 / 暂停'], ['← / →', '上一帧 / 下一帧'], ['Shift + ← / →', '跳 10 帧'], ['Home / End', '第一帧 / 最后一帧'],
     ['Ctrl + Z / Ctrl + Shift + Z', '撤销 / 重做'], ['Delete', '删掉选中的图层'], ['Esc', '取消选中'], ['O', '洋葱皮'],
-    ['Ctrl + D', '复制选中的图层'], ['Ctrl + C / Ctrl + V', '复制 / 粘贴图层（可以贴到别的工程里）'], ['[ / ]', '选中的图层往上 / 往下挪'],
-    ['在预览上拖', '挪选中的文字；没选中文字就挪模型'], ['滚轮 / 双指捏合', '缩放选中的文字或者模型'], ['Alt + 方向键', '一像素一像素地微调（加 Shift 一次 10 像素）'],
-    ['Ctrl + S', '保存工程文件（在代码里是「运行」）'], ['Ctrl + Enter', '运行代码'], ['拖文件进来', '打开工程 / 载入组件'],
+    ['Ctrl + D', '复制选中的图层'], ['Ctrl + C / Ctrl + V', '拷贝 / 粘贴图层'], ['[ / ]', '选中的图层往上 / 往下挪'],
+    ['在预览上拖', '移动选中的文字或模型'], ['滚轮 / 双指捏合', '缩放'], ['Alt + 方向键', '微调 1 px（加 Shift 10 px）'],
+    ['Ctrl + S', '保存为文件（代码里是运行）'], ['Ctrl + Enter', '运行代码'], ['拖文件进来', '打开工程 / 载入组件'],
   ].map(([k, v]) => el('tr', {}, el('td', {}, el('kbd', { text: k })), el('td', { text: v })))),
-  el('h4', {}, icon('robot', 'tiny'), ' 给 AI 助手 / 自动化脚本'),
-  el('p', { class: 'st-note', text: '能在页面里执行 JavaScript 的工具可以直接调 window.axo（比点按钮稳）：axo.help() 看全部接口，axo.state() 看当前状态，axo.layers.add(\'motion\', \'hop\') 加图层，axo.export() 导出 GIF。只能点按钮的工具：每个按钮都有中文名字和 data-ax 操作名。完整说明在网站根目录的 llms.txt。' }),
+  el('h4', {}, icon('robot', 'tiny'), ' 自动化'),
+  el('p', { class: 'st-note', text: '脚本可以直接调用 window.axo（axo.help() 查看接口），按钮都带 data-ax 操作名。' }),
   el('a', { href: 'llms.txt', target: '_blank', rel: 'noopener' }, '打开 llms.txt')], []);
 }
 
@@ -2012,7 +2072,7 @@ function randomize() {
 
 function onKey(e) {
   if (!S?.active || e.defaultPrevented) return;
-  if (e.target.closest('input, textarea, select, .cm-editor, dialog')) return;
+  if (e.target.closest('input, textarea, select, .cm-editor, dialog, [role="combobox"], [role="menu"]')) return;
   const k = e.key, mod = e.ctrlKey || e.metaKey;
   if (mod && k.length === 1) S.endLive?.();                    // Ctrl+S 存文件、Ctrl+C 复制图层这些只读工程：拖着的、滚轮还没算完的先写进去（光按住 Ctrl 不算：Ctrl+滚轮要接着滚）
   if (k === ' ') { setPlaying(!S.playing); e.preventDefault(); }

@@ -46,6 +46,7 @@ const P = {
   warn: 'M12 3.5L21.5 20h-19zM12 10v4.5M12 17.5h.01',
   search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4',
   more: 'M5 12h.01M12 12h.01M19 12h.01',
+  menu: 'M4 7h16M4 12h16M4 17h16',
   check: 'M5 12.5l4.5 4.5L19 7',
   sliders: 'M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1M15 4v4M9 10v4M17 16v4',
   close: 'M6 6l12 12M18 6L6 18',

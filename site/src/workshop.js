@@ -38,7 +38,7 @@ function render() {
 }
 
 export async function initWorkshop() {
-  if (!CONTRIBUTE) $('#ws-empty').replaceChildren(el('b', { text: '这里还空着' }), '先去创意工坊自己做一张吧。', el('br'), el('br'), el('a', { class: 'btn primary', href: '#/editor', text: '去做一张' }));   // 投稿入口关着：不招呼人来发布
+  if (!CONTRIBUTE) $('#ws-empty').replaceChildren(el('b', { text: '还没有作品' }), el('br'), el('a', { class: 'btn primary', href: '#/editor', text: '去创意工坊' }));   // 投稿入口关着：不招呼人来发布
   try { await loadWorkshop(); } catch (e) { loadFailed($('#ws-empty'), '工坊作品'); throw e; }
   loadOk($('#ws-empty'));
   const chips = $('#ws-sort');
