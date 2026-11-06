@@ -83,7 +83,7 @@ export function uiSelect({ options, value, label, prefix = null, ax = null, cls 
   b.options = opts;
   render();
 
-  let pop = null, active = -1, close = null, typed = '', typedAt = 0;
+  let pop = null, active = -1, close = null, typed = '', typedAt = 0, space = false;   // space：空格按下去已经处理过了，松开时浏览器补的那下 click 不算
   const items = () => [...pop.querySelectorAll('.ui-opt')];
   const setActive = (i, scroll = true) => {
     const list = items();
@@ -114,9 +114,11 @@ export function uiSelect({ options, value, label, prefix = null, ax = null, cls 
     close = show(b, pop, { onClose: () => { close = null; pop = null; b.removeAttribute('aria-activedescendant'); } });
     setActive(Math.max(0, opts.findIndex((o) => same(o.value, val))));
   };
-  b.addEventListener('click', () => (close ? close() : open()));
+  b.addEventListener('click', (e) => { if (space && e.detail === 0) return; if (close) close(); else open(); });
+  b.addEventListener('keyup', (e) => { if (e.key === ' ') setTimeout(() => { space = false; }); });
   b.addEventListener('keydown', (e) => {
     const k = e.key;
+    if (k === ' ') space = true;
     if (!close) {
       if (k === 'ArrowDown' || k === 'ArrowUp' || k === 'Enter' || k === ' ') { open(); e.preventDefault(); e.stopPropagation(); }
       return;

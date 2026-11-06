@@ -254,7 +254,7 @@ function build(root) {
   S.dockTabs = el('div', { class: 'st-docktabs' },
     el('div', { class: 'st-tablist', role: 'tablist', 'aria-label': '时间轴和代码' }, tab('timeline', '时间轴', 'layers'), tab('code', '代码', 'code')),
     el('span', { class: 'st-grow' }),
-    btn('加图层', '加一层', (e) => addMenu(e.currentTarget, e.detail === 0), { cls: 'small', ico: 'plus', ax: 'add-layer-menu' }));
+    Object.assign(btn('加图层', '加一层', (e) => addMenu(e.currentTarget, e.detail === 0), { cls: 'small', ico: 'plus', ax: 'add-layer-menu' }), { ariaHasPopup: 'menu' }));
   S.timeline = el('div', { class: 'st-timeline', role: 'region', 'aria-label': '时间轴' });
   S.codePane = el('div', { class: 'st-code', role: 'region', 'aria-label': '代码' });
   const dock = el('section', { class: 'st-dock' }, S.dockTabs, S.timeline, S.codePane);
@@ -2072,7 +2072,7 @@ function randomize() {
 
 function onKey(e) {
   if (!S?.active || e.defaultPrevented) return;
-  if (e.target.closest('input, textarea, select, .cm-editor, dialog, [role="combobox"], [role="menu"]')) return;
+  if (e.target.closest('input, textarea, select, .cm-editor, dialog, [role="menu"], [role="menubar"], [aria-haspopup]')) return;   // 下拉框、菜单按钮上的空格 / 回车是打开它，不是播放
   const k = e.key, mod = e.ctrlKey || e.metaKey;
   if (mod && k.length === 1) S.endLive?.();                    // Ctrl+S 存文件、Ctrl+C 复制图层这些只读工程：拖着的、滚轮还没算完的先写进去（光按住 Ctrl 不算：Ctrl+滚轮要接着滚）
   if (k === ' ') { setPlaying(!S.playing); e.preventDefault(); }

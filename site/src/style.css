@@ -254,7 +254,6 @@ html[data-route="editor"] #view-editor, html[data-route="workshop"] #view-worksh
 .boot-empty { display: grid; justify-items: center; gap: 12px; padding-top: 22vh; }
 .spin { width: 28px; height: 28px; border-radius: 50%; border: 3.5px solid var(--pink); border-right-color: transparent; animation: spin .8s linear infinite; }
 .section-title { font: 900 26px/1.2 var(--font-big); margin: 0 0 14px; letter-spacing: .02em; }
-.section-sub { margin: 0 0 18px; color: var(--ink-soft); }
 
 /* ---------------- gallery ---------------- */
 .toolbar { display: grid; gap: 12px; margin-bottom: 18px; }
