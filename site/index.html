@@ -36,22 +36,27 @@
   <!-- ======== 图鉴 ======== -->
   <section class="view" id="view-gallery" data-view="gallery">
     <div class="hero">
+      <div class="hero-bg" aria-hidden="true"></div>
       <div class="bubbles" aria-hidden="true"></div>
       <div class="hero-inner">
-        <div>
+        <div class="hero-text">
+          <p class="hero-eyebrow" aria-hidden="true"><span class="hero-dot"></span>AXOLOTL LAUNCHER · STICKER PACK</p>
           <h1 class="hero-h1"><span class="hero-fallback">美西螈表情包</span>
             <canvas class="hero-title" id="hero-title" width="1280" height="300" aria-hidden="true"></canvas></h1>
-          <p class="hero-copy">Axolotl Launcher 的美西螈动图表情包：<b>300 张</b> + 4 张初代 + 水龙卷特别篇，400×400 GIF，每张不到 1 MB。
-            群里答疑专用，不保证能解决问题，但能表达情绪。</p>
+          <p class="hero-tag">解决不了问题，<em>但能表达情绪。</em></p>
           <div class="hero-actions">
-            <a class="btn primary" id="zip-link" href="#">打包下载全部 <small id="zip-size"></small></a>
-            <a class="btn water" href="#/editor">去创意工坊做一张</a>
+            <a class="btn primary" id="zip-link" href="#">打包下载 <small id="zip-size"></small></a>
+            <a class="btn water" href="#/editor">创意工坊</a>
           </div>
         </div>
-        <figure class="hero-live" id="hero-live" aria-hidden="true">
-          <canvas width="512" height="512"></canvas>
-          <figcaption></figcaption>
-        </figure>
+        <div class="hero-stack" aria-hidden="true">
+          <img class="hero-chip c1" alt="" width="132" height="132" decoding="async">
+          <img class="hero-chip c2" alt="" width="112" height="112" decoding="async">
+          <figure class="hero-live" id="hero-live">
+            <canvas width="512" height="512"></canvas>
+            <figcaption></figcaption>
+          </figure>
+        </div>
       </div>
       <svg class="water-edge" viewBox="0 0 1200 34" preserveAspectRatio="none" aria-hidden="true">
         <path d="M0 14 Q 50 4 100 14 T 200 14 T 300 14 T 400 14 T 500 14 T 600 14 T 700 14 T 800 14 T 900 14 T 1000 14 T 1100 14 T 1200 14 V 34 H 0 Z" fill="#aadeff"/>
@@ -61,51 +66,47 @@
     <div class="water-band" aria-hidden="true"></div>
     <div class="wrap">
       <h2 class="section-title">图鉴</h2>
-      <p class="section-sub">鼠标放上去（手机上滑到）就会动；点开看大图、配方和下载。</p>
       <div class="toolbar">
         <div class="chips" id="cat-chips" role="group" aria-label="分类"></div>
         <div class="toolbar-row">
           <label class="search">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
             <span class="sr-only">搜索文字</span>
-            <input class="input" id="q" type="search" placeholder="搜文字，比如：下班" autocomplete="off">
+            <input class="input" id="q" type="search" placeholder="搜索文字" autocomplete="off">
           </label>
-          <label class="field"><span class="sr-only">动作</span><select class="select" id="f-motion"><option value="">全部动作</option></select></label>
+          <button class="ui-select" id="f-motion" type="button" disabled aria-label="动作"><span class="ui-select-text">全部动作</span><svg class="ui-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
           <div class="swatches" id="f-style" role="group" aria-label="字色"></div>
           <span class="result-count" id="count" aria-live="polite"></span>
         </div>
       </div>
       <div class="grid" id="grid"></div>
-      <div class="empty" id="g-empty" hidden><b>没有这张</b>换个词试试，或者去<a href="#/editor">创意工坊</a>自己做一张。</div>
+      <div class="empty" id="g-empty" hidden><b>没找到</b>换个词，或者去<a href="#/editor">创意工坊</a>做一张。</div>
     </div>
   </section>
 
   <!-- ======== 创意工坊 · 编辑器（studio/studio.js 按需加载） ======== -->
   <section class="view studio-view" id="view-editor" data-view="editor" hidden>
-    <div id="studio-root"><div class="empty boot-empty" role="status"><span class="spin" aria-hidden="true"></span><b>正在打开创意工坊…</b></div></div>
+    <div id="studio-root"><div class="empty boot-empty" role="status"><span class="spin" aria-hidden="true"></span><b>载入创意工坊…</b></div></div>
   </section>
 
   <!-- ======== 工坊作品 ======== -->
   <section class="view" id="view-workshop" data-view="workshop" hidden>
     <div class="wrap">
       <div class="ws-head">
-        <div>
-          <h2 class="section-title">工坊作品</h2>
-          <p class="section-sub" style="margin:0">大家在创意工坊里做的，GitHub Actions 用真引擎出的图。👍 是 GitHub issue 上的点赞，每 6 小时数一次。</p>
-        </div>
+        <h2 class="section-title">工坊作品</h2>
         <div class="chips" id="ws-sort" role="group" aria-label="排序">
           <button class="chip" data-sort="new" aria-pressed="true">最新</button>
           <button class="chip" data-sort="likes" aria-pressed="false">最多赞</button>
         </div>
       </div>
       <div class="grid" id="ws-grid"></div>
-      <div class="empty" id="ws-empty" hidden><b>还没有人发布</b>第一个发的可以自称开山鼻祖。<br><br><a class="btn primary" href="#/editor">去做一张</a></div>
+      <div class="empty" id="ws-empty" hidden><b>还没有作品</b><br><a class="btn primary" href="#/editor">去创意工坊</a></div>
     </div>
   </section>
 </main>
 
 <dialog class="detail" id="detail" aria-labelledby="d-title">
-  <button class="detail-close" id="d-close" aria-label="关闭">×</button>
+  <button class="detail-close" id="d-close" aria-label="关闭"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button>
   <div class="detail-body">
     <div class="detail-pic player" id="d-player"></div>
     <div>
@@ -123,7 +124,7 @@
   </div>
   <div class="detail-nav">
     <button class="btn" id="d-prev" type="button" title="Shift + ←">← 上一张</button>
-    <span class="hint keys">空格 暂停 · ←/→ 逐帧 · Shift+←/→ 换一张 · 图能直接拖进 QQ</span>
+    <span class="hint keys"><kbd>空格</kbd> 暂停 <kbd>←</kbd><kbd>→</kbd> 逐帧 <kbd>Shift</kbd>+<kbd>←</kbd><kbd>→</kbd> 换一张</span>
     <button class="btn" id="d-next" type="button" title="Shift + →">下一张 →</button>
   </div>
 </dialog>
@@ -134,8 +135,8 @@
     <path d="M0 14 Q 50 4 100 14 T 200 14 T 300 14 T 400 14 T 500 14 T 600 14 T 700 14 T 800 14 T 900 14 T 1000 14 T 1100 14 T 1200 14" fill="none" stroke="#fff" stroke-width="5" vector-effect="non-scaling-stroke"/>
   </svg>
   <div class="wrap">
-    <div>表情、代码和引擎都在 <a href="https://github.com/Axolotl-Launcher/AxoStickers" target="_blank" rel="noopener">Axolotl-Launcher/AxoStickers</a>，GPL-3.0-only。美西螈模型来自 <a href="https://github.com/Axolotl-Launcher/Axolotl" target="_blank" rel="noopener">Axolotl Launcher</a>，字体是思源黑体（SIL OFL 1.1）。</div>
-    <div>不含任何 Minecraft 游戏文件。Minecraft 是 Mojang Synergies AB 的商标，本项目与 Mojang 无关。</div>
+    <div><a href="https://github.com/Axolotl-Launcher/AxoStickers" target="_blank" rel="noopener">Axolotl-Launcher/AxoStickers</a> · GPL-3.0-only · 模型来自 <a href="https://github.com/Axolotl-Launcher/Axolotl" target="_blank" rel="noopener">Axolotl Launcher</a> · 字体 思源黑体（SIL OFL 1.1）</div>
+    <div>不含 Minecraft 游戏文件。Minecraft 是 Mojang Synergies AB 的商标，本项目与 Mojang 无关。</div>
   </div>
 </footer>
 <div class="toast" id="toast" role="status"></div>

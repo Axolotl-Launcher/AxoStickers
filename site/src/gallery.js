@@ -1,5 +1,6 @@
 // 图鉴：300 张 + 初代 + 水龙卷。分类、搜索、按动作 / 字色筛选；卡片先放缩略图，悬停或滑到才加载 GIF。
 import { CAT, STYLE_COLORS, $, el, pad3, encodePath, fxLabel, animated, gifName, dragOut } from './util.js';
+import { uiSelect } from './ui.js';
 
 export const G = { items: [], byKey: new Map(), visible: [], ready: null };
 const state = { cat: '', q: '', motion: '', style: '' };
@@ -28,7 +29,7 @@ export function loadGallery() {
 // 加载失败的提示单独放一块，不覆盖原来的空状态
 export function loadFailed(box, what) {
   loadOk(box); box.hidden = true;
-  box.before(el('div', { class: 'empty load-error' }, el('b', { text: `${what}没加载出来` }), '网络抖了一下，过会儿再试。', el('br'), el('br'),
+  box.before(el('div', { class: 'empty load-error' }, el('b', { text: `${what}加载失败` }), '请检查网络后重试。', el('br'), el('br'),
     el('button', { class: 'btn primary', type: 'button', text: '重试', onclick: () => location.reload() })));
 }
 export function loadOk(box) { box.parentElement.querySelector('.load-error')?.remove(); }
@@ -81,10 +82,11 @@ export async function initGallery() {
 
   const mc = {};
   for (const it of G.items) if (!it.special) mc[it.motion] = (mc[it.motion] || 0) + 1;
-  const sel = $('#f-motion');
-  Object.keys(mc).sort((a, b) => (CAT.motions[a]?.zh || a).localeCompare(CAT.motions[b]?.zh || b, 'zh-CN'))
-    .forEach((m) => sel.append(el('option', { value: m, text: `${CAT.motions[m]?.zh || m}（${mc[m]}）` })));
-  sel.addEventListener('change', () => { state.motion = sel.value; apply(); });
+  const motions = Object.keys(mc).sort((a, b) => (CAT.motions[a]?.zh || a).localeCompare(CAT.motions[b]?.zh || b, 'zh-CN'));
+  const ms = uiSelect({ options: [['', '全部动作'], ...motions.map((m) => [m, CAT.motions[m]?.zh || m, mc[m]])], value: '', label: '动作', ax: 'gallery-motion',
+    onChange: (v) => { state.motion = v; apply(); } });
+  ms.id = 'f-motion';
+  $('#f-motion').replaceWith(ms);                              // 页面上先放着一个一样大的占位按钮，换掉时不跳
 
   const sw = $('#f-style');
   for (const [k, zh] of Object.entries(CAT.styles)) {

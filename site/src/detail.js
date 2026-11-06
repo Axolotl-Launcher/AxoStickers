@@ -36,9 +36,9 @@ function fill() {
   $('#d-meta').textContent = meta;
   const dl = $('#d-recipe');
   dl.replaceChildren(...(kind === 'workshop' && it.desc ? [el('dt', { text: '说明' }), el('dd', { text: it.desc })] : []),   // 投稿时写的一句话（纯文本）
-    ...(it.series === '水龙卷' ? [el('dt', { text: '动作' }), el('dd', { text: '水龙卷（转着圈飞上天，又掉回来）' })]
-    : it.special && it.project ? [el('dt', { text: '来源' }), el('dd', { text: '初代表情包工具包里的原图' }), el('dt', { text: '工程' }), el('dd', { text: '照着原图的脚本在创意工坊里拼了一份（动作、道具、特效、文字动画都是编辑器里的组件），「在工坊里改一改」打开它' })]
-    : it.special ? [el('dt', { text: '来源' }), el('dd', { text: '初代表情包工具包里的原图（不是这个引擎出的，没有配方）' })]
+    ...(it.series === '水龙卷' ? [el('dt', { text: '动作' }), el('dd', { text: '水龙卷' })]
+    : it.special && it.project ? [el('dt', { text: '来源' }), el('dd', { text: '初代工具包原图' }), el('dt', { text: '工程' }), el('dd', { text: '已在创意工坊复刻，可直接改' })]
+    : it.special ? [el('dt', { text: '来源' }), el('dd', { text: '初代工具包原图（无配方）' })]
     : (kind === 'workshop' && !recipe) || (!it.special && it.summary) ? summaryRows(it.summary) : rows(recipe)));
   const down = $('#d-download');
   down.href = gif;
@@ -48,13 +48,12 @@ function fill() {
   remix.href = kind === 'workshop' ? `#/editor?w=${it.issue}` : it.project ? `#/editor?g=${encodeURIComponent(it.special ? it.slug : it.key)}` : '#/editor?r=' + encodeURIComponent(JSON.stringify(Object.fromEntries(['text', 'motion', 'face', 'fx', 'hold', 'wear', 'style', 'tmode', 'n', 's', 'debris', 'dir', 'flip', 'seed', 'idle', 'params'].filter((k) => it[k] !== undefined).map((k) => [k, it[k]]))));   // 动作参数和种子也带上，改一改时和原图一样
   const issue = $('#d-issue');
   issue.hidden = kind !== 'workshop';
-  if (kind === 'workshop') { issue.href = `https://github.com/${REPO}/issues/${it.issue}`; issue.textContent = `去 GitHub 点 👍（${it.likes || 0}）`; }
+  if (kind === 'workshop') { issue.href = `https://github.com/${REPO}/issues/${it.issue}`; issue.textContent = `👍 ${it.likes || 0} · GitHub`; }
   const note = $('#d-note');
   note.replaceChildren();
-  if (kind === 'workshop') note.append('想让它进下一版正式表情包？去 issue 里喊一声。');
-  else {
-    if (it.series === '水龙卷') note.append('水龙卷用到了原版 Minecraft 材质，没放进工坊，只能本地用引擎出（见 README）。 ');
-    note.append('全部 300 张 + 4 张初代 + 水龙卷打包：', el('a', { href: RELEASE.url, text: `Release zip（${RELEASE.size}）` }));
+  if (kind !== 'workshop') {
+    if (it.series === '水龙卷') note.append('用到原版 Minecraft 材质，只能本地出图（见 README）。 ');
+    note.append(el('a', { href: RELEASE.url, text: `打包下载全部（${RELEASE.size}）` }));
   }
   const i = list.indexOf(it);
   $('#d-prev').disabled = i <= 0; $('#d-next').disabled = i < 0 || i >= list.length - 1;
@@ -96,5 +95,5 @@ share.addEventListener('click', async () => {
     const src = $('#d-download').href, name = $('#d-download').download;
     const blob = await (await fetch(src)).blob();
     await navigator.share({ files: [new File([blob], name, { type: 'image/gif' })], title: $('#d-title').textContent });
-  } catch (e) { if (e.name !== 'AbortError') toast('分享没成功，长按图片保存试试'); }
+  } catch (e) { if (e.name !== 'AbortError') toast('分享失败，可以长按图片保存'); }
 });

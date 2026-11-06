@@ -63,9 +63,10 @@ axo.favorites.toggle('motion:hop');        // 收藏：键是「类型:id」，�
 - 等编辑器根节点 `.studio[data-state="ready"]` 出现再操作（`booting` = 沙盒还在启动，`error` = 没启动起来）。
 - 预览是沙盒 iframe 里的画布，读不到内容；看 `[data-ax="status"]`（读屏用的一句话，描述当前工程）和 `[data-ax="frame-counter"]`。
 - 按钮都有中文名字（aria-label），也有稳定的 `data-ax`：
-[[contribute]]   - 顶栏：`back` `project-name` `save-state`（自动保存的状态）`undo` `redo` `new` `open` `save` `projects`（我的工程）`random` `help` `share` `publish` `export`
-[[!contribute]]   - 顶栏：`back` `project-name` `save-state`（自动保存的状态）`undo` `redo` `new` `open` `save` `projects`（我的工程）`random` `help` `share` `export`
-  - 网站顶栏（图鉴 / 创意工坊 / 工坊作品）在编辑器里会收起来：鼠标移到窗口最上沿、或者 Tab 到导航时出来；自动化工具直接 `location.hash = '#/'` 换页就行
+[[contribute]]   - 顶栏：`back`（返回图鉴）`project-name` `save-state`（自动保存的状态）`undo` `redo` `random` `share` `publish` `export`；菜单栏 `menu:file` `menu:edit` `menu:view` `menu:help`（窄屏收成一个 `menu:all`），点开后里面有 `new` `open` `save` `projects`（我的工程）`help`
+[[!contribute]]   - 顶栏：`back`（返回图鉴）`project-name` `save-state`（自动保存的状态）`undo` `redo` `random` `share` `export`；菜单栏 `menu:file` `menu:edit` `menu:view` `menu:help`（窄屏收成一个 `menu:all`），点开后里面有 `new` `open` `save` `projects`（我的工程）`help`
+  - 编辑器占满整个窗口，不显示网站顶栏；换页点 `back`，或者直接 `location.hash = '#/'`
+  - 下拉框（`zoom` `stage-bg` `quality` `field:…` `export-format` `export-colors` `gallery-motion` 等）是自绘的 `role="combobox"` 按钮：点开后点 `[role="option"][data-value="值"]`；也可以给按钮的 `.value` 赋值再派发 `change` 事件
   - 预览：在 `.st-stage-box` 上拖 = 挪选中的文字（没选中文字就挪模型），滚轮缩放；`guides` 参考线开关
   - 模型的大小和位置（素材栏「模型」和工程设置里）：`field:model-scale` `field:model-x` `field:model-y` `field:model-rot`（数字框，加 `:range` 是滑块）、`model-flip` `model-reset`
   - 帽子的「戴在哪」：`field:gx` … `field:rz`、`wear-reset`；字色：`style:pink`… 和 `style:custom`（颜色选择器）；背景 `field:background`（white / transparent / color / gradient）
